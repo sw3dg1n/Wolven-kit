@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Numerics;
+using System.Text;
 using System.Windows.Forms;
 using BrightIdeasSoftware;
 using WeifenLuo.WinFormsUI.Docking;
@@ -373,6 +376,299 @@ namespace WolvenKit
         private void treeView_ItemsChanged(object sender, ItemsChangedEventArgs e)
         {
             MainController.Get().ProjectUnsaved = true;
+        }
+
+        private void addCurveFromSBUILogToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            List<Vector3> positions = new List<Vector3>();
+            List<Vector3> rotations = new List<Vector3>();
+            Vector3 initialTransformPos = new Vector3();
+            Vector3 initialTransformRot = new Vector3();
+
+            string line;
+
+            using (var fs = new FileStream(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\The Witcher 3\\scriptslog.txt", FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            using (var stream = new StreamReader(fs, Encoding.Default))
+                while ((line = stream.ReadLine()) != null)
+                {
+                    var str = line;
+
+                    // Initial position
+                    if (str.Contains("[W2SCENE]       #pos: [ "))
+                    {
+                        str = str.Remove(0, 24);
+                        str = str.Replace("]", "");
+
+                        initialTransformPos = StrToVec(str);
+                        positions.Clear();
+                        rotations.Clear();
+                    }
+                    // Initial rotation
+                    else if (str.Contains("[W2SCENE]       #rot: [ "))
+                    {
+                        str = str.Remove(0, 24);
+                        str = str.Replace("]", "");
+
+                        initialTransformRot = StrToVec(str);
+                    }
+                    // All curve positions / rotations
+                    else if (str.Contains("[W2SCENE]       - prop.placement: [0.0, "))
+                    {
+                        str = str.Remove(0, 40);
+                        str = str.Replace("[", "");
+                        str = str.Replace("]", "");
+
+                        string[] data = str.Split(',');
+
+                        Vector3 result = new Vector3(
+                            float.Parse(data[1]),
+                            float.Parse(data[2]),
+                            float.Parse(data[3]));
+
+
+                        Vector3 result2 = new Vector3(
+                            float.Parse(data[4]),
+                            float.Parse(data[6]),
+                            float.Parse(data[5]));
+
+                        positions.Add(result);
+                        rotations.Add(result2);
+                    }
+                }
+
+            // For curves that u want to be on the same level on Z axis
+            bool sameZ = false;
+            var boxresult = MessageBox.Show("Height value based on origin?", "Height", MessageBoxButtons.YesNo);
+            if (boxresult == DialogResult.Yes)
+            {
+                sameZ = true;
+            }
+
+            // ------------------------------------------------------------------------
+            List<Vector3> positionsV3 = new List<Vector3>();
+            positionsV3 = positions;
+
+            // calculate distances
+            float dist = 0;
+            float totalDist = 0;
+            List<float> distanceArray = new List<float>();
+            List<float> timeArray = new List<float>();
+            for (int i = 0; i < positionsV3.Count; i++)
+            {
+                if (i == 0)
+                {
+                    totalDist += Vector3.Distance(positionsV3[i], positionsV3[positionsV3.Count - 1]);
+                    distanceArray.Add(Vector3.Distance(positionsV3[i], positionsV3[positionsV3.Count - 1]));
+                }
+                else
+                {
+                    totalDist += Vector3.Distance(positionsV3[i - 1], positionsV3[i]);
+                    distanceArray.Add(Vector3.Distance(positionsV3[i - 1], positionsV3[i]));
+                }
+            }
+            for (int i = 0; i < distanceArray.Count; i++)
+            {
+                timeArray.Add(dist / totalDist);
+                dist += distanceArray[i];
+            }
+
+
+            // ------------------------------------------------------------------------
+            // Create the SCurveData Array
+            var node = (VariableListNode)treeView.SelectedObject;
+            if (node?.Variable == null || !node.Variable.CanAddVariable(null))
+            {
+                return;
+            }
+
+            var curveDataArray = CR2WTypeManager.Get().GetByName("array:2,0,SCurveData", "curves", Chunk.cr2w, false);
+
+            curveDataArray.Name = "curves";
+            curveDataArray.Type = "array:2,0,SCurveData";
+
+
+            // ------------------------------------------------------------------------
+            // Add 9 elements to SCurveData
+            for (int i = 0; i < 9; i++)
+            {
+                // new curve array element
+                var sCurveDataArrayVar = CR2WTypeManager.Get().GetByName("array:2,0,SCurveData", "", Chunk.cr2w, false);
+
+                CVariable curveValues = null;
+                curveValues = CR2WTypeManager.Get().GetByName("array:142,0,SCurveDataEntry", "Curve Values", Chunk.cr2w, false);
+                curveValues.Name = "Curve Values";
+                curveValues.Type = "array:142,0,SCurveDataEntry";
+
+                for (int j = 0; j < positionsV3.Count; j++)
+                {
+                    //-----------------------------------------------------------------------------------------------
+                    //-----------------------------------------------------------------------------------------------
+                    // CURVE VALUE SPECIAL
+                    CVariable curveValue = null;
+                    curveValue = CR2WTypeManager.Get().GetByName("array:142,0,SCurveDataEntry", "", Chunk.cr2w, false);
+
+                    curveValues.AddVariable(curveValue);
+
+                    // me
+                    CVariable me = null;
+                    me = CR2WTypeManager.Get().GetByName("Float", "me", Chunk.cr2w, false);
+                    me.Name = "me";
+                    me.Type = "Float";
+                    ((CFloat)me).val = timeArray[j];
+
+                    // ntrolPoint
+                    CVariable ntrolPoint = null;
+                    ntrolPoint = CR2WTypeManager.Get().GetByName("Vector", "ntrolPoint", Chunk.cr2w, false);
+                    ntrolPoint.Name = "ntrolPoint";
+                    ntrolPoint.Type = "Vector";
+
+                    CVariable x = null;
+                    x = CR2WTypeManager.Get().GetByName("Float", "X", Chunk.cr2w, false);
+                    x.Name = "X";
+                    x.Type = "Float";
+                    ((CFloat)x).val = (float)-0.1;
+                    CVariable y = null;
+                    y = CR2WTypeManager.Get().GetByName("Float", "Y", Chunk.cr2w, false);
+                    y.Name = "Y";
+                    y.Type = "Float";
+                    ((CFloat)y).val = 0;
+                    CVariable z = null;
+                    z = CR2WTypeManager.Get().GetByName("Float", "Z", Chunk.cr2w, false);
+                    z.Name = "Z";
+                    z.Type = "Float";
+                    ((CFloat)z).val = (float)0.1;
+                    CVariable w = null;
+                    w = CR2WTypeManager.Get().GetByName("Float", "W", Chunk.cr2w, false);
+                    w.Name = "W";
+                    w.Type = "Float";
+                    ((CFloat)w).val = 0;
+
+                    ((CVector)ntrolPoint).AddVariable(x);
+                    ((CVector)ntrolPoint).AddVariable(y);
+                    ((CVector)ntrolPoint).AddVariable(z);
+                    ((CVector)ntrolPoint).AddVariable(w);
+
+                    // lue
+                    CVariable lue = null;
+                    lue = CR2WTypeManager.Get().GetByName("Float", "lue", Chunk.cr2w, false);
+                    lue.Name = "lue";
+                    lue.Type = "Float";
+
+                    if (i == 0)
+                        ((CFloat)lue).val = positions[j].X;
+                    else if (i == 1)
+                        ((CFloat)lue).val = positions[j].Y;
+                    else if (i == 2)
+                    {
+                        if (sameZ)
+                            ((CFloat)lue).val = 0;
+                        else
+                            ((CFloat)lue).val = positions[j].Z;
+                    }
+                    else if (i == 3)
+                        ((CFloat)lue).val = rotations[j].X;
+                    else if (i == 4)
+                        ((CFloat)lue).val = rotations[j].Y;
+                    else if (i == 5)
+                        ((CFloat)lue).val = rotations[j].Z;
+                    else if (i > 5)
+                        ((CFloat)lue).val = 1;
+
+
+                    // rveTypeL
+                    CVariable rveTypeL = null;
+                    rveTypeL = CR2WTypeManager.Get().GetByName("Uint16", "rveTypeL", Chunk.cr2w, false);
+                    rveTypeL.Name = "rveTypeL";
+                    rveTypeL.Type = "Uint16";
+                    ((CUInt16)rveTypeL).val = 3;
+
+                    // rveTypeR
+                    CVariable rveTypeR = null;
+                    rveTypeR = CR2WTypeManager.Get().GetByName("Uint16", "rveTypeR", Chunk.cr2w, false);
+                    rveTypeR.Name = "rveTypeR";
+                    rveTypeR.Type = "Uint16";
+                    ((CUInt16)rveTypeR).val = 3;
+
+                    if (((CFloat)me).val != 0)
+                        ((CVariable)curveValue).AddVariable(me);
+                    ((CVariable)curveValue).AddVariable(ntrolPoint);
+                    if (((CFloat)lue).val != 0)
+                        ((CVariable)curveValue).AddVariable(lue);
+                    ((CVariable)curveValue).AddVariable(rveTypeL);
+                    ((CVariable)curveValue).AddVariable(rveTypeR);
+                    // END OF CURVE SPECIAL
+                    //-----------------------------------------------------------------------------------------------
+                    //-----------------------------------------------------------------------------------------------
+                }
+
+                // curve value type
+                CVariable valueType = null;
+                valueType = CR2WTypeManager.Get().GetByName("ECurveValueType", "value type", Chunk.cr2w, false);
+                valueType.Name = "value type";
+                valueType.Type = "ECurveValueType";
+                ((CName)valueType).Value = "CVT_Float";
+
+                // curve base type
+                CVariable baseType = null;
+                baseType = CR2WTypeManager.Get().GetByName("ECurveBaseType", "type", Chunk.cr2w, false);
+                baseType.Name = "type";
+                baseType.Type = "ECurveBaseType";
+                ((CName)baseType).Value = "CT_Smooth";
+
+                // is looped
+                CVariable isLooped = null;
+                isLooped = CR2WTypeManager.Get().GetByName("Bool", "is looped", Chunk.cr2w, false);
+                isLooped.Name = "is looped";
+                isLooped.Type = "Bool";
+                ((CBool)isLooped).val = true;
+
+                ((CVariable)sCurveDataArrayVar).AddVariable(curveValues);
+                ((CVariable)sCurveDataArrayVar).AddVariable(valueType);
+                ((CVariable)sCurveDataArrayVar).AddVariable(baseType);
+                ((CVariable)sCurveDataArrayVar).AddVariable(isLooped);
+
+                ((CVariable)curveDataArray).AddVariable(sCurveDataArrayVar);
+            }
+
+            // Add Initial Parent Transform variable            
+            node = (VariableListNode)treeView.SelectedObject;
+            CVariable initialParentTransform = null;
+            initialParentTransform = CR2WTypeManager.Get().GetByName("EngineTransform", "initialParentTransform", Chunk.cr2w, false);
+            initialParentTransform.Name = "initialParentTransform";
+            initialParentTransform.Type = "EngineTransform";
+            ((CEngineTransform)initialParentTransform).x.val = initialTransformPos.X;
+            ((CEngineTransform)initialParentTransform).y.val = initialTransformPos.Y;
+            ((CEngineTransform)initialParentTransform).z.val = initialTransformPos.Z;
+            ((CEngineTransform)initialParentTransform).pitch.val = initialTransformRot.X;
+            ((CEngineTransform)initialParentTransform).roll.val = initialTransformRot.Y;
+            ((CEngineTransform)initialParentTransform).yaw.val = initialTransformRot.Z;
+
+            AddAndRefresh(curveDataArray, node);
+            AddAndRefresh(initialParentTransform, node);
+        }
+
+
+        private void AddAndRefresh(CVariable varr, VariableListNode node)
+        {
+            node.Variable.AddVariable(varr);
+
+            var subnode = AddListViewItems(varr, node);
+            node.Children.Add(subnode);
+
+            treeView.RefreshObject(node);
+            treeView.RefreshObject(subnode);
+        }
+
+
+        private Vector3 StrToVec(string sVector)
+        {
+            string[] sArray = sVector.Split(',');
+            Vector3 result = new Vector3(
+                float.Parse(sArray[0]),
+                float.Parse(sArray[1]),
+                float.Parse(sArray[2]));
+
+            return result;
         }
     }
 }

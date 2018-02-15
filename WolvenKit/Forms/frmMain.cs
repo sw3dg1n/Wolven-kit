@@ -1400,19 +1400,25 @@ Would you like to open the problem steps recorder?", "Bug reporting", MessageBox
 
         private void packProjectAndLaunchGameToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var pack = PackAndInstallMod();
+            //var pack = PackAndInstallMod();
+            var pack = PackAndInstallMod(true);
             while (!pack.IsCompleted)
                 Application.DoEvents();
-            var getparams = new Input("Please give the commands to launch the game with!");
+            /*var getparams = new Input("Please give the commands to launch the game with!");
             if (getparams.ShowDialog() == DialogResult.OK)
             {
                 executeGame(getparams.Resulttext);
-            }
+            }*/
+
+            var gameparams = "-net -debugscripts";
+            executeGame(gameparams);
+
+
         }
         #endregion
 
         #region Mod Pack
-        private async Task PackAndInstallMod()
+        private async Task PackAndInstallMod(bool autoPack = false)
         {
             if (ActiveMod == null)
                 return;
@@ -1423,7 +1429,7 @@ Would you like to open the problem steps recorder?", "Bug reporting", MessageBox
             }
 
             var packsettings = new frmPackSettings();
-            if (packsettings.ShowDialog() == DialogResult.OK)
+            if (autoPack == true || packsettings.ShowDialog() == DialogResult.OK)
             {
                 btPack.Enabled = false;
                 ShowOutput();

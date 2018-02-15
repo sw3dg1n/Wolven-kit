@@ -52,6 +52,7 @@ namespace WolvenKit
             this.copyTextToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolSplitPtr = new System.Windows.Forms.ToolStripSeparator();
             this.ptrPropertiesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.addCurveFromSBUILogToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.treeView)).BeginInit();
             this.contextMenu.SuspendLayout();
             this.SuspendLayout();
@@ -116,95 +117,103 @@ namespace WolvenKit
             this.pasteToolStripMenuItem,
             this.copyTextToolStripMenuItem,
             this.toolSplitPtr,
-            this.ptrPropertiesToolStripMenuItem});
+            this.ptrPropertiesToolStripMenuItem,
+            this.addCurveFromSBUILogToolStripMenuItem});
             this.contextMenu.Name = "contextMenu";
-            this.contextMenu.Size = new System.Drawing.Size(185, 242);
+            this.contextMenu.Size = new System.Drawing.Size(207, 286);
             this.contextMenu.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenu_Opening);
             // 
             // expandAllToolStripMenuItem
             // 
             this.expandAllToolStripMenuItem.Name = "expandAllToolStripMenuItem";
-            this.expandAllToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
+            this.expandAllToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
             this.expandAllToolStripMenuItem.Text = "Expand All";
             this.expandAllToolStripMenuItem.Click += new System.EventHandler(this.expandAllToolStripMenuItem_Click);
             // 
             // expandAllChildrenToolStripMenuItem
             // 
             this.expandAllChildrenToolStripMenuItem.Name = "expandAllChildrenToolStripMenuItem";
-            this.expandAllChildrenToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
+            this.expandAllChildrenToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
             this.expandAllChildrenToolStripMenuItem.Text = "Expand All Children";
             this.expandAllChildrenToolStripMenuItem.Click += new System.EventHandler(this.expandAllChildrenToolStripMenuItem_Click);
             // 
             // collapseAllToolStripMenuItem
             // 
             this.collapseAllToolStripMenuItem.Name = "collapseAllToolStripMenuItem";
-            this.collapseAllToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
+            this.collapseAllToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
             this.collapseAllToolStripMenuItem.Text = "Collapse All";
             this.collapseAllToolStripMenuItem.Click += new System.EventHandler(this.collapseAllToolStripMenuItem_Click);
             // 
             // collapseAllChildrenToolStripMenuItem
             // 
             this.collapseAllChildrenToolStripMenuItem.Name = "collapseAllChildrenToolStripMenuItem";
-            this.collapseAllChildrenToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
+            this.collapseAllChildrenToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
             this.collapseAllChildrenToolStripMenuItem.Text = "Collapse All Children";
             this.collapseAllChildrenToolStripMenuItem.Click += new System.EventHandler(this.collapseAllChildrenToolStripMenuItem_Click);
             // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(181, 6);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(203, 6);
             // 
             // addVariableToolStripMenuItem
             // 
             this.addVariableToolStripMenuItem.Name = "addVariableToolStripMenuItem";
-            this.addVariableToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
+            this.addVariableToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
             this.addVariableToolStripMenuItem.Text = "Add Variable";
             this.addVariableToolStripMenuItem.Click += new System.EventHandler(this.addVariableToolStripMenuItem_Click);
             // 
             // removeVariableToolStripMenuItem
             // 
             this.removeVariableToolStripMenuItem.Name = "removeVariableToolStripMenuItem";
-            this.removeVariableToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
+            this.removeVariableToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
             this.removeVariableToolStripMenuItem.Text = "Remove Variable";
             this.removeVariableToolStripMenuItem.Click += new System.EventHandler(this.removeVariableToolStripMenuItem_Click);
             // 
             // toolStripMenuItem2
             // 
             this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-            this.toolStripMenuItem2.Size = new System.Drawing.Size(181, 6);
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(203, 6);
             // 
             // copyToolStripMenuItem
             // 
             this.copyToolStripMenuItem.Name = "copyToolStripMenuItem";
-            this.copyToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
+            this.copyToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
             this.copyToolStripMenuItem.Text = "Copy Variable";
             this.copyToolStripMenuItem.Click += new System.EventHandler(this.copyToolStripMenuItem_Click);
             // 
             // pasteToolStripMenuItem
             // 
             this.pasteToolStripMenuItem.Name = "pasteToolStripMenuItem";
-            this.pasteToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
+            this.pasteToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
             this.pasteToolStripMenuItem.Text = "Paste Variable";
             this.pasteToolStripMenuItem.Click += new System.EventHandler(this.pasteToolStripMenuItem_Click);
             // 
             // copyTextToolStripMenuItem
             // 
             this.copyTextToolStripMenuItem.Name = "copyTextToolStripMenuItem";
-            this.copyTextToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
+            this.copyTextToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
             this.copyTextToolStripMenuItem.Text = "Copy Text";
             this.copyTextToolStripMenuItem.Click += new System.EventHandler(this.copyTextToolStripMenuItem_Click);
             // 
             // toolSplitPtr
             // 
             this.toolSplitPtr.Name = "toolSplitPtr";
-            this.toolSplitPtr.Size = new System.Drawing.Size(181, 6);
+            this.toolSplitPtr.Size = new System.Drawing.Size(203, 6);
             // 
             // ptrPropertiesToolStripMenuItem
             // 
             this.ptrPropertiesToolStripMenuItem.Name = "ptrPropertiesToolStripMenuItem";
-            this.ptrPropertiesToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
+            this.ptrPropertiesToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
             this.ptrPropertiesToolStripMenuItem.Text = "Ptr Properties";
             this.ptrPropertiesToolStripMenuItem.Click += new System.EventHandler(this.ptrPropertiesToolStripMenuItem_Click);
+            // 
+            // addCurveFromSBUILogToolStripMenuItem
+            // 
+            this.addCurveFromSBUILogToolStripMenuItem.Name = "addCurveFromSBUILogToolStripMenuItem";
+            this.addCurveFromSBUILogToolStripMenuItem.Size = new System.Drawing.Size(206, 22);
+            this.addCurveFromSBUILogToolStripMenuItem.Text = "Add Curve from SBUI log";
+            this.addCurveFromSBUILogToolStripMenuItem.Click += new System.EventHandler(this.addCurveFromSBUILogToolStripMenuItem_Click);
             // 
             // frmChunkProperties
             // 
@@ -246,5 +255,6 @@ namespace WolvenKit
         private ToolStripSeparator toolSplitPtr;
         private ToolStripMenuItem ptrPropertiesToolStripMenuItem;
         private ToolStripMenuItem copyTextToolStripMenuItem;
+        private ToolStripMenuItem addCurveFromSBUILogToolStripMenuItem;
     }
 }
