@@ -566,7 +566,7 @@ namespace WolvenKit
             this.stringsEncoderGUIToolStripMenuItem.Image = global::WolvenKit.Properties.Resources.edit_letter_spacing;
             this.stringsEncoderGUIToolStripMenuItem.Name = "stringsEncoderGUIToolStripMenuItem";
             this.stringsEncoderGUIToolStripMenuItem.Size = new System.Drawing.Size(178, 22);
-            this.stringsEncoderGUIToolStripMenuItem.Text = "Strings Encoder GUI";
+            this.stringsEncoderGUIToolStripMenuItem.Text = "Strings Encoder";
             this.stringsEncoderGUIToolStripMenuItem.Click += new System.EventHandler(this.StringsGUIToolStripMenuItem_Click);
             // 
             // gameDebuggerToolStripMenuItem

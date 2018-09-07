@@ -1744,7 +1744,7 @@ Would you like to open the problem steps recorder?", "Bug reporting", MessageBox
                         stringsGui = new frmStringsGui();
                     if (stringsGui.AreHashesDifferent())
                     {
-                        var result = MessageBox.Show("There are not encoded CSV files in your mod, do you want to open Strings Encoder GUI?", "", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+                        var result = MessageBox.Show("There are not encoded CSV files in your mod, do you want to open Strings Encoder?", "", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
                         if (result == DialogResult.Yes)
                             stringsGui.ShowDialog();
                     }

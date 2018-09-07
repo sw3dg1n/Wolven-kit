@@ -396,7 +396,7 @@
             this.MainMenuStrip = this.menuStrip1;
             this.MinimumSize = new System.Drawing.Size(1200, 39);
             this.Name = "frmStringsGui";
-            this.Text = "Automated Strings GUI";
+            this.Text = "Strings Encoder";
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.toolStrip1.ResumeLayout(false);
