@@ -108,15 +108,18 @@ namespace WolvenKit.W3Strings
                 }
             }
 
-            var dlc = Path.Combine(exedir, @"..\..\DLC\");
+            var dlc = Path.Combine(exedir, @"..\..\dlc\");
             try
             {
                 foreach (var dir in Directory.GetDirectories(dlc))
                 {
-                    var strs = GetdirectoriesDebug(dir, Language + ".w3strings", SearchOption.AllDirectories);
-                    foreach (var file in strs)
+                    foreach (var subDir in Directory.GetDirectories(dlc))
                     {
-                        OpenFile(file);
+                        var strs = Directory.GetFiles(Path.Combine(dir, @"content\"), Language + ".w3strings");
+                        foreach (var file in strs)
+                        {
+                            OpenFile(file);
+                        }
                     }
                 }
             }
