@@ -43,7 +43,11 @@ namespace WolvenKit
             foreach (ListViewItem item in listViewStrings.SelectedItems)
             {
                 var stringWithID = strings.Find(x => x.Contains(item.Text));
-                stringsWithIDs.Add(Convert.ToInt32(stringWithID[0]), stringWithID[2]);
+                if (!stringsWithIDs.ContainsKey(Convert.ToInt32(stringWithID[0])))
+                {
+                    stringsWithIDs.Add(Convert.ToInt32(stringWithID[0]), stringWithID[2]);
+                }
+                
             }
 
             idDialog.PassStrings(stringsWithIDs);
@@ -132,7 +136,7 @@ namespace WolvenKit
 
         private void LoadGameStrings()
         {
-            stringsManager.Load(comboBoxLanguage.SelectedItem.ToString(), Path.GetDirectoryName(MainController.Get().Configuration.ExecutablePath));
+            //stringsManager.Load(comboBoxLanguage.SelectedItem.ToString(), Path.GetDirectoryName(MainController.Get().Configuration.ExecutablePath));
 
             foreach (var line in stringsManager.Lines)
             {
