@@ -21,6 +21,9 @@ namespace WolvenKit
         GROUP
     }
 
+    /// <summary>
+    /// The main strings encoder form.
+    /// </summary>
     public partial class frmStringsGui : Form
     {
         int counter = 0;
@@ -46,6 +49,9 @@ namespace WolvenKit
 
         Mod.W3Mod activeMod = MainController.Get().Window.ActiveMod;
 
+        /// <summary>
+        /// Initializes the form and reads CSV files if it finds any in \\strings\\CSV.
+        /// </summary>
         public frmStringsGui()
         {
             InitializeComponent();
@@ -119,6 +125,11 @@ namespace WolvenKit
             toolStrip Buttons
         */
 
+        /// <summary>
+        /// Saves strings to CSV if there are any, shows an error message otherwise.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void toolStripButtonSave_Click(object sender, EventArgs e)
         {
             if (dataGridViewStrings.Rows.Count != 1)
@@ -127,21 +138,41 @@ namespace WolvenKit
                 MessageBox.Show("Current file is empty.", "Wolven Kit", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
         }
 
+        /// <summary>
+        /// Opens a CSV file.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void toolStripButtonOpen_Click(object sender, EventArgs e)
         {
             OpenCSV();
         }
 
+        /// <summary>
+        /// Generates strings from menu xml. The menu should not contain custom localization tags.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void toolStripButtonGenerateXML_Click(object sender, EventArgs e)
         {
             GenerateFromXML();
         }
 
+        /// <summary>
+        /// Generates strings from script files - grabs string keys with a specified prefix.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void toolStripButtonGenerateScripts_Click(object sender, EventArgs e)
         {
             ReadScripts();
         }
 
+        /// <summary>
+        /// Encodes strings to w3string file(s).
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void toolStripButtonEncode_Click(object sender, EventArgs e)
         {
             if (dataGridViewStrings.Rows.Count != 1)
@@ -150,6 +181,11 @@ namespace WolvenKit
                 MessageBox.Show("Current file is empty.", "Wolven Kit", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
         }
 
+        /// <summary>
+        /// Opens the importer, which can be used to explore existing w3string files and import from them.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void toolStripButtonImport_Click(object sender, EventArgs e)
         {
             ImportW3Strings();
@@ -159,21 +195,41 @@ namespace WolvenKit
             toolStrip Menus
         */
 
+        /// <summary>
+        /// Switches visibility of the ID column.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void idToolStripMenuItem_Click(object sender, EventArgs e)
         {
             idToolStripMenuItem.Checked = dataGridViewStrings.Columns[0].Visible = !idToolStripMenuItem.Checked;
         }
 
+        /// <summary>
+        /// Switches visibility of the hex key column.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void hexKeyToolStripMenuItem_Click(object sender, EventArgs e)
         {
             hexKeyToolStripMenuItem.Checked = dataGridViewStrings.Columns[1].Visible = !hexKeyToolStripMenuItem.Checked;
         }
 
+        /// <summary>
+        /// Switches visibility of the string key column.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void stringKeyToolStripMenuItem_Click(object sender, EventArgs e)
         {
             stringKeyToolStripMenuItem.Checked = dataGridViewStrings.Columns[2].Visible = !stringKeyToolStripMenuItem.Checked;
         }
 
+        /// <summary>
+        /// Creates a new strings project, asks to save changes if necessary.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void newToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (dataGridViewStrings.Visible == false)
@@ -193,21 +249,41 @@ namespace WolvenKit
             languagesStrings.Clear();
         }
 
+        /// <summary>
+        /// Opens a CSV file.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
             OpenCSV();
         }
 
+        /// <summary>
+        /// Opens the importer, which can be used to explore existing w3string files and import from them.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void importToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ImportW3Strings();
         }
 
+        /// <summary>
+        /// Generates strings from menu xml. The menu should not contain custom localization tags.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void fromXMLToolStripMenuItem_Click(object sender, EventArgs e)
         {
             GenerateFromXML();
         }
 
+        /// <summary>
+        /// Generates strings from script files - grabs string keys with a specified prefix.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void fromScriptsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ReadScripts();
@@ -217,12 +293,22 @@ namespace WolvenKit
             Other 
         */
 
+        /// <summary>
+        /// Verifies the entered mod ID and uses it if valid.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void textBoxModID_Leave(object sender, EventArgs e)
         {
             FillModIDIfValid();
             currentModID = textBoxModID.Text;
         }
 
+        /// <summary>
+        /// Event to save ID changes with Enter.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void textBoxModID_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyData == Keys.Enter)
@@ -231,6 +317,11 @@ namespace WolvenKit
             }
         }
 
+        /// <summary>
+        /// Fires up when the cell is validated, checks for mod ID, calculates final IDs and hex keys.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void dataGridViewStrings_CellValidated(object sender, DataGridViewCellEventArgs e)
         {
             if (rowAddedAutomatically)
@@ -252,11 +343,21 @@ namespace WolvenKit
             fileIsSaved = false;
         }
 
+        /// <summary>
+        /// Recalculates IDs for rows when row is deleted.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void dataGridViewStrings_UserDeletedRow(object sender, DataGridViewRowEventArgs e)
         {
             UpdateModID();
         }
 
+        /// <summary>
+        /// Switches languages mode between English and separate languages.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void comboBoxLanguagesMode_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (abortedSwitchingBackToAllLanguages)
@@ -332,6 +433,10 @@ namespace WolvenKit
             End of events
         */
 
+        /// <summary>
+        /// Calculates Fowler–Noll–Vo based hash of string keys, used as hex key.
+        /// Similar to FNV-1 with addition instead of XOR.
+        /// </summary>
         private void HashStringKeys()
         {
             foreach (DataGridViewRow row in dataGridViewStrings.Rows)
@@ -353,6 +458,9 @@ namespace WolvenKit
             }
         }
 
+        /// <summary>
+        /// Gets strings from strings manager that were selected in importer.
+        /// </summary>
         private void ImportW3Strings()
         {
             if (textBoxModID.Text == "")
@@ -384,6 +492,11 @@ namespace WolvenKit
             UpdateModID();
         }
 
+        /// <summary>
+        /// Checks for valid mod ID, asks for one if needed.
+        /// If ID is valid it generates strings from menu xml. 
+        /// The menu should not contain custom localization tags.
+        /// </summary>
         private void GenerateFromXML()
         {
             if (textBoxModID.Text != "" && FillModIDIfValid())
@@ -392,12 +505,19 @@ namespace WolvenKit
                 AskForModID();
         }
 
+        /// <summary>
+        /// Shows a message asking to enter mod ID.
+        /// </summary>
         private void AskForModID()
         {
             MessageBox.Show("Enter mod ID.", "Wolven Kit", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
             textBoxModID.Text = "";
         }
 
+        /// <summary>
+        /// Dialog that gets the prefix used for grabbing keys from scripts.
+        /// </summary>
+        /// <returns>The selected prefix, "Cancelled" if user cancells.</returns>
         public string ShowScriptPrefixDialog()
         {
             frmStringsGuiScriptsPrefixDialog testDialog = new frmStringsGuiScriptsPrefixDialog();
@@ -412,6 +532,9 @@ namespace WolvenKit
             return prefix;
         }
 
+        /// <summary>
+        /// Walks recursively through scripts, grabs the key IDs and generates string rows from them.
+        /// </summary>
         private void ReadScripts()
         {
             if (textBoxModID.Text == "")
@@ -501,6 +624,9 @@ namespace WolvenKit
             HashStringKeys();
         }
 
+        /// <summary>
+        /// Gets the menu file path and reads it, generates string rows.
+        /// </summary>
         private void ReadXML()
         {
             rowAddedAutomatically = true;
@@ -577,6 +703,10 @@ namespace WolvenKit
             UpdateModID();
         }
 
+        /// <summary>
+        /// Dialog that gets menu XML path.
+        /// </summary>
+        /// <returns>The XML path, empty string if user cancelled.</returns>
         private string GetXMLPath()
         {
             OpenFileDialog ofd = new OpenFileDialog();
@@ -589,6 +719,11 @@ namespace WolvenKit
                 return "";
         }
 
+        /// <summary>
+        /// Gets string key for option group.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         private List<string> DisplayNameToKeyGroup(string name)
         {
             char[] nameConverted = name.ToCharArray(0, name.Length);
@@ -624,6 +759,11 @@ namespace WolvenKit
             return stringKeys;
         }
 
+        /// <summary>
+        /// Gets string key for option.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         private string DisplayNameToKey(string name)
         {
             char[] nameConverted = name.ToCharArray(0, name.Length);
@@ -643,6 +783,11 @@ namespace WolvenKit
             return stringKey;
         }
 
+        /// <summary>
+        /// Checks if mod ID is valid.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         private bool IsIDValid(string id)
         {
             char[] digits = new char[10] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', };
@@ -672,6 +817,11 @@ namespace WolvenKit
             return false;
         }
 
+        /// <summary>
+        /// Checks if multiple mod IDs are valid.
+        /// </summary>
+        /// <param name="splittedIDs"></param>
+        /// <returns></returns>
         private bool AreAllIDsValid(string[] splittedIDs)
         {
             foreach (string modID in splittedIDs)
@@ -685,6 +835,10 @@ namespace WolvenKit
             return true;
         }
 
+        /// <summary>
+        /// Verifies the entered mod ID and uses it if valid.
+        /// </summary>
+        /// <returns></returns>
         private bool FillModIDIfValid()
         {
             modIDs.Clear();
@@ -734,6 +888,9 @@ namespace WolvenKit
             return true;
         }
 
+        /// <summary>
+        /// Recalculates IDs for rows when row is deleted.
+        /// </summary>
         private void UpdateModID()
         {
             rowAddedAutomatically = true;
@@ -760,6 +917,9 @@ namespace WolvenKit
             rowAddedAutomatically = false;
         }
 
+        /// <summary>
+        /// Saves strings to CSV.
+        /// </summary>
         private void SaveCSV()
         {
             dataGridViewStrings.EndEdit();
@@ -869,6 +1029,10 @@ namespace WolvenKit
             fileIsSaved = true;
         }
 
+        /// <summary>
+        /// Dialog that gets folder path.
+        /// </summary>
+        /// <returns></returns>
         private string GetPath()
         {
             FolderBrowserDialog fbw = new FolderBrowserDialog();
@@ -880,6 +1044,9 @@ namespace WolvenKit
                 return "";
         }
 
+        /// <summary>
+        /// Creates the source for dataGridViewStrings.
+        /// </summary>
         private void CreateDataTable()
         {
             if (dataTableGridViewSource == null)
@@ -901,9 +1068,12 @@ namespace WolvenKit
                 foreach (DataGridViewColumn column in dataGridViewStrings.Columns)
                     column.SortMode = DataGridViewColumnSortMode.NotSortable;
             }
-
         }
 
+        /// <summary>
+        /// Parses the string IDs from CSV.
+        /// </summary>
+        /// <param name="rows"></param>
         private void GetCSVIDs(List<string[]> rows)
         {
             modIDs.Clear();
@@ -934,6 +1104,11 @@ namespace WolvenKit
                 textBoxModID.Text = Convert.ToString(modIDs[0]);
         }
 
+        /// <summary>
+        /// Parses the CSV, removes invalid rows.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns>Rows as a List of string[]</returns>
         private List<string[]> ParseCSV(string path)
         {
             List<string[]> rows = File.ReadAllLines(path, Encoding.UTF8).Select(x => x.Split('|')).ToList();
@@ -953,6 +1128,9 @@ namespace WolvenKit
             return rows;
         }
 
+        /// <summary>
+        /// Opens a CSV file.
+        /// </summary>
         private void OpenCSV()
         {
             rowAddedAutomatically = true;
@@ -1009,6 +1187,9 @@ namespace WolvenKit
             rowAddedAutomatically = false;
         }
 
+        /// <summary>
+        /// Encodes strings to w3string file(s).
+        /// </summary>
         private void Encode()
         {
             dataGridViewStrings.EndEdit();
@@ -1089,7 +1270,11 @@ namespace WolvenKit
             MessageBox.Show("Strings encoded.", "Wolven Kit", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
         }
 
-        // to check for not encoded csvs, function from Sound_Cache.cs (FNV1A64)
+        /// <summary>
+        /// Hash used to check for not encoded csvs, function from Sound_Cache.cs (FNV1A64)
+        /// </summary>
+        /// <param name="bytes">Bytes to hash.</param>
+        /// <returns></returns>
         private ulong CalculateHash(byte[] bytes)
         {
             const ulong fnv64Offset = 0xcbf29ce484222325;
@@ -1103,7 +1288,11 @@ namespace WolvenKit
             return hash;
         }
 
-        private void WriteHash(string type) // encoded strings hash/csv hash
+        /// <summary>
+        /// Wrotes encoded strings/csv hash.
+        /// </summary>
+        /// <param name="type">"encoded" or "csv"</param>
+        private void WriteHash(string type) // 
         {
             var toHash = "";
             var outputPath = "";
@@ -1176,6 +1365,10 @@ namespace WolvenKit
             }
         }
 
+        /// <summary>
+        /// Compares hashes of encoded strings and CSV.
+        /// </summary>
+        /// <returns>Comparison result.</returns>
         public bool AreHashesDifferent()
         {
             if (activeMod == null)
@@ -1216,6 +1409,11 @@ namespace WolvenKit
             return false;
         }
 
+        /// <summary>
+        /// Fires up when languages mode is selected. Populates strings for each language.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void tabControlLanguages_Selected(object sender, TabControlEventArgs e)
         {
             if (e.TabPage == null)
@@ -1258,6 +1456,9 @@ namespace WolvenKit
         }
     }
 
+    /// <summary>
+    /// Encapsulates a language with its strings.
+    /// </summary>
     class LanguageStringsCollection
     {
         public string language;
