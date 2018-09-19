@@ -11,11 +11,17 @@ using WolvenKit.Common;
 using Newtonsoft.Json;
 using System.ComponentModel;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
+using System.Threading;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
+using SharpRaven;
+using SharpRaven.Data;
 using WolvenKit.Mod;
 
 namespace WolvenKit
@@ -162,6 +168,37 @@ namespace WolvenKit
             return mainController;
         }
 
+        private static void CurrentDomainOnUnhandledException(object sender, UnhandledExceptionEventArgs unhandledExceptionEventArgs)
+        {
+            ReportException((Exception)unhandledExceptionEventArgs.ExceptionObject);
+            Environment.Exit(0);
+        }
+
+        private static void ApplicationThreadException(object sender, ThreadExceptionEventArgs e)
+        {
+            ReportException(e.Exception);
+            
+        }
+
+        public static void ReportException(Exception ex)
+        {
+            if (mainController.Window?.ActiveMod != null)
+            {
+                //TODO: Add more stuff here that may be helpfull with exceptions.
+                if (mainController?.Window?.ActiveDocument != null)
+                {
+                    ex.Data.Add("File",mainController.Window.ActiveDocument.FileName);
+                }
+                else
+                {
+                    ex.Data.Add("File","None");
+                }
+            }
+            var ravenClient = new RavenClient("https://29cb2f2a742643e2bfd52392e7999a8f@sentry.io/1284016");
+            ravenClient.Release = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
+            ravenClient.Capture(new SentryEvent(ex));
+        }
+
         /// <summary>
         /// Initializes the archive managers in an async thread
         /// </summary>
@@ -170,6 +207,9 @@ namespace WolvenKit
         {
             try
             {
+                Application.ThreadException += ApplicationThreadException;
+                Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
+                AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;
                 loadStatus = "Loading string manager";
                 #region Load string manager
                 var sw = new System.Diagnostics.Stopwatch();

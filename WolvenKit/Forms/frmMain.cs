@@ -18,6 +18,8 @@ using ICSharpCode.SharpZipLib.Core;
 using ICSharpCode.SharpZipLib.Zip;
 using Newtonsoft.Json;
 using SharpPresence;
+using SharpRaven;
+using SharpRaven.Data;
 using WeifenLuo.WinFormsUI.Docking;
 using WolvenKit.CR2W;
 using WolvenKit.CR2W.Types;
@@ -92,7 +94,7 @@ namespace WolvenKit
             hotkeys.RegisterHotkey(Keys.F1, HKHelp, "Help");
             hotkeys.RegisterHotkey(Keys.Control | Keys.C, HKCopy, "Copy");
             hotkeys.RegisterHotkey(Keys.Control | Keys.V, HKPaste,"Paste");            
-            MainController.Get().InitForm(this);
+            MainController.Get().InitForm(this);           
         }
 
         private delegate void strDelegate(string t);
@@ -541,7 +543,7 @@ namespace WolvenKit
         {
             if (ActiveMod != null)
             {
-                if(ActiveMod.LastOpenedFiles != null)
+                if(ActiveMod.LastOpenedFiles != null && OpenDocuments != null)
                     ActiveMod.LastOpenedFiles = OpenDocuments.Select(x => x.File.FileName).ToList();
                 var ser = new XmlSerializer(typeof(W3Mod));
                 var modfile = new FileStream(ActiveMod.FileName, FileMode.Create, FileAccess.Write);
@@ -1045,6 +1047,46 @@ namespace WolvenKit
         #endregion //Methods
 
         #region  Control events
+        private void ModWwiseNew_Click(object sender, EventArgs e)
+        {
+            using (var of = new OpenFileDialog())
+            {
+                of.Multiselect = true;
+                of.Filter = "Wwise files | *.wem;*.bnk";
+                of.Title = "Please select the wwise bank and sound files for importing them into your mod";
+                if(of.ShowDialog() == DialogResult.OK)
+                {
+                    foreach (var f in of.FileNames)
+                    {
+                        var newfilepath = Path.Combine(ActiveMod.ModDirectory, new SoundManager().TypeName, Path.GetFileName(f));
+                        //Create the directory because it will crash if it doesn't exist.
+                        Directory.CreateDirectory(Path.GetDirectoryName(newfilepath));
+                        File.Copy(f, newfilepath, true);
+                    }
+                }
+            }
+        }
+
+        private void DLCWwise_Click(object sender, EventArgs e)
+        {
+            using (var of = new OpenFileDialog())
+            {
+                of.Multiselect = true;
+                of.Filter = "Wwise files | *.wem;*.bnk";
+                of.Title = "Please select the wwise bank and sound files for importing them into your DLC";
+                if (of.ShowDialog() == DialogResult.OK)
+                {
+                    foreach (var f in of.FileNames)
+                    {
+                        var newfilepath = Path.Combine(ActiveMod.DlcDirectory, new SoundManager().TypeName,"dlc", ActiveMod.Name, Path.GetFileName(f));
+                        //Create the directory because it will crash if it doesn't exist.
+                        Directory.CreateDirectory(Path.GetDirectoryName(newfilepath));
+                        File.Copy(f, newfilepath, true);
+                    }
+                }
+            }
+        }
+
         private void richpresenceworker_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
         {
             string project = "non";
@@ -2390,50 +2432,5 @@ Would you like to open the problem steps recorder?", "Bug reporting", MessageBox
             #endregion
         }
         #endregion // Mod Pack
-
-        private void wwiseSoundbankToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void ModWwiseNew_Click(object sender, EventArgs e)
-        {
-            using (var of = new OpenFileDialog())
-            {
-                of.Multiselect = true;
-                of.Filter = "Wwise files | *.wem;*.bnk";
-                of.Title = "Please select the wwise bank and sound files for importing them into your mod";
-                if(of.ShowDialog() == DialogResult.OK)
-                {
-                    foreach (var f in of.FileNames)
-                    {
-                        var newfilepath = Path.Combine(ActiveMod.ModDirectory, new SoundManager().TypeName, Path.GetFileName(f));
-                        //Create the directory because it will crash if it doesn't exist.
-                        Directory.CreateDirectory(Path.GetDirectoryName(newfilepath));
-                        File.Copy(f, newfilepath, true);
-                    }
-                }
-            }
-        }
-
-        private void DLCWwise_Click(object sender, EventArgs e)
-        {
-            using (var of = new OpenFileDialog())
-            {
-                of.Multiselect = true;
-                of.Filter = "Wwise files | *.wem;*.bnk";
-                of.Title = "Please select the wwise bank and sound files for importing them into your DLC";
-                if (of.ShowDialog() == DialogResult.OK)
-                {
-                    foreach (var f in of.FileNames)
-                    {
-                        var newfilepath = Path.Combine(ActiveMod.DlcDirectory, new SoundManager().TypeName,"dlc", ActiveMod.Name, Path.GetFileName(f));
-                        //Create the directory because it will crash if it doesn't exist.
-                        Directory.CreateDirectory(Path.GetDirectoryName(newfilepath));
-                        File.Copy(f, newfilepath, true);
-                    }
-                }
-            }
-        }
     }
 }
