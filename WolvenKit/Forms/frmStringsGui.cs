@@ -448,8 +448,11 @@ namespace WolvenKit
                     return;
                 char[] keyConverted = key.ToCharArray();
                 uint hash = 0;
-                foreach (char c in keyConverted)
+
+                for (int i = 0; i < keyConverted.Count(); ++i)
                 {
+                    char c = keyConverted[i];
+                    c = Char.ToLower(c);
                     hash *= 31;
                     hash += (uint)c;
                 }
@@ -1280,6 +1283,7 @@ namespace WolvenKit
             const ulong fnv64Offset = 0xcbf29ce484222325;
             const ulong fnv64Prime = 0x100000001b3;
             ulong hash = fnv64Offset;
+
             foreach (var b in bytes)
             {
                 hash = hash ^ b;
