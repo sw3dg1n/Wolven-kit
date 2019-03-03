@@ -457,6 +457,13 @@ namespace WolvenKit
                     hash += (uint)c;
                 }
                 string hex_key = hash.ToString("X");
+
+                const int targetLength = 8;
+                int currentLength = hex_key.Count();
+                for (int i = 0; i < targetLength - currentLength; ++i)
+                {
+                    hex_key = hex_key.Insert(0, "0");
+                }
                 row.Cells[1].Value = hex_key;
             }
         }
@@ -775,13 +782,17 @@ namespace WolvenKit
             stringKey += "option_";
 
             for (int i = 0; i < nameConverted.Length; ++i)
+            {
                 if (nameConverted[i] == ' ')
                 {
                     nameConverted[i] = '_';
                     stringKey += nameConverted[i];
                 }
                 else
+                {
                     stringKey += nameConverted[i];
+                }
+            }
 
             return stringKey;
         }
