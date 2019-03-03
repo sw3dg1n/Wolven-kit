@@ -675,9 +675,9 @@ namespace WolvenKit
                     {
                         String name = var.Attribute("displayName").Value;
                         if (counter > idsLimit)
-                            dataTableGridViewSource.Rows.Add(counter + 2110000000 + modIDs[1] * 1000, "", DisplayNameToKey(name), name);
+                            dataTableGridViewSource.Rows.Add(counter + 2110000000 + modIDs[1] * 1000, "", DisplayNameToKey(name, true), name);
                         else
-                            dataTableGridViewSource.Rows.Add(counter + 2110000000 + modIDs[0] * 1000, "", DisplayNameToKey(name), name);
+                            dataTableGridViewSource.Rows.Add(counter + 2110000000 + modIDs[0] * 1000, "", DisplayNameToKey(name, true), name);
 
                         ++counter;
                     }
@@ -774,12 +774,20 @@ namespace WolvenKit
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        private string DisplayNameToKey(string name)
+        private string DisplayNameToKey(string name, bool optionsArray = false)
         {
             char[] nameConverted = name.ToCharArray(0, name.Length);
             string stringKey = "";
 
-            stringKey += "option_";
+            if (!optionsArray)
+            {
+                stringKey += "option_";
+            }
+            else
+            {
+                stringKey += "preset_value_";
+            }
+            
 
             for (int i = 0; i < nameConverted.Length; ++i)
             {
