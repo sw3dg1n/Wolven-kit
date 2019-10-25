@@ -333,6 +333,12 @@
     <Compile Include="Forms\frmCreateInstaller.Designer.cs">
       <DependentUpon>frmCreateInstaller.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\frmW2XBatchProcessor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\frmW2XBatchProcessor.Designer.cs">
+      <DependentUpon>frmW2XBatchProcessor.cs</DependentUpon>
+    </Compile>
     <Compile Include="WitcherListViewItem.cs" />
     <Compile Include="Commonfunctions.cs" />
     <Compile Include="Forms\frmAbout.cs">
@@ -679,6 +685,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmUsmPlayer.resx">
       <DependentUpon>frmUsmPlayer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\frmW2XBatchProcessor.resx">
+      <DependentUpon>frmW2XBatchProcessor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\frmWCCLicense.resx">
       <DependentUpon>frmWCCLicense.cs</DependentUpon>
