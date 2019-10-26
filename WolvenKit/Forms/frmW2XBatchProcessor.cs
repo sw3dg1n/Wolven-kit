@@ -26,7 +26,7 @@ namespace WolvenKit.Forms
 
             InitializeComponent();
 
-            ShowLog();
+            showLog();
         }
 
         private void frmW2XBatchProcessor_Load(object sender, EventArgs e)
@@ -34,7 +34,7 @@ namespace WolvenKit.Forms
 
         }
 
-        private void ShowLog()
+        private void showLog()
         {
             if (log == null || log.IsDisposed)
             {
@@ -48,20 +48,38 @@ namespace WolvenKit.Forms
         private void startBatch_Click(object sender, EventArgs e)
         {
 
-            ShowLog();
+            showLog();
 
-            foreach (String relativeModFilePath in activeMod.Files)
+            foreach (string relativeModFilePath in activeMod.Files)
             {
-                String absoluteModFilePath = activeMod.FileDirectory + Path.DirectorySeparatorChar + relativeModFilePath;
+                string absoluteModFilePath = activeMod.FileDirectory + Path.DirectorySeparatorChar + relativeModFilePath;
 
                 if (!File.Exists(absoluteModFilePath))
                 {
-                    // TODO show in log
+                    log.AddText("File '" + absoluteModFilePath + "' does not exist.\n", frmOutput.Logtype.Error);
+
                     continue;
                 }
 
-                log.AddText(absoluteModFilePath + "\n", frmOutput.Logtype.Normal);
+                string fileExtension = Path.GetExtension(absoluteModFilePath);
 
+                if (!fileExtension.Equals(".w2ent") && !fileExtension.Equals(".w2p") && !fileExtension.Equals(".w2mesh") && !fileExtension.Equals(".w2l")  )
+                {
+                    continue;
+                }
+
+                CR2WFile file = loadFile(absoluteModFilePath);
+
+                if (file == null)
+                {
+                    log.AddText("File '" + absoluteModFilePath + "' could not be loaded.\n", frmOutput.Logtype.Error);
+
+                    continue;
+                }
+
+                log.AddText("Successfully loaded file '" + absoluteModFilePath + "\n", frmOutput.Logtype.Success);
+
+                
                 //var doc = new frmCR2WDocument();
 
                 //try
@@ -91,6 +109,25 @@ namespace WolvenKit.Forms
         private void dockPanel_ActiveContentChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private CR2WFile loadFile(string filePath)
+        {
+            CR2WFile file = null;
+
+            using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+            {
+                using (var reader = new BinaryReader(stream))
+                {
+                    file = new CR2WFile(reader)
+                    {
+                        FileName = filePath,
+                        LocalizedStringSource = MainController.Get()
+                    };
+                }
+            }
+
+            return file;
         }
     }
 }
