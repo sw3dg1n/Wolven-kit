@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
 using WolvenKit.CR2W;
+using WolvenKit.CR2W.BatchProcessors;
 using WolvenKit.CR2W.Types;
 using WolvenKit.Mod;
 
@@ -47,7 +48,6 @@ namespace WolvenKit.Forms
 
         private void startBatch_Click(object sender, EventArgs e)
         {
-
             showLog();
 
             foreach (string relativeModFilePath in activeMod.Files)
@@ -61,73 +61,44 @@ namespace WolvenKit.Forms
                     continue;
                 }
 
-                string fileExtension = Path.GetExtension(absoluteModFilePath);
+                W2XFilePatcher filePatcher;
 
-                if (!fileExtension.Equals(".w2ent") && !fileExtension.Equals(".w2p") && !fileExtension.Equals(".w2mesh") && !fileExtension.Equals(".w2l")  )
+                switch (Path.GetExtension(absoluteModFilePath))
                 {
+                    case ".w2ent":
+                        // TODO: sdkfd
+                        continue;
+                    case ".w2p":
+                        filePatcher = new W2PFilePatcher(absoluteModFilePath, MainController.Get());
+                        break;
+                    case ".w2mesh":
+                        // TODO: sdkfd
+                        continue;
+                    case ".w2l":
+                        // TODO: sdkfd
+                        continue;
+                    default:
+                        continue;
+                }
+
+                try
+                {
+                    filePatcher.PatchForIncreasedDrawDistance();
+                }
+                catch (Exception ex)
+                {
+                    log.AddText(ex.Message, frmOutput.Logtype.Error);
+
                     continue;
                 }
 
-                CR2WFile file = loadFile(absoluteModFilePath);
-
-                if (file == null)
-                {
-                    log.AddText("File '" + absoluteModFilePath + "' could not be loaded.\n", frmOutput.Logtype.Error);
-
-                    continue;
-                }
-
-                log.AddText("Successfully loaded file '" + absoluteModFilePath + "\n", frmOutput.Logtype.Success);
-
-                
-                //var doc = new frmCR2WDocument();
-
-                //try
-                //{
-                //    doc.LoadFile(absoluteModFilePath);
-                //}
-                //catch (InvalidFileTypeException ex)
-                //{
-
-                //    // TODO log ex.Message
-
-                //    doc.Dispose();
-
-                //    continue;
-                //}
-                //catch (MissingTypeException ex)
-                //{
-                //    // TODO log ex.Message
-
-                //    doc.Dispose();
-
-                //    continue;
-                //}
+                log.AddText("Successfully processed file '" + absoluteModFilePath + "\n", frmOutput.Logtype.Success);
             }
         }
 
         private void dockPanel_ActiveContentChanged(object sender, EventArgs e)
         {
 
-        }
-
-        private CR2WFile loadFile(string filePath)
-        {
-            CR2WFile file = null;
-
-            using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
-            {
-                using (var reader = new BinaryReader(stream))
-                {
-                    file = new CR2WFile(reader)
-                    {
-                        FileName = filePath,
-                        LocalizedStringSource = MainController.Get()
-                    };
-                }
-            }
-
-            return file;
         }
     }
 }

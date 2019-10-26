@@ -90,6 +90,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BatchProcessors\W2PBatchProcessor.cs" />
+    <Compile Include="BatchProcessors\W2XBatchProcessor.cs" />
     <Compile Include="CR2WChunk.cs" />
     <Compile Include="CR2WCopyAction.cs" />
     <Compile Include="CR2WFile.cs" />
