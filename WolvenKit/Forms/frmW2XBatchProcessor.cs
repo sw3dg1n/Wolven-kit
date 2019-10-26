@@ -87,7 +87,7 @@ namespace WolvenKit.Forms
                 }
                 catch (Exception ex)
                 {
-                    log.AddText(ex.Message, frmOutput.Logtype.Error);
+                    log.AddText(ex.Message + "\n", frmOutput.Logtype.Error);
 
                     continue;
                 }
