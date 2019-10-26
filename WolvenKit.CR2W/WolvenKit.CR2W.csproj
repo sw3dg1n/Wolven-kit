@@ -90,6 +90,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FilePatchers\W2EntFilePatcher.cs" />
     <Compile Include="FilePatchers\W2PFilePatcher.cs" />
     <Compile Include="FilePatchers\W2XFilePatcher.cs" />
     <Compile Include="CR2WChunk.cs" />

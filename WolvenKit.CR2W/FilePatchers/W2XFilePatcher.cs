@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WolvenKit.CR2W.Types;
 
 namespace WolvenKit.CR2W.BatchProcessors
 {
@@ -18,9 +19,10 @@ namespace WolvenKit.CR2W.BatchProcessors
             this.localizedStringSource = localizedStringSource;
         }
 
+        // TODO probably change return type to void
         public abstract bool PatchForIncreasedDrawDistance();
 
-        protected CR2WFile ReadCR2WFile()
+        protected static CR2WFile ReadCR2WFile(string filePath, ILocalizedStringSource localizedStringSource)
         {
             CR2WFile file = null;
 
@@ -39,7 +41,7 @@ namespace WolvenKit.CR2W.BatchProcessors
             return file;
         }
 
-        protected void WriteCR2WFile(CR2WFile file)
+        protected static void WriteCR2WFile(CR2WFile file, string filePath)
         {
             using (var stream = new MemoryStream())
             {
@@ -55,5 +57,48 @@ namespace WolvenKit.CR2W.BatchProcessors
                 }
             }
         }
+
+        protected static CR2WFile ReadSharedDataBuffer(CByteArray sharedDataBuffer, ILocalizedStringSource localizedStringSource)
+        {
+            CR2WFile file = null;
+
+            using (var stream = new MemoryStream(sharedDataBuffer.Bytes))
+            {
+                using (var reader = new BinaryReader(stream))
+                {
+                    file = new CR2WFile(reader)
+                    {
+                        FileName = sharedDataBuffer.cr2w.FileName + ":" + sharedDataBuffer.FullName,
+                        LocalizedStringSource = localizedStringSource
+                    };
+                }
+            }
+
+            return file;
+        }
+
+        //private void OpenEditorFor(CVariable editvar)
+        //{
+        //    byte[] bytes = null;
+
+        //    if (editvar is IByteSource)
+        //    {
+        //        bytes = ((IByteSource)editvar).Bytes;
+        //    }
+
+        //    if (bytes != null)
+        //    {
+        //        var doc = LoadDocument(editvar.cr2w.FileName + ":" + editvar.FullName, new MemoryStream(bytes), true);
+        //        if (doc != null)
+        //        {
+        //            doc.OnFileSaved += OnVariableEditorSave;
+        //            doc.SaveTarget = editvar;
+        //        }
+        //        else
+        //        {
+        //            OpenHexEditorFor(editvar);
+        //        }
+        //    }
+        //}
     }
 }

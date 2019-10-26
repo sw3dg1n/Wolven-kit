@@ -11,6 +11,7 @@ using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
 using WolvenKit.CR2W;
 using WolvenKit.CR2W.BatchProcessors;
+using WolvenKit.CR2W.FilePatchers;
 using WolvenKit.CR2W.Types;
 using WolvenKit.Mod;
 
@@ -66,17 +67,17 @@ namespace WolvenKit.Forms
                 switch (Path.GetExtension(absoluteModFilePath))
                 {
                     case ".w2ent":
-                        // TODO: sdkfd
+                        filePatcher = new W2EntFilePatcher(absoluteModFilePath, MainController.Get());
+                        break;
+                    case ".w2l":
+                        // TODO add
+                        continue;
+                    case ".w2mesh":
+                        // TODO add
                         continue;
                     case ".w2p":
                         filePatcher = new W2PFilePatcher(absoluteModFilePath, MainController.Get());
                         break;
-                    case ".w2mesh":
-                        // TODO: sdkfd
-                        continue;
-                    case ".w2l":
-                        // TODO: sdkfd
-                        continue;
                     default:
                         continue;
                 }

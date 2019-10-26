@@ -9,7 +9,7 @@ namespace WolvenKit.CR2W.BatchProcessors
 {
     public sealed class W2PFilePatcher : W2XFilePatcher
     {
-        private const string chunkTypeCParticleSystem = "CParticleSystem";
+        private const string typeCParticleSystem = "CParticleSystem";
 
         private const string variableNameAutoHideDistance = "autoHideDistance";
         private const string variableNameDistance = "distance";
@@ -25,7 +25,7 @@ namespace WolvenKit.CR2W.BatchProcessors
 
         public override bool PatchForIncreasedDrawDistance()
         {
-            CR2WFile file = ReadCR2WFile();
+            CR2WFile file = ReadCR2WFile(filePath, localizedStringSource);
 
             if (file == null)
             {
@@ -36,16 +36,21 @@ namespace WolvenKit.CR2W.BatchProcessors
 
             foreach (CR2WChunk chunk in file.chunks)
             {
-                if (!chunk.Type.Equals(chunkTypeCParticleSystem))
+                if (!chunk.Type.Equals(typeCParticleSystem))
                 {
                     continue;
+                }
+                else if (cParticleSystemFound)
+                {
+                    // TODO not sure if this is a valid or invalid case
+                    throw new System.InvalidOperationException("File '" + filePath + "' contains more than one chunk of type '" + typeCParticleSystem + "'.");
                 }
 
                 cParticleSystemFound = true;
 
                 if (chunk.data == null || !(chunk.data is CVector))
                 {
-                    throw new System.InvalidOperationException("File '" + filePath + "' contains either no or invalid chunk data for type '" + chunkTypeCParticleSystem + "' and could thus not be patched.");
+                    throw new System.InvalidOperationException("File '" + filePath + "' contains either no or invalid chunk data for type '" + typeCParticleSystem + "' and could thus not be patched.");
                 }
 
                 CVector chunkData = (CVector)chunk.data;
@@ -75,10 +80,10 @@ namespace WolvenKit.CR2W.BatchProcessors
 
             if (!cParticleSystemFound)
             {
-                throw new System.InvalidOperationException("File '" + filePath + "' contains chunk of type '" + chunkTypeCParticleSystem + "' and could thus not be patched.");
+                throw new System.InvalidOperationException("File '" + filePath + "' contains no chunk of type '" + typeCParticleSystem + "' and could thus not be patched.");
             }
 
-            WriteCR2WFile(file);
+            WriteCR2WFile(file, filePath);
 
             return true;
         }
@@ -93,16 +98,16 @@ namespace WolvenKit.CR2W.BatchProcessors
             return variable is CArray && variable.Name.Equals(variableNameLODs);
         }
 
-        private static void patchAutoHideDistance(CVariable variable)
+        private static void patchAutoHideDistance(CVariable variableAutoHideDistance)
         {
-            ((CFloat)variable).SetValue(valueAutoHideDistanceIDD);
+            ((CFloat)variableAutoHideDistance).SetValue(valueAutoHideDistanceIDD);
         }
 
-        private static void patchLODs(CVariable variable)
+        private static void patchLODs(CVariable variableLODs)
         {
             float valueLODIDD = valueLOD1IDD;
 
-            foreach (CVariable lodEntry in ((CArray)variable).array)
+            foreach (CVariable lodEntry in ((CArray)variableLODs).array)
             {
                 if (lodEntry is CVector && ((CVector)lodEntry).variables != null)
                 {
