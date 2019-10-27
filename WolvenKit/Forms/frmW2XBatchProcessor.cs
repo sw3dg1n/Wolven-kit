@@ -19,6 +19,11 @@ namespace WolvenKit.Forms
 {
     public partial class frmW2XBatchProcessor : Form
     {
+        private const string FileExtensionW2Ent = ".w2ent";
+        private const string FileExtensionW2L = ".w2l";
+        private const string FileExtensionW2Mesh = ".w2mesh";
+        private const string FileExtensionW2P = ".w2p";
+        
         private W3Mod activeMod;
         private frmOutput log;
 
@@ -28,7 +33,7 @@ namespace WolvenKit.Forms
 
             InitializeComponent();
 
-            showLog();
+            ShowLog();
         }
 
         private void frmW2XBatchProcessor_Load(object sender, EventArgs e)
@@ -36,7 +41,7 @@ namespace WolvenKit.Forms
 
         }
 
-        private void showLog()
+        private void ShowLog()
         {
             if (log == null || log.IsDisposed)
             {
@@ -49,7 +54,10 @@ namespace WolvenKit.Forms
 
         private void startBatch_Click(object sender, EventArgs e)
         {
-            showLog();
+            ShowLog();
+
+            // TODO
+            // List<string> relativeW2EntFilePathsForFires = GetRelativeW2EntFilePathsForFires(activeMod.Files);
 
             foreach (string relativeModFilePath in activeMod.Files)
             {
@@ -66,16 +74,16 @@ namespace WolvenKit.Forms
 
                 switch (Path.GetExtension(absoluteModFilePath))
                 {
-                    case ".w2ent":
+                    case FileExtensionW2Ent:
                         filePatcher = new W2EntFilePatcher(absoluteModFilePath, MainController.Get());
                         break;
-                    case ".w2l":
+                    case FileExtensionW2L:
                         // TODO add
                         continue;
-                    case ".w2mesh":
+                    case FileExtensionW2Mesh:
                         // TODO add
                         continue;
-                    case ".w2p":
+                    case FileExtensionW2P:
                         filePatcher = new W2PFilePatcher(absoluteModFilePath, MainController.Get());
                         break;
                     default:
@@ -95,6 +103,54 @@ namespace WolvenKit.Forms
 
                 log.AddText("Successfully processed file '" + absoluteModFilePath + "\n", frmOutput.Logtype.Success);
             }
+        }
+
+        private List<string> GetRelativeW2EntFilePathsForFires(List<string> relativeModFilePaths)
+        {
+            List<string> relativeW2EntFilePathsForFires = new List<string>();
+            List<string> relativeW2PFilePathsForFires = new List<string>();
+
+            foreach (string relativeModFilePath in activeMod.Files)
+            {
+                try
+                {
+                    string absoluteModFilePath = activeMod.FileDirectory + Path.DirectorySeparatorChar + relativeModFilePath;
+
+                    if (!File.Exists(absoluteModFilePath))
+                    {
+                        log.AddText("File '" + absoluteModFilePath + "' does not exist.\n", frmOutput.Logtype.Error);
+
+                        continue;
+                    }
+
+                    if (Path.GetExtension(absoluteModFilePath).Equals(FileExtensionW2Ent))
+                    {
+                        CR2WFile w2EntFile = W2EntFilePatcher.ReadW2EntFile(absoluteModFilePath, MainController.Get());
+                        List<SharedDataBuffer> sharedDataBuffersForFires = W2EntFilePatcher.ReadSharedDataBuffersForFires(w2EntFile);
+
+                        if (sharedDataBuffersForFires == null || !sharedDataBuffersForFires.Any())
+                        {
+                            continue;
+                        }
+
+                        foreach (SharedDataBuffer sharedDataBufferForFire in sharedDataBuffersForFires)
+                        {
+                            if (W2EntFilePatcher.SharedDataBufferReferencesFireW2PFile(sharedDataBufferForFire, absoluteModFilePath))
+                            {
+                                relativeW2EntFilePathsForFires.Add(relativeModFilePath);
+                            }
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    log.AddText(e.Message + "\n", frmOutput.Logtype.Error);
+
+                    continue;
+                }
+            }
+
+            return relativeW2EntFilePathsForFires;
         }
 
         private void dockPanel_ActiveContentChanged(object sender, EventArgs e)

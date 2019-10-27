@@ -90,6 +90,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FilePatchers\SharedDataBuffer.cs" />
     <Compile Include="FilePatchers\W2EntFilePatcher.cs" />
     <Compile Include="FilePatchers\W2PFilePatcher.cs" />
     <Compile Include="FilePatchers\W2XFilePatcher.cs" />

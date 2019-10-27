@@ -9,15 +9,15 @@ namespace WolvenKit.CR2W.BatchProcessors
 {
     public sealed class W2PFilePatcher : W2XFilePatcher
     {
-        private const string typeCParticleSystem = "CParticleSystem";
+        private const string TypeCParticleSystem = "CParticleSystem";
 
-        private const string variableNameAutoHideDistance = "autoHideDistance";
-        private const string variableNameDistance = "distance";
-        private const string variableNameLODs = "lods";
+        private const string VariableNameAutoHideDistance = "autoHideDistance";
+        private const string VariableNameDistance = "distance";
+        private const string VariableNameLODs = "lods";
 
-        private const float valueAutoHideDistanceIDD = 800;
-        private const float valueLOD1IDD = 80;
-        private const float valueIncrementLODIDD = 40;
+        private const float ValueAutoHideDistanceIDD = 800;
+        private const float ValueLOD1IDD = 80;
+        private const float ValueIncrementLODIDD = 40;
 
         public W2PFilePatcher(string filePath, ILocalizedStringSource localizedStringSource) : base(filePath, localizedStringSource)
         {
@@ -36,20 +36,20 @@ namespace WolvenKit.CR2W.BatchProcessors
 
             foreach (CR2WChunk chunk in file.chunks)
             {
-                if (!chunk.Type.Equals(typeCParticleSystem))
+                if (!chunk.Type.Equals(TypeCParticleSystem))
                 {
                     continue;
                 }
                 else if (cParticleSystemFound)
                 {
-                    throw new System.InvalidOperationException("File '" + filePath + "' contains more than one chunk of type '" + typeCParticleSystem + "'.");
+                    throw new System.InvalidOperationException("File '" + filePath + "' contains more than one chunk of type '" + TypeCParticleSystem + "'.");
                 }
 
                 cParticleSystemFound = true;
 
                 if (chunk.data == null || !(chunk.data is CVector))
                 {
-                    throw new System.InvalidOperationException("File '" + filePath + "' contains either no or invalid chunk data for type '" + typeCParticleSystem + "' and could thus not be patched.");
+                    throw new System.InvalidOperationException("File '" + filePath + "' contains either no or invalid chunk data for type '" + TypeCParticleSystem + "' and could thus not be patched.");
                 }
 
                 CVector chunkData = (CVector)chunk.data;
@@ -57,20 +57,20 @@ namespace WolvenKit.CR2W.BatchProcessors
 
                 foreach (CVariable variable in chunkData.variables)
                 {
-                    if (isAutoHideDistance(variable))
+                    if (IsAutoHideDistance(variable))
                     {
                         if (autoHideDistanceFound)
                         {
-                            throw new System.InvalidOperationException("File '" + filePath + "' contains more than one attribute '" + variableNameAutoHideDistance + "' and could thus not be patched.");
+                            throw new System.InvalidOperationException("File '" + filePath + "' contains more than one attribute '" + VariableNameAutoHideDistance + "' and could thus not be patched.");
                         }
 
-                        patchAutoHideDistance(variable);
+                        PatchAutoHideDistance(variable);
 
                         autoHideDistanceFound = true;
                     }
-                    else if (isLODs(variable))
+                    else if (IsLODs(variable))
                     {
-                        patchLODs(variable);
+                        PatchLODs(variable);
 
                         // TODO not sure if LODs should be added if not present
                     }
@@ -78,38 +78,28 @@ namespace WolvenKit.CR2W.BatchProcessors
 
                 if (!autoHideDistanceFound)
                 {
-                    addAutoHideDistance(file, chunkData);
+                    AddAutoHideDistance(file, chunkData);
                 }
             }
 
             if (!cParticleSystemFound)
             {
-                throw new System.InvalidOperationException("File '" + filePath + "' contains no chunk of type '" + typeCParticleSystem + "' and could thus not be patched.");
+                throw new System.InvalidOperationException("File '" + filePath + "' contains no chunk of type '" + TypeCParticleSystem + "' and could thus not be patched.");
             }
 
             WriteCR2WFile(file, filePath);
 
             return true;
         }
-        
-        private static bool isAutoHideDistance(CVariable variable)
+
+        private static void PatchAutoHideDistance(CVariable variableAutoHideDistance)
         {
-            return variable is CFloat && variable.Name.Equals(variableNameAutoHideDistance);
+            ((CFloat)variableAutoHideDistance).SetValue(ValueAutoHideDistanceIDD);
         }
 
-        private static bool isLODs(CVariable variable)
+        private static void PatchLODs(CVariable variableLODs)
         {
-            return variable is CArray && variable.Name.Equals(variableNameLODs);
-        }
-
-        private static void patchAutoHideDistance(CVariable variableAutoHideDistance)
-        {
-            ((CFloat)variableAutoHideDistance).SetValue(valueAutoHideDistanceIDD);
-        }
-
-        private static void patchLODs(CVariable variableLODs)
-        {
-            float valueLODIDD = valueLOD1IDD;
+            float valueLODIDD = ValueLOD1IDD;
 
             foreach (CVariable lodEntry in ((CArray)variableLODs).array)
             {
@@ -117,26 +107,36 @@ namespace WolvenKit.CR2W.BatchProcessors
                 {
                     foreach (CVariable lodVariable in ((CVector)lodEntry).variables)
                     {
-                        if (lodVariable is CFloat && ((CFloat)lodVariable).Name.Equals(variableNameDistance))
+                        if (lodVariable is CFloat && ((CFloat)lodVariable).Name.Equals(VariableNameDistance))
                         {
                             ((CFloat)lodVariable).SetValue(valueLODIDD);
 
-                            valueLODIDD += valueIncrementLODIDD;
+                            valueLODIDD += ValueIncrementLODIDD;
                         }
                     }
                 }
             }
         }
 
-        private static void addAutoHideDistance(CR2WFile file, CVector chunkData)
+        private static void AddAutoHideDistance(CR2WFile file, CVector chunkData)
         {
             CFloat autoHideDistanceVariable = new CFloat(file);
 
-            autoHideDistanceVariable.Type = "Float";
-            autoHideDistanceVariable.Name = variableNameAutoHideDistance;
-            autoHideDistanceVariable.SetValue(valueAutoHideDistanceIDD);
+            autoHideDistanceVariable.Type = CVariableTypeFloat;
+            autoHideDistanceVariable.Name = VariableNameAutoHideDistance;
+            autoHideDistanceVariable.SetValue(ValueAutoHideDistanceIDD);
 
             chunkData.variables.Add(autoHideDistanceVariable);
+        }
+
+        private static bool IsAutoHideDistance(CVariable variable)
+        {
+            return variable is CFloat && variable.Name.Equals(VariableNameAutoHideDistance);
+        }
+
+        private static bool IsLODs(CVariable variable)
+        {
+            return variable is CArray && variable.Name.Equals(VariableNameLODs);
         }
     }
 }
