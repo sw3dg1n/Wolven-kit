@@ -42,7 +42,6 @@ namespace WolvenKit.CR2W.BatchProcessors
                 }
                 else if (cParticleSystemFound)
                 {
-                    // TODO not sure if this is a valid or invalid case
                     throw new System.InvalidOperationException("File '" + filePath + "' contains more than one chunk of type '" + typeCParticleSystem + "'.");
                 }
 
@@ -60,6 +59,11 @@ namespace WolvenKit.CR2W.BatchProcessors
                 {
                     if (isAutoHideDistance(variable))
                     {
+                        if (autoHideDistanceFound)
+                        {
+                            throw new System.InvalidOperationException("File '" + filePath + "' contains more than one attribute '" + variableNameAutoHideDistance + "' and could thus not be patched.");
+                        }
+
                         patchAutoHideDistance(variable);
 
                         autoHideDistanceFound = true;

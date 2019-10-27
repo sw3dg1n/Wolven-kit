@@ -16,7 +16,7 @@ namespace WolvenKit.CR2W.FilePatchers
 
         private const string variableNameBuffer = "buffer";
         private const string variableNameCookedEffects = "cookedEffects";
-        private const string variableNameFire = "fire";
+        private const string variableNamePrefixFire = "fire";
         private const string variableNameShowDistance = "showDistance";
 
         private const float valueShowDistanceIDD = 800;
@@ -44,7 +44,6 @@ namespace WolvenKit.CR2W.FilePatchers
                 }
                 else if (cEntityTemplateFound)
                 {
-                    // TODO not sure if this is a valid or invalid case
                     throw new System.InvalidOperationException("File '" + filePath + "' contains more than one chunk of type '" + typeCEntityTemplate + "'.");
                 }
 
@@ -71,7 +70,7 @@ namespace WolvenKit.CR2W.FilePatchers
                 throw new System.InvalidOperationException("File '" + filePath + "' contains no chunk of type '" + typeCEntityTemplate + "' and could thus not be patched.");
             }
 
-            //WriteCR2WFile(file);
+            WriteCR2WFile(file, filePath);
 
             return true;
         }
@@ -93,7 +92,7 @@ namespace WolvenKit.CR2W.FilePatchers
 
         private static bool isFire(CVariable variable)
         {
-            return variable is CName && ((CName)variable).Value.Equals(variableNameFire);
+            return variable is CName && ((CName)variable).Value.StartsWith(variableNamePrefixFire);
         }
 
         private static bool isSharedDataBuffer(CVariable variable)
@@ -108,7 +107,6 @@ namespace WolvenKit.CR2W.FilePatchers
 
         private void patchFireShowDistance(CVariable variableCookedEffects)
         {
-            // TODO add check for showDistanceFound
             foreach (CVariable cookedEffectsEntry in ((CArray)variableCookedEffects).array)
             {
                 if (cookedEffectsEntry is CVector)
@@ -129,13 +127,13 @@ namespace WolvenKit.CR2W.FilePatchers
                             throw new System.InvalidOperationException("File '" + filePath + "' contains a shared data buffer which could not be read and could thus not be patched.");
                         }
 
-                        patchFireShowDistanceInSharedDataBuffer(sharedDataBufferContent);
+                        patchFireShowDistanceInSharedDataBuffer(sharedDataBufferContent, (CByteArray)cookedEffectsVariables[1]);
                     }
                 }
             }
         }
 
-        private void patchFireShowDistanceInSharedDataBuffer(CR2WFile sharedDataBufferContent)
+        private void patchFireShowDistanceInSharedDataBuffer(CR2WFile sharedDataBufferContent, CByteArray sharedDataBufferByteArray)
         {
             bool cFXDefinitionFound = false;
 
@@ -147,7 +145,6 @@ namespace WolvenKit.CR2W.FilePatchers
                 }
                 else if (cFXDefinitionFound)
                 {
-                    // TODO not sure if this is a valid or invalid case
                     throw new System.InvalidOperationException("File '" + filePath + "' contains more than one chunk of type '" + typeCFXDefinition + "'.");
                 }
 
@@ -159,13 +156,26 @@ namespace WolvenKit.CR2W.FilePatchers
                 }
 
                 CVector chunkData = (CVector)chunk.data;
+                bool showDistanceFound = false;
 
                 foreach (CVariable variable in chunkData.variables)
                 {
                     if (isShowDistance(variable))
                     {
+                        if (showDistanceFound)
+                        {
+                            throw new System.InvalidOperationException("File '" + filePath + "' contains more than one attribute '" + variableNameShowDistance + "' and could thus not be patched.");
+                        }
+
                         patchShowDistance(variable);
+
+                        showDistanceFound = true;
                     }
+                }
+
+                if (!showDistanceFound)
+                {
+                    addShowDistance(sharedDataBufferContent, chunkData);
                 }
             }
 
@@ -174,12 +184,23 @@ namespace WolvenKit.CR2W.FilePatchers
                 throw new System.InvalidOperationException("File '" + filePath + "' contains no chunk of type '" + typeCFXDefinition + "' and could thus not be patched.");
             }
 
-            // TODO write sharedDataBuffer to memory
+            WriteSharedDataBuffer(sharedDataBufferContent, sharedDataBufferByteArray);
         }
 
         private static void patchShowDistance(CVariable variableShowDistance)
         {
             ((CFloat)variableShowDistance).SetValue(valueShowDistanceIDD);
+        }
+
+        private static void addShowDistance(CR2WFile file, CVector chunkData)
+        {
+            CFloat showDistanceVariable = new CFloat(file);
+
+            showDistanceVariable.Type = "Float";
+            showDistanceVariable.Name = variableNameShowDistance;
+            showDistanceVariable.SetValue(valueShowDistanceIDD);
+
+            chunkData.variables.Add(showDistanceVariable);
         }
     }
 }

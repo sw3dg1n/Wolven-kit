@@ -77,28 +77,17 @@ namespace WolvenKit.CR2W.BatchProcessors
             return file;
         }
 
-        //private void OpenEditorFor(CVariable editvar)
-        //{
-        //    byte[] bytes = null;
+        protected static void WriteSharedDataBuffer(CR2WFile sharedDataBufferContent, CByteArray sharedDataBufferByteArray)
+        {
+            using (var stream = new MemoryStream())
+            {
+                using (var writer = new BinaryWriter(stream))
+                {
+                    sharedDataBufferContent.Write(writer);
+                }
 
-        //    if (editvar is IByteSource)
-        //    {
-        //        bytes = ((IByteSource)editvar).Bytes;
-        //    }
-
-        //    if (bytes != null)
-        //    {
-        //        var doc = LoadDocument(editvar.cr2w.FileName + ":" + editvar.FullName, new MemoryStream(bytes), true);
-        //        if (doc != null)
-        //        {
-        //            doc.OnFileSaved += OnVariableEditorSave;
-        //            doc.SaveTarget = editvar;
-        //        }
-        //        else
-        //        {
-        //            OpenHexEditorFor(editvar);
-        //        }
-        //    }
-        //}
+                sharedDataBufferByteArray.SetValue(stream.ToArray());
+            }
+        }
     }
 }
