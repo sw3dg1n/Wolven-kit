@@ -13,6 +13,9 @@ namespace WolvenKit.CR2W.BatchProcessors
     {
         protected const string CVariableTypeFloat = "Float";
 
+        protected const string LabelFire = "fire";
+        protected const string LabelFlame = "flame";
+
         protected readonly string filePath;
         protected readonly ILocalizedStringSource localizedStringSource;
 

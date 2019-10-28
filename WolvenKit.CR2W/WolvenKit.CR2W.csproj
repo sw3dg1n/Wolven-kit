@@ -93,6 +93,7 @@
     <Compile Include="FilePatchers\SharedDataBuffer.cs" />
     <Compile Include="FilePatchers\W2EntFilePatcher.cs" />
     <Compile Include="FilePatchers\W2PFilePatcher.cs" />
+    <Compile Include="FilePatchers\W2XFileHandler.cs" />
     <Compile Include="FilePatchers\W2XFilePatcher.cs" />
     <Compile Include="CR2WChunk.cs" />
     <Compile Include="CR2WCopyAction.cs" />

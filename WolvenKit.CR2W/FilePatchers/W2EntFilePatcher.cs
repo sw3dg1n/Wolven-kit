@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,15 +14,15 @@ namespace WolvenKit.CR2W.FilePatchers
         private const string TypeCEntityTemplate = "CEntityTemplate";
         private const string TypeCFXDefinition = "CFXDefinition";
         private const string TypeCFXTrackItemParticles = "CFXTrackItemParticles";
+        private const string TypeCParticleSystem = "CParticleSystem";
         private const string TypeSharedDataBuffer = "SharedDataBuffer";
 
         private const string VariableNameBuffer = "buffer";
         private const string VariableNameCookedEffects = "cookedEffects";
-        private const string VariableNameParticleSystem = "particleSystem";
         private const string VariableNameShowDistance = "showDistance";
-
-        private const string LabelFire = "fire";
-        private const string LabelFlame = "flame";
+        
+        private const string PathBundle = "Bundle";
+        private const string PathDLC = "dlc";
 
         private const float ValueShowDistanceIDD = 800;
 
@@ -51,12 +52,12 @@ namespace WolvenKit.CR2W.FilePatchers
             return true;
         }
 
-        public static CR2WFile ReadW2EntFile(string filePath, ILocalizedStringSource localizedStringSource)
+        internal static CR2WFile ReadW2EntFile(string filePath, ILocalizedStringSource localizedStringSource)
         {
             return ReadCR2WFile(filePath, localizedStringSource);
         }
 
-        public static List<SharedDataBuffer> ReadSharedDataBuffersForFires(CR2WFile w2EntFile)
+        internal static List<SharedDataBuffer> ReadSharedDataBuffersForFires(CR2WFile w2EntFile)
         {
             List<SharedDataBuffer> sharedDataBuffersForFires = null;
 
@@ -206,8 +207,10 @@ namespace WolvenKit.CR2W.FilePatchers
             chunkData.variables.Add(showDistanceVariable);
         }
 
-        public static bool SharedDataBufferReferencesFireW2PFile(SharedDataBuffer sharedDataBuffer, string filePath)
+        internal static List<string> GetW2PFilePathsForFires(SharedDataBuffer sharedDataBuffer, string w2EntFilePath, string modDirectory, string dlcDirectory, ILocalizedStringSource localizedStringSource)
         {
+            List<string> w2PFilePathsForFires = new List<string>();
+
             foreach (CR2WChunk chunk in sharedDataBuffer.Content.chunks)
             {
                 if (!IsCFXTrackItemParticles(chunk))
@@ -217,7 +220,7 @@ namespace WolvenKit.CR2W.FilePatchers
 
                 if (chunk.data == null || !(chunk.data is CVector))
                 {
-                    throw new System.InvalidOperationException("File '" + filePath + "' contains either no or invalid chunk data for type '" + TypeCFXTrackItemParticles + "'.");
+                    throw new System.InvalidOperationException("File '" + w2EntFilePath + "' contains either no or invalid chunk data for type '" + TypeCFXTrackItemParticles + "'.");
                 }
 
                 CVector chunkData = (CVector)chunk.data;
@@ -228,17 +231,21 @@ namespace WolvenKit.CR2W.FilePatchers
                     {
                         CSoft cSoftParticleSystem = (CSoft)variable;
 
-                        if (cSoftParticleSystem.Handle.Contains(LabelFire) || cSoftParticleSystem.Handle.Contains(LabelFlame))
-                        {
-                            return true;
-                        }
+                        String relativeW2PFilePath = cSoftParticleSystem.Handle;
+                        String initialPath = relativeW2PFilePath.StartsWith(PathDLC) ? dlcDirectory : modDirectory;
 
-                        // TODO check w2p file
+                        String absoluteW2PFilePath = initialPath + Path.DirectorySeparatorChar + PathBundle + Path.DirectorySeparatorChar + relativeW2PFilePath;
+
+                        // TODO maybe the first two checks should be disabled again
+                        if (relativeW2PFilePath.Contains(LabelFire) || relativeW2PFilePath.Contains(LabelFlame) || W2PFilePatcher.W2PFileContainsFireParticleEmitter(absoluteW2PFilePath, localizedStringSource))
+                        {
+                            w2PFilePathsForFires.Add(absoluteW2PFilePath); 
+                        }
                     }
                 }
             }
 
-            return false;
+            return w2PFilePathsForFires;
         }
 
         private static bool IsCEntityTemplate(CR2WChunk chunk)
@@ -263,7 +270,7 @@ namespace WolvenKit.CR2W.FilePatchers
 
         private static bool IsCSoftParticleSystem(CVariable variable)
         {
-            return variable is CSoft && ((CSoft)variable).FileType.Equals(VariableNameParticleSystem);
+            return variable is CSoft && ((CSoft)variable).FileType.Equals(TypeCParticleSystem);
         }
 
         private static bool IsFire(CVariable variable)

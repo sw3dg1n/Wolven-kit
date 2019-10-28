@@ -56,8 +56,72 @@ namespace WolvenKit.Forms
         {
             ShowLog();
 
-            // TODO
-            // List<string> relativeW2EntFilePathsForFires = GetRelativeW2EntFilePathsForFires(activeMod.Files);
+            W2XFileHandler w2XFileHandler = new W2XFileHandler();
+
+            w2XFileHandler.Initialize(activeMod.Files, activeMod.FileDirectory, activeMod.ModDirectory, activeMod.DlcDirectory, MainController.Get());
+
+            foreach (string errorMessage in w2XFileHandler.ErrorMessages)
+            {
+                log.AddText(errorMessage + "\n", frmOutput.Logtype.Error);
+            }
+
+            List<string> w2EntFilePathsInMod = new List<string>();
+            List<string> w2PFilePathsInMod = new List<string>();
+
+            foreach (string relativeModFilePath in activeMod.Files)
+            {
+                string absoluteModFilePath = activeMod.FileDirectory + Path.DirectorySeparatorChar + relativeModFilePath;
+
+                switch (Path.GetExtension(absoluteModFilePath))
+                {
+                    case FileExtensionW2Ent:
+                        w2EntFilePathsInMod.Add(absoluteModFilePath);
+                        break;
+                    case FileExtensionW2L:
+                        // TODO add
+                        continue;
+                    case FileExtensionW2Mesh:
+                        // TODO add
+                        continue;
+                    case FileExtensionW2P:
+                        w2PFilePathsInMod.Add(absoluteModFilePath);
+                        break;
+                    default:
+                        continue;
+                }
+            }
+
+            IEnumerable<string> w2EntFilePathsInModButNotInFires = w2EntFilePathsInMod.Except(w2XFileHandler.W2EntFilePathsForFires);
+            IEnumerable<string> w2EntFilePathsInFiresButNotInMod = w2XFileHandler.W2EntFilePathsForFires.Except(w2EntFilePathsInMod);
+
+            IEnumerable<string> w2PFilePathsInModButNotInFires = w2PFilePathsInMod.Except(w2XFileHandler.W2PFilePathsForFires);
+            IEnumerable<string> w2PFilePathsInFiresButNotInMod = w2XFileHandler.W2PFilePathsForFires.Except(w2PFilePathsInMod);
+
+            log.AddText("w2EntFilePathsInModButNotInFires:\n", frmOutput.Logtype.Important);
+            foreach (string file in w2EntFilePathsInModButNotInFires)
+            {
+                log.AddText(file + "\n", frmOutput.Logtype.Error);
+            }
+
+            log.AddText("w2EntFilePathsInFiresButNotInMod:\n", frmOutput.Logtype.Important);
+            foreach (string file in w2EntFilePathsInFiresButNotInMod)
+            {
+                log.AddText(file + "\n", frmOutput.Logtype.Error);
+            }
+
+            log.AddText("w2PFilePathsInModButNotInFires:\n", frmOutput.Logtype.Important);
+            foreach (string file in w2PFilePathsInModButNotInFires)
+            {
+                log.AddText(file + "\n", frmOutput.Logtype.Error);
+            }
+
+            log.AddText("w2PFilePathsInFiresButNotInMod:\n", frmOutput.Logtype.Important);
+            foreach (string file in w2PFilePathsInFiresButNotInMod)
+            {
+                log.AddText(file + "\n", frmOutput.Logtype.Error);
+            }
+
+            return;
 
             foreach (string relativeModFilePath in activeMod.Files)
             {
@@ -103,54 +167,6 @@ namespace WolvenKit.Forms
 
                 log.AddText("Successfully processed file '" + absoluteModFilePath + "\n", frmOutput.Logtype.Success);
             }
-        }
-
-        private List<string> GetRelativeW2EntFilePathsForFires(List<string> relativeModFilePaths)
-        {
-            List<string> relativeW2EntFilePathsForFires = new List<string>();
-            List<string> relativeW2PFilePathsForFires = new List<string>();
-
-            foreach (string relativeModFilePath in activeMod.Files)
-            {
-                try
-                {
-                    string absoluteModFilePath = activeMod.FileDirectory + Path.DirectorySeparatorChar + relativeModFilePath;
-
-                    if (!File.Exists(absoluteModFilePath))
-                    {
-                        log.AddText("File '" + absoluteModFilePath + "' does not exist.\n", frmOutput.Logtype.Error);
-
-                        continue;
-                    }
-
-                    if (Path.GetExtension(absoluteModFilePath).Equals(FileExtensionW2Ent))
-                    {
-                        CR2WFile w2EntFile = W2EntFilePatcher.ReadW2EntFile(absoluteModFilePath, MainController.Get());
-                        List<SharedDataBuffer> sharedDataBuffersForFires = W2EntFilePatcher.ReadSharedDataBuffersForFires(w2EntFile);
-
-                        if (sharedDataBuffersForFires == null || !sharedDataBuffersForFires.Any())
-                        {
-                            continue;
-                        }
-
-                        foreach (SharedDataBuffer sharedDataBufferForFire in sharedDataBuffersForFires)
-                        {
-                            if (W2EntFilePatcher.SharedDataBufferReferencesFireW2PFile(sharedDataBufferForFire, absoluteModFilePath))
-                            {
-                                relativeW2EntFilePathsForFires.Add(relativeModFilePath);
-                            }
-                        }
-                    }
-                }
-                catch (Exception e)
-                {
-                    log.AddText(e.Message + "\n", frmOutput.Logtype.Error);
-
-                    continue;
-                }
-            }
-
-            return relativeW2EntFilePathsForFires;
         }
 
         private void dockPanel_ActiveContentChanged(object sender, EventArgs e)
