@@ -16,17 +16,12 @@ namespace WolvenKit.CR2W.BatchProcessors
         protected const string LabelFire = "fire";
         protected const string LabelFlame = "flame";
 
-        protected readonly string filePath;
         protected readonly ILocalizedStringSource localizedStringSource;
 
-        public W2XFilePatcher(string filePath, ILocalizedStringSource localizedStringSource)
+        public W2XFilePatcher(ILocalizedStringSource localizedStringSource)
         {
-            this.filePath = filePath;
             this.localizedStringSource = localizedStringSource;
         }
-
-        // TODO probably change return type to void
-        public abstract bool PatchForIncreasedDrawDistance();
 
         protected static CR2WFile ReadCR2WFile(string filePath, ILocalizedStringSource localizedStringSource)
         {

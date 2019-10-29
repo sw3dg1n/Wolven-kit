@@ -121,51 +121,70 @@ namespace WolvenKit.Forms
                 log.AddText(file + "\n", frmOutput.Logtype.Error);
             }
 
-            return;
+            //return;
+            // TODO patch glow autohidedistance in w2ent file
+            // TODO try with all vanilla files
 
-            foreach (string relativeModFilePath in activeMod.Files)
+            (Dictionary<string, string> relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap, List<string> absoluteRenamedW2PFilePaths) = W2XFileHandler.CopyAndRenameW2PFiles(w2XFileHandler.W2PFilePathsForFires);
+
+            patchW2EntFilesForFires(w2XFileHandler.W2EntFilePathsForFires, relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap);
+
+            patchW2PFilesForFires(absoluteRenamedW2PFilePaths);
+        }
+
+        private void patchW2EntFilesForFires(List<string> w2EntFilePathsForFires, Dictionary<string, string> relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap)
+        {
+            W2EntFilePatcher w2EntFilePatcher = new W2EntFilePatcher(MainController.Get());
+
+            foreach (string w2EntFilePathForFire in w2EntFilePathsForFires)
             {
-                string absoluteModFilePath = activeMod.FileDirectory + Path.DirectorySeparatorChar + relativeModFilePath;
-
-                if (!File.Exists(absoluteModFilePath))
+                if (!File.Exists(w2EntFilePathForFire))
                 {
-                    log.AddText("File '" + absoluteModFilePath + "' does not exist.\n", frmOutput.Logtype.Error);
+                    log.AddText("File '" + w2EntFilePathForFire + "' does not exist.\n", frmOutput.Logtype.Error);
 
                     continue;
-                }
-
-                W2XFilePatcher filePatcher;
-
-                switch (Path.GetExtension(absoluteModFilePath))
-                {
-                    case FileExtensionW2Ent:
-                        filePatcher = new W2EntFilePatcher(absoluteModFilePath, MainController.Get());
-                        break;
-                    case FileExtensionW2L:
-                        // TODO add
-                        continue;
-                    case FileExtensionW2Mesh:
-                        // TODO add
-                        continue;
-                    case FileExtensionW2P:
-                        filePatcher = new W2PFilePatcher(absoluteModFilePath, MainController.Get());
-                        break;
-                    default:
-                        continue;
                 }
 
                 try
                 {
-                    filePatcher.PatchForIncreasedDrawDistance();
+                    w2EntFilePatcher.PatchForIncreasedDrawDistance(w2EntFilePathForFire, relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap);
                 }
-                catch (Exception ex)
+                catch (Exception e)
                 {
-                    log.AddText(ex.Message + "\n", frmOutput.Logtype.Error);
+                    log.AddText(e.Message + "\n", frmOutput.Logtype.Error);
 
                     continue;
                 }
 
-                log.AddText("Successfully processed file '" + absoluteModFilePath + "\n", frmOutput.Logtype.Success);
+                log.AddText("Successfully processed file '" + w2EntFilePathForFire + "\n", frmOutput.Logtype.Success);
+            }
+        }
+
+        private void patchW2PFilesForFires(List<string> w2PFilePathsForFires)
+        {
+            W2PFilePatcher w2PFilePatcher = new W2PFilePatcher(MainController.Get());
+
+            foreach (string w2PFilePathForFire in w2PFilePathsForFires)
+            {
+                if (!File.Exists(w2PFilePathForFire))
+                {
+                    log.AddText("File '" + w2PFilePathForFire + "' does not exist.\n", frmOutput.Logtype.Error);
+
+                    continue;
+                }
+
+                try
+                {
+                    w2PFilePatcher.PatchForIncreasedDrawDistance(w2PFilePathForFire);
+                }
+                catch (Exception e)
+                {
+                    log.AddText(e.Message + "\n", frmOutput.Logtype.Error);
+
+                    continue;
+                }
+
+                log.AddText("Successfully processed file '" + w2PFilePathForFire + "\n", frmOutput.Logtype.Success);
             }
         }
 

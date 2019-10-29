@@ -9,10 +9,12 @@ namespace WolvenKit.CR2W.FilePatchers
 {
     public sealed class W2XFileHandler
     {
-        private const string FileExtensionW2Ent = ".w2ent";
-        private const string FileExtensionW2L = ".w2l";
-        private const string FileExtensionW2Mesh = ".w2mesh";
-        private const string FileExtensionW2P = ".w2p";
+        public const string FileExtensionW2Ent = ".w2ent";
+        public const string FileExtensionW2L = ".w2l";
+        public const string FileExtensionW2Mesh = ".w2mesh";
+        public const string FileExtensionW2P = ".w2p";
+
+        public const string FileNameSuffixILOD = "_ilod";
 
         private const string PathBundle = "Bundle";
         private const string PathDLC = "dlc";
@@ -37,6 +39,11 @@ namespace WolvenKit.CR2W.FilePatchers
         {
             foreach (string relativeModFilePath in relativeModFilePaths)
             {
+                //if (relativeModFilePath.Contains("character") || relativeModFilePath.Contains("community"))
+                //{
+                //    continue;
+                //}
+
                 try
                 {
                     string absoluteModFilePath = fileDirectory + Path.DirectorySeparatorChar + relativeModFilePath;
@@ -75,6 +82,110 @@ namespace WolvenKit.CR2W.FilePatchers
                     continue;
                 }
             }
+
+            // TODO this should simply be replaced with a set
+            W2PFilePathsForFires = W2PFilePathsForFires.Distinct().ToList();
+            W2EntFilePathsForFires = W2EntFilePathsForFires.Distinct().ToList();
+
+            //string w2psource = "C:\\Users\\mkaltenb\\source\\repos\\fire_files\\w2p";
+
+            //foreach (string fullPath in W2PFilePathsForFires)
+            //{
+            //    string newPath = w2psource + fullPath.Substring(fullPath.IndexOf(PathBundle) + PathBundle.Length);
+
+            //    if (File.Exists(fullPath) && !File.Exists(newPath))
+            //    {
+            //        Directory.CreateDirectory(Path.GetDirectoryName(newPath));
+            //        File.Copy(fullPath, newPath);
+            //    }
+            //}
+
+            //string w2entsource = "C:\\Users\\mkaltenb\\source\\repos\\fire_files\\w2ent";
+
+            //foreach (string fullPath in W2EntFilePathsForFires)
+            //{
+            //    string newPath = w2entsource + fullPath.Substring(fullPath.IndexOf(PathBundle) + PathBundle.Length);
+
+            //    if (File.Exists(fullPath) && !File.Exists(newPath))
+            //    {
+            //        Directory.CreateDirectory(Path.GetDirectoryName(newPath));
+            //        File.Copy(fullPath, newPath);
+            //    }
+            //}
+
+
+            //using (TextWriter tw = new StreamWriter("C:\\Users\\mkaltenb\\source\\repos\\w2pfiles.txt"))
+            //{
+            //    foreach (string s in W2PFilePathsForFires)
+            //    {
+            //        tw.WriteLine(s);
+            //    }
+            //}
+
+            //using (TextWriter tw = new StreamWriter("C:\\Users\\mkaltenb\\source\\repos\\w2entfiles.txt"))
+            //{
+            //    foreach (string s in W2EntFilePathsForFires)
+            //    {
+            //        tw.WriteLine(s);
+            //    }
+            //}
+        }
+
+        public static (Dictionary<string, string> relativeOriginalFilePathToRelativeRenamedFilePathMap, List<string> absoluteRenamedFilePaths) CopyAndRenameW2PFiles(List<string> absoluteW2PFilePaths)
+        {
+            return CopyAndRenameFiles(absoluteW2PFilePaths, FileExtensionW2P);
+        }
+
+        private static (Dictionary<string, string> relativeOriginalFilePathToRelativeRenamedFilePathMap, List<string> absoluteRenamedFilePaths) CopyAndRenameFiles(List<string> absoluteFilePaths, string fileExtension)
+        {
+            Dictionary<string, string> relativeOriginalFilePathToRelativeRenamedFilePathMap = new Dictionary<string, string>();
+            List<string> absoluteRenamedFilePaths = new List<string>();
+
+            string renamedFileNameSuffix = FileNameSuffixILOD + fileExtension;
+            string filePathSeparator = Path.DirectorySeparatorChar + PathBundle + Path.DirectorySeparatorChar;
+
+            foreach (string absoluteFilePath in absoluteFilePaths)
+            {
+                if (!File.Exists(absoluteFilePath))
+                {
+                    continue;
+                }
+
+                string absoluteRenamedFilePath;
+                string absoluteOriginalFilePath;
+
+                // We also add entries for already renamed files as there might be new w2ent files which still contain references to the original files
+                if (absoluteFilePath.EndsWith(renamedFileNameSuffix))
+                {
+                    absoluteRenamedFilePath = absoluteFilePath;
+                    absoluteOriginalFilePath = absoluteRenamedFilePath.Replace(renamedFileNameSuffix, fileExtension);
+                }
+                else
+                {
+                    absoluteOriginalFilePath = absoluteFilePath;
+                    absoluteRenamedFilePath = absoluteOriginalFilePath.Replace(fileExtension, renamedFileNameSuffix);
+
+                    // As files might already have been renamed in a previous run, we only create ones which are not existing yet
+                    if (!File.Exists(absoluteRenamedFilePath))
+                    {
+                        File.Copy(absoluteOriginalFilePath, absoluteRenamedFilePath);
+                    }
+
+                    // TODO maybe even delete the original file once everything is stable
+                }
+
+                string relativeOriginalFilePath = absoluteOriginalFilePath.Substring(absoluteOriginalFilePath.LastIndexOf(filePathSeparator) + filePathSeparator.Length);
+                string relativeRenamedFilePath = absoluteRenamedFilePath.Substring(absoluteRenamedFilePath.LastIndexOf(filePathSeparator) + filePathSeparator.Length);
+
+                if (!relativeOriginalFilePathToRelativeRenamedFilePathMap.ContainsKey(relativeOriginalFilePath))
+                {
+                    relativeOriginalFilePathToRelativeRenamedFilePathMap.Add(relativeOriginalFilePath, relativeRenamedFilePath);
+                }
+
+                absoluteRenamedFilePaths.Add(absoluteRenamedFilePath);
+            }
+
+            return (relativeOriginalFilePathToRelativeRenamedFilePathMap, absoluteRenamedFilePaths);
         }
     }
 }

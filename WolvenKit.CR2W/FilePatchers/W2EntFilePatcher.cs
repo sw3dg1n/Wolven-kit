@@ -26,11 +26,11 @@ namespace WolvenKit.CR2W.FilePatchers
 
         private const float ValueShowDistanceIDD = 800;
 
-        public W2EntFilePatcher(string filePath, ILocalizedStringSource localizedStringSource) : base(filePath, localizedStringSource)
+        public W2EntFilePatcher(ILocalizedStringSource localizedStringSource) : base(localizedStringSource)
         {
         }
 
-        public override bool PatchForIncreasedDrawDistance()
+        public void PatchForIncreasedDrawDistance(string filePath, Dictionary<string, string> relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap)
         {
             CR2WFile w2EntFile = ReadW2EntFile(filePath, localizedStringSource);
             List<SharedDataBuffer> sharedDataBuffersForFires = ReadSharedDataBuffersForFires(w2EntFile);
@@ -42,14 +42,14 @@ namespace WolvenKit.CR2W.FilePatchers
 
             foreach (SharedDataBuffer sharedDataBufferForFire in sharedDataBuffersForFires) {
 
-                PatchFireShowDistance(sharedDataBufferForFire);
+                PatchFireShowDistance(filePath, sharedDataBufferForFire);
+                PatchW2PFilePath(filePath, sharedDataBufferForFire, relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap);
+
                 WriteSharedDataBuffer(sharedDataBufferForFire);
             }
 
             // TODO probably get rid of the 2nd arg
             WriteCR2WFile(w2EntFile, w2EntFile.FileName);
-
-            return true;
         }
 
         internal static CR2WFile ReadW2EntFile(string filePath, ILocalizedStringSource localizedStringSource)
@@ -139,7 +139,7 @@ namespace WolvenKit.CR2W.FilePatchers
             return sharedDataBuffersForFires;
         }
 
-        private void PatchFireShowDistance(SharedDataBuffer sharedDataBufferForFire)
+        private static void PatchFireShowDistance(string filePath, SharedDataBuffer sharedDataBufferForFire)
         {
             bool cFXDefinitionFound = false;
 
@@ -207,6 +207,59 @@ namespace WolvenKit.CR2W.FilePatchers
             chunkData.variables.Add(showDistanceVariable);
         }
 
+        private static void PatchW2PFilePath(string w2EntFilePath, SharedDataBuffer sharedDataBuffer, Dictionary<string, string> relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap)
+        {
+            bool cFXTrackItemParticlesFound = false;
+
+            foreach (CR2WChunk chunk in sharedDataBuffer.Content.chunks)
+            {
+                if (!IsCFXTrackItemParticles(chunk))
+                {
+                    continue;
+                }
+
+                cFXTrackItemParticlesFound = true;
+
+                if (chunk.data == null || !(chunk.data is CVector))
+                {
+                    throw new System.InvalidOperationException("File '" + w2EntFilePath + "' contains either no or invalid chunk data for type '" + TypeCFXTrackItemParticles + "'.");
+                }
+
+                CVector chunkData = (CVector)chunk.data;
+
+                foreach (CVariable variable in chunkData.variables)
+                {
+                    if (IsCSoftParticleSystem(variable))
+                    {
+                        CSoft variableCSoftParticleSystem = (CSoft)variable;
+
+                        string relativeW2PFilePath = variableCSoftParticleSystem.Handle;
+                        string relativeRenamedW2PFilePath;
+
+                        if (relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap.TryGetValue(relativeW2PFilePath, out relativeRenamedW2PFilePath))
+                        {
+                            PatchW2PFilePath(variableCSoftParticleSystem, relativeRenamedW2PFilePath);
+                        }
+                        else if (!relativeW2PFilePath.EndsWith(W2XFileHandler.FileNameSuffixILOD + W2XFileHandler.FileExtensionW2P))
+                        {
+                            // TODO this should be tracked but the processing should still finish
+                            //throw new System.InvalidOperationException("File '" + w2EntFilePath + "' contains a w2p path '" + relativeW2PFilePath + "' which is not yet renamed.");
+                        }
+                    }
+                }
+            }
+
+            if (!cFXTrackItemParticlesFound)
+            {
+                throw new System.InvalidOperationException("File '" + w2EntFilePath + "' contains no chunk of type '" + TypeCFXTrackItemParticles + "'.");
+            }
+        }
+
+        private static void PatchW2PFilePath(CSoft variableCSoftParticleSystem, string relativeRenamedW2PFilePath)
+        {
+            variableCSoftParticleSystem.Handle = relativeRenamedW2PFilePath;
+        }
+
         internal static List<string> GetW2PFilePathsForFires(SharedDataBuffer sharedDataBuffer, string w2EntFilePath, string modDirectory, string dlcDirectory, ILocalizedStringSource localizedStringSource)
         {
             List<string> w2PFilePathsForFires = new List<string>();
@@ -229,15 +282,18 @@ namespace WolvenKit.CR2W.FilePatchers
                 {
                     if (IsCSoftParticleSystem(variable))
                     {
-                        CSoft cSoftParticleSystem = (CSoft)variable;
+                        CSoft variableCSoftParticleSystem = (CSoft)variable;
 
-                        String relativeW2PFilePath = cSoftParticleSystem.Handle;
-                        String initialPath = relativeW2PFilePath.StartsWith(PathDLC) ? dlcDirectory : modDirectory;
+                        string relativeW2PFilePath = variableCSoftParticleSystem.Handle;
+                        string initialPath = relativeW2PFilePath.StartsWith(PathDLC) ? dlcDirectory : modDirectory;
 
-                        String absoluteW2PFilePath = initialPath + Path.DirectorySeparatorChar + PathBundle + Path.DirectorySeparatorChar + relativeW2PFilePath;
+                        string absoluteW2PFilePath = initialPath + Path.DirectorySeparatorChar + PathBundle + Path.DirectorySeparatorChar + relativeW2PFilePath;
+                        string w2pFileName = relativeW2PFilePath.Substring(relativeW2PFilePath.LastIndexOf(Path.DirectorySeparatorChar) + 1);
 
-                        // TODO maybe the first two checks should be disabled again
-                        if (relativeW2PFilePath.Contains(LabelFire) || relativeW2PFilePath.Contains(LabelFlame) || W2PFilePatcher.W2PFileContainsFireParticleEmitter(absoluteW2PFilePath, localizedStringSource))
+                        if ((w2pFileName.Contains(LabelFire) || w2pFileName.Contains(LabelFlame) || w2pFileName.Contains("_candle") || w2pFileName.Contains("_brazier"))
+                            && !relativeW2PFilePath.Contains("arson") && !relativeW2PFilePath.Contains("arachas") && !relativeW2PFilePath.Contains("weapons") && !relativeW2PFilePath.Contains("gameplay")
+                            && !relativeW2PFilePath.Contains("monsters") && !relativeW2PFilePath.Contains("characters") && !relativeW2PFilePath.Contains("environment") && !relativeW2PFilePath.Contains("work")
+                            && !relativeW2PFilePath.Contains("igni"))
                         {
                             w2PFilePathsForFires.Add(absoluteW2PFilePath); 
                         }

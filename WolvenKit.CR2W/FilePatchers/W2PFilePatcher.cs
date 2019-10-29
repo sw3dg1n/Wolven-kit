@@ -21,11 +21,11 @@ namespace WolvenKit.CR2W.BatchProcessors
         private const float ValueLOD1IDD = 80;
         private const float ValueIncrementLODIDD = 40;
 
-        public W2PFilePatcher(string filePath, ILocalizedStringSource localizedStringSource) : base(filePath, localizedStringSource)
+        public W2PFilePatcher(ILocalizedStringSource localizedStringSource) : base(localizedStringSource)
         {
         }
 
-        public override bool PatchForIncreasedDrawDistance()
+        public void PatchForIncreasedDrawDistance(string filePath)
         {
             CR2WFile w2PFile = ReadCR2WFile(filePath, localizedStringSource);
 
@@ -90,8 +90,6 @@ namespace WolvenKit.CR2W.BatchProcessors
             }
 
             WriteCR2WFile(w2PFile, filePath);
-
-            return true;
         }
 
         private static void PatchAutoHideDistance(CVariable variableAutoHideDistance)
