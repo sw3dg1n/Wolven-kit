@@ -20,9 +20,6 @@ namespace WolvenKit.CR2W.FilePatchers
         private const string VariableNameBuffer = "buffer";
         private const string VariableNameCookedEffects = "cookedEffects";
         private const string VariableNameShowDistance = "showDistance";
-        
-        private const string PathBundle = "Bundle";
-        private const string PathDLC = "dlc";
 
         private const float ValueShowDistanceIDD = 800;
 
@@ -32,6 +29,7 @@ namespace WolvenKit.CR2W.FilePatchers
 
         public void PatchForIncreasedDrawDistance(string filePath, Dictionary<string, string> relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap)
         {
+            // TODO patch glow autohidedistance in w2ent file
             CR2WFile w2EntFile = ReadW2EntFile(filePath, localizedStringSource);
             List<SharedDataBuffer> sharedDataBuffersForFires = ReadSharedDataBuffersForFires(w2EntFile);
 
@@ -285,9 +283,9 @@ namespace WolvenKit.CR2W.FilePatchers
                         CSoft variableCSoftParticleSystem = (CSoft)variable;
 
                         string relativeW2PFilePath = variableCSoftParticleSystem.Handle;
-                        string initialPath = relativeW2PFilePath.StartsWith(PathDLC) ? dlcDirectory : modDirectory;
+                        string initialPath = relativeW2PFilePath.StartsWith(W2XFileHandler.PathDLC) ? dlcDirectory : modDirectory;
 
-                        string absoluteW2PFilePath = initialPath + Path.DirectorySeparatorChar + PathBundle + Path.DirectorySeparatorChar + relativeW2PFilePath;
+                        string absoluteW2PFilePath = initialPath + Path.DirectorySeparatorChar + W2XFileHandler.PathBundle + Path.DirectorySeparatorChar + relativeW2PFilePath;
                         string w2pFileName = relativeW2PFilePath.Substring(relativeW2PFilePath.LastIndexOf(Path.DirectorySeparatorChar) + 1);
 
                         if ((w2pFileName.Contains(LabelFire) || w2pFileName.Contains(LabelFlame) || w2pFileName.Contains("_candle") || w2pFileName.Contains("_brazier") || w2pFileName.Contains("torch"))

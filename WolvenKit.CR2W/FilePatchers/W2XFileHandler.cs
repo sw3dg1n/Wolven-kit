@@ -16,8 +16,9 @@ namespace WolvenKit.CR2W.FilePatchers
 
         public const string FileNameSuffixILOD = "_ilod";
 
-        private const string PathBundle = "Bundle";
-        private const string PathDLC = "dlc";
+        public const string PathBundle = "Bundle";
+        public const string PathDLC = "dlc";
+        public const string PathILOD = "ilod";
 
         public List<string> ErrorMessages { get; private set; }
         public List<string> W2EntFilePathsForFires { get; private set; }
@@ -109,51 +110,52 @@ namespace WolvenKit.CR2W.FilePatchers
             //}
         }
 
-        public static (Dictionary<string, string> relativeOriginalFilePathToRelativeRenamedFilePathMap, List<string> absoluteRenamedFilePaths) CopyAndRenameW2PFiles(List<string> absoluteW2PFilePaths)
+        public static (Dictionary<string, string> relativeOriginalFilePathToRelativeRenamedFilePathMap, List<string> absoluteRenamedFilePaths) CopyAndRenameW2PFiles(List<string> absoluteW2PFilePaths, string dlcDirectory)
         {
-            return CopyAndRenameFiles(absoluteW2PFilePaths, FileExtensionW2P);
+            return CopyAndRenameFiles(absoluteW2PFilePaths, dlcDirectory, FileExtensionW2P);
         }
 
-        private static (Dictionary<string, string> relativeOriginalFilePathToRelativeRenamedFilePathMap, List<string> absoluteRenamedFilePaths) CopyAndRenameFiles(List<string> absoluteFilePaths, string fileExtension)
+        private static (Dictionary<string, string> relativeOriginalFilePathToRelativeRenamedFilePathMap, List<string> absoluteRenamedFilePaths) CopyAndRenameFiles(List<string> absoluteFilePaths, string dlcDirectory, string fileExtension)
         {
             Dictionary<string, string> relativeOriginalFilePathToRelativeRenamedFilePathMap = new Dictionary<string, string>();
             List<string> absoluteRenamedFilePaths = new List<string>();
 
+            string rootDirectoryDLCBundle = dlcDirectory + Path.DirectorySeparatorChar + PathBundle;
             string renamedFileNameSuffix = FileNameSuffixILOD + fileExtension;
             string filePathSeparator = Path.DirectorySeparatorChar + PathBundle + Path.DirectorySeparatorChar;
 
-            foreach (string absoluteFilePath in absoluteFilePaths)
+            foreach (string absoluteOriginalFilePath in absoluteFilePaths)
             {
-                if (!File.Exists(absoluteFilePath))
+                if (!File.Exists(absoluteOriginalFilePath))
                 {
                     continue;
                 }
-
+                
+                string relativeOriginalFilePath;
+                string relativeRenamedFilePath;
                 string absoluteRenamedFilePath;
-                string absoluteOriginalFilePath;
 
-                // We also add entries for already renamed files as there might be new w2ent files which still contain references to the original files
-                if (absoluteFilePath.EndsWith(renamedFileNameSuffix))
+                // If the file did already get renamed in a previous run, we still wanna add it the the map and list so that the file still gets processed
+                if (absoluteOriginalFilePath.EndsWith(renamedFileNameSuffix))
                 {
-                    absoluteRenamedFilePath = absoluteFilePath;
-                    absoluteOriginalFilePath = absoluteRenamedFilePath.Replace(renamedFileNameSuffix, fileExtension);
+                    relativeOriginalFilePath = absoluteOriginalFilePath.Substring(absoluteOriginalFilePath.LastIndexOf(filePathSeparator) + filePathSeparator.Length);
+                    relativeRenamedFilePath = relativeOriginalFilePath;
+                    absoluteRenamedFilePath = absoluteOriginalFilePath;
                 }
                 else
                 {
-                    absoluteOriginalFilePath = absoluteFilePath;
-                    absoluteRenamedFilePath = absoluteOriginalFilePath.Replace(fileExtension, renamedFileNameSuffix);
+                    relativeOriginalFilePath = absoluteOriginalFilePath.Substring(absoluteOriginalFilePath.LastIndexOf(filePathSeparator) + filePathSeparator.Length);
+                    relativeRenamedFilePath = PathDLC + Path.DirectorySeparatorChar + PathILOD + Path.DirectorySeparatorChar + relativeOriginalFilePath.Replace(fileExtension, renamedFileNameSuffix);
+                    absoluteRenamedFilePath = rootDirectoryDLCBundle + Path.DirectorySeparatorChar + relativeRenamedFilePath;
 
-                    // As files might already have been renamed in a previous run, we only create ones which are not existing yet
                     if (!File.Exists(absoluteRenamedFilePath))
                     {
+                        Directory.CreateDirectory(Path.GetDirectoryName(absoluteRenamedFilePath));
                         File.Copy(absoluteOriginalFilePath, absoluteRenamedFilePath);
                     }
 
-                    // TODO maybe even delete the original file once everything is stable
+                    // TODO probably delete the original file once everything is stable
                 }
-
-                string relativeOriginalFilePath = absoluteOriginalFilePath.Substring(absoluteOriginalFilePath.LastIndexOf(filePathSeparator) + filePathSeparator.Length);
-                string relativeRenamedFilePath = absoluteRenamedFilePath.Substring(absoluteRenamedFilePath.LastIndexOf(filePathSeparator) + filePathSeparator.Length);
 
                 if (!relativeOriginalFilePathToRelativeRenamedFilePathMap.ContainsKey(relativeOriginalFilePath))
                 {

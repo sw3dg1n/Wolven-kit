@@ -122,13 +122,9 @@ namespace WolvenKit.Forms
             }
 
             //return;
-            // TODO check if w2p files can only be renamed in the dlc directory... if so, try to copy them there
-            // TODO if not possible, only rename specific files where draw distance is limited
-
-            // TODO patch glow autohidedistance in w2ent file
-            // TODO try with all vanilla files
-
-            (Dictionary<string, string> relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap, List<string> absoluteRenamedW2PFilePaths) = W2XFileHandler.CopyAndRenameW2PFiles(w2XFileHandler.W2PFilePathsForFires);
+            // TODO add missing fires
+            
+            (Dictionary<string, string> relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap, List<string> absoluteRenamedW2PFilePaths) = W2XFileHandler.CopyAndRenameW2PFiles(w2XFileHandler.W2PFilePathsForFires, activeMod.DlcDirectory);
 
             patchW2EntFilesForFires(w2XFileHandler.W2EntFilePathsForFires, relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap);
 
