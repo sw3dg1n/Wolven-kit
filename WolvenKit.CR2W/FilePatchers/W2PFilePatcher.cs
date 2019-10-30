@@ -74,7 +74,7 @@ namespace WolvenKit.CR2W.BatchProcessors
                     {
                         PatchLODs(variable);
 
-                        // TODO not sure if LODs should be added if not present
+                        // TODO not sure if LODs should be added if not present but probably not
                     }
                 }
 
@@ -129,47 +129,48 @@ namespace WolvenKit.CR2W.BatchProcessors
             chunkData.variables.Add(autoHideDistanceVariable);
         }
 
-        internal static bool W2PFileContainsFireParticleEmitter(string w2PFilePath, ILocalizedStringSource localizedStringSource)
-        {
-            CR2WFile file;
+        // TODO probably remove it it turns out that it is really not required
+        //internal static bool W2PFileContainsFireParticleEmitter(string w2PFilePath, ILocalizedStringSource localizedStringSource)
+        //{
+        //    CR2WFile file;
 
-            try
-            {
-                // TODO check other read methods and change to this try-catch scheme
-                file = ReadCR2WFile(w2PFilePath, localizedStringSource);
-            }
-            catch (Exception e)
-            {
-                // TODO maybe this should be logged, at least for testing purposes but this will 
-                //throw new System.InvalidOperationException("File '" + w2PFilePath + "' could not be loaded.");
-                return false;
-            }
+        //    try
+        //    {
+        //        // TODO check other read methods and change to this try-catch scheme
+        //        file = ReadCR2WFile(w2PFilePath, localizedStringSource);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        // TODO maybe this should be logged, at least for testing purposes but this will 
+        //        //throw new System.InvalidOperationException("File '" + w2PFilePath + "' could not be loaded.");
+        //        return false;
+        //    }
 
-            foreach (CR2WChunk chunk in file.chunks)
-            {
-                if (!chunk.Type.Equals(TypeCParticleEmitter))
-                {
-                    continue;
-                }
+        //    foreach (CR2WChunk chunk in file.chunks)
+        //    {
+        //        if (!chunk.Type.Equals(TypeCParticleEmitter))
+        //        {
+        //            continue;
+        //        }
 
-                if (chunk.data == null || !(chunk.data is CVector))
-                {
-                    throw new System.InvalidOperationException("File '" + w2PFilePath + "' contains either no or invalid chunk data for type '" + TypeCParticleEmitter + "'.");
-                }
+        //        if (chunk.data == null || !(chunk.data is CVector))
+        //        {
+        //            throw new System.InvalidOperationException("File '" + w2PFilePath + "' contains either no or invalid chunk data for type '" + TypeCParticleEmitter + "'.");
+        //        }
 
-                CVector chunkData = (CVector)chunk.data;
+        //        CVector chunkData = (CVector)chunk.data;
 
-                foreach (CVariable variable in chunkData.variables)
-                {
-                    if (isEditorName(variable) && (((CString)variable).val.Contains(LabelFire) || ((CString)variable).val.Contains(LabelFlame)))
-                    {
-                        return true;
-                    }
-                }
-            }
+        //        foreach (CVariable variable in chunkData.variables)
+        //        {
+        //            if (isEditorName(variable) && (((CString)variable).val.Contains(LabelFire) || ((CString)variable).val.Contains(LabelFlame)))
+        //            {
+        //                return true;
+        //            }
+        //        }
+        //    }
 
-            return false;
-        }
+        //    return false;
+        //}
 
         private static bool IsAutoHideDistance(CVariable variable)
         {

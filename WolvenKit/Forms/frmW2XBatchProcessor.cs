@@ -122,6 +122,9 @@ namespace WolvenKit.Forms
             }
 
             //return;
+            // TODO check if w2p files can only be renamed in the dlc directory... if so, try to copy them there
+            // TODO if not possible, only rename specific files where draw distance is limited
+
             // TODO patch glow autohidedistance in w2ent file
             // TODO try with all vanilla files
 
@@ -151,7 +154,7 @@ namespace WolvenKit.Forms
                 }
                 catch (Exception e)
                 {
-                    log.AddText(e.Message + "\n", frmOutput.Logtype.Error);
+                    log.AddText("An unexpected exception occurred while processing file '" + w2EntFilePathForFire + "': " + e.Message + "\n", frmOutput.Logtype.Error);
 
                     continue;
                 }
@@ -179,7 +182,7 @@ namespace WolvenKit.Forms
                 }
                 catch (Exception e)
                 {
-                    log.AddText(e.Message + "\n", frmOutput.Logtype.Error);
+                    log.AddText("An unexpected exception occurred while processing file '" + w2PFilePathForFire + "': " + e.Message + "\n", frmOutput.Logtype.Error);
 
                     continue;
                 }

@@ -290,7 +290,7 @@ namespace WolvenKit.CR2W.FilePatchers
                         string absoluteW2PFilePath = initialPath + Path.DirectorySeparatorChar + PathBundle + Path.DirectorySeparatorChar + relativeW2PFilePath;
                         string w2pFileName = relativeW2PFilePath.Substring(relativeW2PFilePath.LastIndexOf(Path.DirectorySeparatorChar) + 1);
 
-                        if ((w2pFileName.Contains(LabelFire) || w2pFileName.Contains(LabelFlame) || w2pFileName.Contains("_candle") || w2pFileName.Contains("_brazier"))
+                        if ((w2pFileName.Contains(LabelFire) || w2pFileName.Contains(LabelFlame) || w2pFileName.Contains("_candle") || w2pFileName.Contains("_brazier") || w2pFileName.Contains("torch"))
                             && !relativeW2PFilePath.Contains("arson") && !relativeW2PFilePath.Contains("arachas") && !relativeW2PFilePath.Contains("weapons") && !relativeW2PFilePath.Contains("gameplay")
                             && !relativeW2PFilePath.Contains("monsters") && !relativeW2PFilePath.Contains("characters") && !relativeW2PFilePath.Contains("environment") && !relativeW2PFilePath.Contains("work")
                             && !relativeW2PFilePath.Contains("igni"))

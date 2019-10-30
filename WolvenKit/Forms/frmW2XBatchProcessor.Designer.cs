@@ -39,7 +39,7 @@
             // button1
             // 
             this.button1.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.button1.Location = new System.Drawing.Point(667, 63);
+            this.button1.Location = new System.Drawing.Point(827, 63);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 23);
             this.button1.TabIndex = 0;
@@ -51,9 +51,9 @@
             // 
             this.dockPanel.AutoSize = true;
             this.dockPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.dockPanel.Location = new System.Drawing.Point(0, -3);
+            this.dockPanel.Location = new System.Drawing.Point(0, -255);
             this.dockPanel.Name = "dockPanel";
-            this.dockPanel.Size = new System.Drawing.Size(1409, 564);
+            this.dockPanel.Size = new System.Drawing.Size(1728, 816);
             this.dockPanel.TabIndex = 1;
             this.dockPanel.ActiveContentChanged += new System.EventHandler(this.dockPanel_ActiveContentChanged);
             // 
@@ -63,7 +63,7 @@
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(1409, 149);
+            this.panel1.Size = new System.Drawing.Size(1728, 149);
             this.panel1.TabIndex = 3;
             // 
             // panel2
@@ -72,14 +72,14 @@
             this.panel2.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.panel2.Location = new System.Drawing.Point(0, 155);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(1409, 561);
+            this.panel2.Size = new System.Drawing.Size(1728, 561);
             this.panel2.TabIndex = 4;
             // 
             // frmW2XBatchProcessor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1409, 716);
+            this.ClientSize = new System.Drawing.Size(1728, 716);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.panel1);
             this.MinimumSize = new System.Drawing.Size(300, 200);

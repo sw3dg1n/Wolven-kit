@@ -39,11 +39,6 @@ namespace WolvenKit.CR2W.FilePatchers
         {
             foreach (string relativeModFilePath in relativeModFilePaths)
             {
-                //if (relativeModFilePath.Contains("character") || relativeModFilePath.Contains("community"))
-                //{
-                //    continue;
-                //}
-
                 try
                 {
                     string absoluteModFilePath = fileDirectory + Path.DirectorySeparatorChar + relativeModFilePath;
@@ -77,7 +72,7 @@ namespace WolvenKit.CR2W.FilePatchers
                 }
                 catch (Exception e)
                 {
-                    ErrorMessages.Add(e.Message);
+                    ErrorMessages.Add("An unexpected exception occurred while processing file '" + relativeModFilePath + "': " + e.Message);
 
                     continue;
                 }
@@ -110,23 +105,6 @@ namespace WolvenKit.CR2W.FilePatchers
             //    {
             //        Directory.CreateDirectory(Path.GetDirectoryName(newPath));
             //        File.Copy(fullPath, newPath);
-            //    }
-            //}
-
-
-            //using (TextWriter tw = new StreamWriter("C:\\Users\\mkaltenb\\source\\repos\\w2pfiles.txt"))
-            //{
-            //    foreach (string s in W2PFilePathsForFires)
-            //    {
-            //        tw.WriteLine(s);
-            //    }
-            //}
-
-            //using (TextWriter tw = new StreamWriter("C:\\Users\\mkaltenb\\source\\repos\\w2entfiles.txt"))
-            //{
-            //    foreach (string s in W2EntFilePathsForFires)
-            //    {
-            //        tw.WriteLine(s);
             //    }
             //}
         }

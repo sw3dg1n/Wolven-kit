@@ -444,7 +444,7 @@ namespace WolvenKit.CR2W.Types
             //Register("SSeedKeyValue", new SSeedKeyValue(null)); //sw3dg1n: disabled as this causes an exception when reading certain w2p files
             //Register("SDynamicDecalMaterialInfo", new SDynamicDecalMaterialInfo(null)); //rfuzzo: disabled because it couldn't read the stream
             //Register("SParticleEmitterLODLevel", new SParticleEmitterLODLevel(null)); //sw3dg1n: disabled as this causes an exception when reading certain w2p files
-            Register("EmitterDelaySettings", new EmitterDelaySettings(null));
+            //Register("EmitterDelaySettings", new EmitterDelaySettings(null)); //sw3dg1n: disabled as this causes an exception when reading certain w2p files
             //Register("EmitterDurationSettings", new EmitterDurationSettings(null)); //sw3dg1n: disabled as this causes an exception when reading certain w2p files
             //Register("CParticleSystem", new CParticleSystem(null)); //sw3dg1n: disabled as this causes an exception when reading certain w2p files
 
