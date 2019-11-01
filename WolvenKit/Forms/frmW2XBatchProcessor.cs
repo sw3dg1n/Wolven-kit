@@ -123,6 +123,8 @@ namespace WolvenKit.Forms
 
             //return;
             // TODO add missing fires
+            // TODO maybe also patch fire w2p files which are not found in w2ent files
+            // TODO maybe also check w2l files for fires as apparently they can also reference w2p files directly
             
             (Dictionary<string, string> relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap, List<string> absoluteRenamedW2PFilePaths) = W2XFileHandler.CopyAndRenameW2PFiles(w2XFileHandler.W2PFilePathsForFires, activeMod.DlcDirectory);
 
