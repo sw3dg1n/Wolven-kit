@@ -7,12 +7,12 @@ using WolvenKit.CR2W.Types;
 
 namespace WolvenKit.CR2W.FilePatchers
 {
-    public sealed class SharedDataBuffer
+    public sealed class CByteArrayContainer
     {
         public CR2WFile Content { get; private set; }
         public CByteArray ByteArray { get; private set; }
 
-        public SharedDataBuffer(CR2WFile content, CByteArray byteArray)
+        public CByteArrayContainer(CR2WFile content, CByteArray byteArray)
         {
             Content = content;
             ByteArray = byteArray;

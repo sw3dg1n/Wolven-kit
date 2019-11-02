@@ -12,12 +12,10 @@ namespace WolvenKit.CR2W.BatchProcessors
         private const string TypeCParticleEmitter = "CParticleEmitter";
         private const string TypeCParticleSystem = "CParticleSystem";
 
-        private const string VariableNameAutoHideDistance = "autoHideDistance";
         private const string VariableNameDistance = "distance";
         private const string VariableNameEditorName = "editorName";
         private const string VariableNameLODs = "lods";
 
-        private const float ValueAutoHideDistanceIDD = 1200;
         private const float ValueLOD1IDD = 80;
         private const float ValueIncrementLODIDD = 40;
 
@@ -92,11 +90,6 @@ namespace WolvenKit.CR2W.BatchProcessors
             WriteCR2WFile(w2PFile, filePath);
         }
 
-        private static void PatchAutoHideDistance(CVariable variableAutoHideDistance)
-        {
-            ((CFloat)variableAutoHideDistance).SetValue(ValueAutoHideDistanceIDD);
-        }
-
         private static void PatchLODs(CVariable variableLODs)
         {
             float valueLODIDD = ValueLOD1IDD;
@@ -116,17 +109,6 @@ namespace WolvenKit.CR2W.BatchProcessors
                     }
                 }
             }
-        }
-
-        private static void AddAutoHideDistance(CR2WFile file, CVector chunkData)
-        {
-            CFloat autoHideDistanceVariable = new CFloat(file);
-
-            autoHideDistanceVariable.Type = CVariableTypeFloat;
-            autoHideDistanceVariable.Name = VariableNameAutoHideDistance;
-            autoHideDistanceVariable.SetValue(ValueAutoHideDistanceIDD);
-
-            chunkData.variables.Add(autoHideDistanceVariable);
         }
 
         // TODO probably remove it it turns out that it is really not required
@@ -172,15 +154,10 @@ namespace WolvenKit.CR2W.BatchProcessors
         //    return false;
         //}
 
-        private static bool IsAutoHideDistance(CVariable variable)
-        {
-            return variable is CFloat && variable.Name.Equals(VariableNameAutoHideDistance);
-        }
-
-        private static bool isEditorName(CVariable variable)
-        {
-            return variable is CString && variable.Name.Equals(VariableNameEditorName);
-        }
+        //private static bool isEditorName(CVariable variable)
+        //{
+        //    return variable is CString && variable.Name.Equals(VariableNameEditorName);
+        //}
 
         private static bool IsLODs(CVariable variable)
         {

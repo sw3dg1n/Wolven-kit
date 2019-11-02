@@ -15,10 +15,12 @@ namespace WolvenKit.CR2W.FilePatchers
         private const string TypeCFXDefinition = "CFXDefinition";
         private const string TypeCFXTrackItemParticles = "CFXTrackItemParticles";
         private const string TypeCParticleSystem = "CParticleSystem";
+        private const string TypeCPointLightComponent = "CPointLightComponent";
         private const string TypeSharedDataBuffer = "SharedDataBuffer";
 
         private const string VariableNameBuffer = "buffer";
         private const string VariableNameCookedEffects = "cookedEffects";
+        private const string VariableNameFlatCompiledData = "flatCompiledData";
         private const string VariableNameShowDistance = "showDistance";
 
         private const float ValueShowDistanceIDD = 1200;
@@ -29,21 +31,25 @@ namespace WolvenKit.CR2W.FilePatchers
 
         public void PatchForIncreasedDrawDistance(string filePath, Dictionary<string, string> relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap)
         {
-            // TODO patch glow autohidedistance in w2ent file
             CR2WFile w2EntFile = ReadW2EntFile(filePath, localizedStringSource);
-            List<SharedDataBuffer> sharedDataBuffersForFires = ReadSharedDataBuffersForFires(w2EntFile);
+            (List<CByteArrayContainer> sharedDataBuffersForFires, CByteArrayContainer flatCompiledData) = ReadSharedDataBuffersAndFlatCompiledDataForFires(w2EntFile);
 
             if (sharedDataBuffersForFires == null || !sharedDataBuffersForFires.Any())
             {
                 throw new System.InvalidOperationException("File '" + filePath + "' contains no shared data buffer.");
             }
 
-            foreach (SharedDataBuffer sharedDataBufferForFire in sharedDataBuffersForFires) {
+            foreach (CByteArrayContainer sharedDataBufferForFire in sharedDataBuffersForFires) {
 
                 PatchFireShowDistance(filePath, sharedDataBufferForFire);
                 PatchW2PFilePath(filePath, sharedDataBufferForFire, relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap);
 
-                WriteSharedDataBuffer(sharedDataBufferForFire);
+                WriteCByteArrayContainer(sharedDataBufferForFire);
+            }
+
+            if(PatchGlowAutoHideDistance(filePath, flatCompiledData))
+            {
+                WriteCByteArrayContainer(flatCompiledData);
             }
 
             // TODO probably get rid of the 2nd arg
@@ -55,9 +61,10 @@ namespace WolvenKit.CR2W.FilePatchers
             return ReadCR2WFile(filePath, localizedStringSource);
         }
 
-        internal static List<SharedDataBuffer> ReadSharedDataBuffersForFires(CR2WFile w2EntFile)
+        internal static (List<CByteArrayContainer> sharedDataBuffersForFires, CByteArrayContainer flatCompiledData) ReadSharedDataBuffersAndFlatCompiledDataForFires(CR2WFile w2EntFile)
         {
-            List<SharedDataBuffer> sharedDataBuffersForFires = null;
+            List<CByteArrayContainer> sharedDataBuffersForFires = null;
+            CByteArrayContainer flatCompiledData = null;
 
             string filePath = w2EntFile.FileName;
 
@@ -99,15 +106,31 @@ namespace WolvenKit.CR2W.FilePatchers
 
                         sharedDataBuffersForFires = GetSharedDataBuffersForFiresFromCookedEffectsVariable(variable, filePath, w2EntFile.LocalizedStringSource);
                     }
+                    else if (IsFlatCompiledData(variable))
+                    {
+                        if (flatCompiledData != null)
+                        {
+                            throw new System.InvalidOperationException("File '" + filePath + "' contains more than one flat compiled data.");
+                        }
+
+                        CR2WFile flatCompiledDataContent = ReadCByteArrayContainerContent((CByteArray)variable, w2EntFile.LocalizedStringSource);
+
+                        if (flatCompiledDataContent == null)
+                        {
+                            throw new System.InvalidOperationException("File '" + filePath + "' contains flat compiled data which could not be read.");
+                        }
+
+                        flatCompiledData = new CByteArrayContainer(flatCompiledDataContent, (CByteArray)variable);
+                    }
                 }
             }
 
-            return sharedDataBuffersForFires;
+            return (sharedDataBuffersForFires, flatCompiledData);
         }
 
-        private static List<SharedDataBuffer> GetSharedDataBuffersForFiresFromCookedEffectsVariable(CVariable variableCookedEffects, string filePath, ILocalizedStringSource localizedStringSource)
+        private static List<CByteArrayContainer> GetSharedDataBuffersForFiresFromCookedEffectsVariable(CVariable variableCookedEffects, string filePath, ILocalizedStringSource localizedStringSource)
         {
-            List<SharedDataBuffer> sharedDataBuffersForFires = new List<SharedDataBuffer>();
+            List<CByteArrayContainer> sharedDataBuffersForFires = new List<CByteArrayContainer>();
 
             foreach (CVariable cookedEffectsEntry in ((CArray)variableCookedEffects).array)
             {
@@ -122,14 +145,14 @@ namespace WolvenKit.CR2W.FilePatchers
 
                     if (IsFire(cookedEffectsVariables[0]) && IsSharedDataBuffer(cookedEffectsVariables[1]))
                     {
-                        CR2WFile sharedDataBufferContent = ReadSharedDataBufferContent((CByteArray)cookedEffectsVariables[1], localizedStringSource);
+                        CR2WFile sharedDataBufferContent = ReadCByteArrayContainerContent((CByteArray)cookedEffectsVariables[1], localizedStringSource);
 
                         if (sharedDataBufferContent == null)
                         {
                             throw new System.InvalidOperationException("File '" + filePath + "' contains a shared data buffer which could not be read.");
                         }
 
-                        sharedDataBuffersForFires.Add(new SharedDataBuffer(sharedDataBufferContent, (CByteArray)cookedEffectsVariables[1]));
+                        sharedDataBuffersForFires.Add(new CByteArrayContainer(sharedDataBufferContent, (CByteArray)cookedEffectsVariables[1]));
                     }
                 }
             }
@@ -137,7 +160,7 @@ namespace WolvenKit.CR2W.FilePatchers
             return sharedDataBuffersForFires;
         }
 
-        private static void PatchFireShowDistance(string filePath, SharedDataBuffer sharedDataBufferForFire)
+        private static void PatchFireShowDistance(string filePath, CByteArrayContainer sharedDataBufferForFire)
         {
             bool cFXDefinitionFound = false;
 
@@ -205,7 +228,7 @@ namespace WolvenKit.CR2W.FilePatchers
             chunkData.variables.Add(showDistanceVariable);
         }
 
-        private static void PatchW2PFilePath(string w2EntFilePath, SharedDataBuffer sharedDataBuffer, Dictionary<string, string> relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap)
+        private static void PatchW2PFilePath(string w2EntFilePath, CByteArrayContainer sharedDataBuffer, Dictionary<string, string> relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap)
         {
             bool cFXTrackItemParticlesFound = false;
 
@@ -259,7 +282,52 @@ namespace WolvenKit.CR2W.FilePatchers
             variableCSoftParticleSystem.Handle = relativeRenamedW2PFilePath;
         }
 
-        internal static List<string> GetW2PFilePathsForFires(SharedDataBuffer sharedDataBuffer, string w2EntFilePath, string modDirectory, string dlcDirectory, ILocalizedStringSource localizedStringSource)
+        private bool PatchGlowAutoHideDistance(string w2EntFilePath, CByteArrayContainer flatCompiledData)
+        {
+            bool cPointLightComponentFound = false;
+
+            foreach (CR2WChunk chunk in flatCompiledData.Content.chunks)
+            {
+                if (!IsCPointLightComponent(chunk))
+                {
+                    continue;
+                }
+
+                cPointLightComponentFound = true;
+
+                if (chunk.data == null || !(chunk.data is CVector))
+                {
+                    throw new System.InvalidOperationException("File '" + w2EntFilePath + "' contains either no or invalid chunk data for type '" + TypeCPointLightComponent + "'.");
+                }
+
+                CVector chunkData = (CVector)chunk.data;
+                bool autoHideDistanceFound = false;
+
+                foreach (CVariable variable in chunkData.variables)
+                {
+                    if (IsAutoHideDistance(variable))
+                    {
+                        if (autoHideDistanceFound)
+                        {
+                            throw new System.InvalidOperationException("File '" + w2EntFilePath + "' contains more than one attribute '" + VariableNameAutoHideDistance + "'.");
+                        }
+
+                        PatchAutoHideDistance(variable);
+
+                        autoHideDistanceFound = true;
+                    }
+                }
+
+                if (!autoHideDistanceFound)
+                {
+                    AddAutoHideDistance(flatCompiledData.Content, chunkData);
+                }
+            }
+
+            return cPointLightComponentFound;
+        }
+
+        internal static List<string> GetW2PFilePathsForFires(CByteArrayContainer sharedDataBuffer, string w2EntFilePath, string modDirectory, string dlcDirectory, ILocalizedStringSource localizedStringSource)
         {
             List<string> w2PFilePathsForFires = new List<string>();
 
@@ -328,6 +396,11 @@ namespace WolvenKit.CR2W.FilePatchers
             return variable is CSoft && ((CSoft)variable).FileType.Equals(TypeCParticleSystem);
         }
 
+        private static bool IsCPointLightComponent(CR2WChunk chunk)
+        {
+            return chunk.Type.Equals(TypeCPointLightComponent);
+        }
+
         private static bool IsFire(CVariable variable)
         {
             if (!(variable is CName))
@@ -339,6 +412,11 @@ namespace WolvenKit.CR2W.FilePatchers
 
             return variableValue.Contains(LabelFire) || variableValue.Contains("torch") || variableValue.Contains("destroy") || variableValue.Contains("light_on")
                 || variableValue.Equals("effects") || variableValue.Equals("active") || variableValue.Equals("candle") || variableValue.Equals("smoke") || variableValue.Equals("burn") || variableValue.Equals("active_effect");
+        }
+
+        private static bool IsFlatCompiledData(CVariable variable)
+        {
+            return variable is CByteArray && variable.Name.Equals(VariableNameFlatCompiledData);
         }
 
         private static bool IsSharedDataBuffer(CVariable variable)

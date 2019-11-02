@@ -13,8 +13,12 @@ namespace WolvenKit.CR2W.BatchProcessors
     {
         protected const string CVariableTypeFloat = "Float";
 
+        protected const string VariableNameAutoHideDistance = "autoHideDistance";
+
         protected const string LabelFire = "fire";
         protected const string LabelFlame = "flame";
+
+        protected const float ValueAutoHideDistanceIDD = 1200;
 
         protected readonly ILocalizedStringSource localizedStringSource;
 
@@ -59,7 +63,7 @@ namespace WolvenKit.CR2W.BatchProcessors
             }
         }
 
-        protected static CR2WFile ReadSharedDataBufferContent(CByteArray sharedDataBufferByteArray, ILocalizedStringSource localizedStringSource)
+        protected static CR2WFile ReadCByteArrayContainerContent(CByteArray sharedDataBufferByteArray, ILocalizedStringSource localizedStringSource)
         {
             CR2WFile file = null;
 
@@ -78,7 +82,7 @@ namespace WolvenKit.CR2W.BatchProcessors
             return file;
         }
 
-        protected static void WriteSharedDataBuffer(SharedDataBuffer sharedDataBuffer)
+        protected static void WriteCByteArrayContainer(CByteArrayContainer sharedDataBuffer)
         {
             using (var stream = new MemoryStream())
             {
@@ -89,6 +93,27 @@ namespace WolvenKit.CR2W.BatchProcessors
 
                 sharedDataBuffer.ByteArray.SetValue(stream.ToArray());
             }
+        }
+
+        protected static bool IsAutoHideDistance(CVariable variable)
+        {
+            return variable is CFloat && variable.Name.Equals(VariableNameAutoHideDistance);
+        }
+
+        protected static void PatchAutoHideDistance(CVariable variableAutoHideDistance)
+        {
+            ((CFloat)variableAutoHideDistance).SetValue(ValueAutoHideDistanceIDD);
+        }
+
+        protected static void AddAutoHideDistance(CR2WFile file, CVector chunkData)
+        {
+            CFloat autoHideDistanceVariable = new CFloat(file);
+
+            autoHideDistanceVariable.Type = CVariableTypeFloat;
+            autoHideDistanceVariable.Name = VariableNameAutoHideDistance;
+            autoHideDistanceVariable.SetValue(ValueAutoHideDistanceIDD);
+
+            chunkData.variables.Add(autoHideDistanceVariable);
         }
     }
 }

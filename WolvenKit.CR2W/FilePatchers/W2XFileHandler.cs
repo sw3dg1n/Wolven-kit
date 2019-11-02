@@ -52,14 +52,14 @@ namespace WolvenKit.CR2W.FilePatchers
                     if (Path.GetExtension(absoluteModFilePath).Equals(FileExtensionW2Ent))
                     {
                         CR2WFile w2EntFile = W2EntFilePatcher.ReadW2EntFile(absoluteModFilePath, localizedStringSource);
-                        List<SharedDataBuffer> sharedDataBuffersForFires = W2EntFilePatcher.ReadSharedDataBuffersForFires(w2EntFile);
+                        (List<CByteArrayContainer> sharedDataBuffersForFires, CByteArrayContainer flatCompiledData) = W2EntFilePatcher.ReadSharedDataBuffersAndFlatCompiledDataForFires(w2EntFile);
 
                         if (sharedDataBuffersForFires == null || !sharedDataBuffersForFires.Any())
                         {
                             continue;
                         }
 
-                        foreach (SharedDataBuffer sharedDataBufferForFire in sharedDataBuffersForFires)
+                        foreach (CByteArrayContainer sharedDataBufferForFire in sharedDataBuffersForFires)
                         {
                             List<string> w2PFilePathsForFires = W2EntFilePatcher.GetW2PFilePathsForFires(sharedDataBufferForFire, absoluteModFilePath, modDirectory, dlcDirectory, localizedStringSource);
 
