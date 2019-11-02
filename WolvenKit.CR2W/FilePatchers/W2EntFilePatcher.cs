@@ -21,7 +21,7 @@ namespace WolvenKit.CR2W.FilePatchers
         private const string VariableNameCookedEffects = "cookedEffects";
         private const string VariableNameShowDistance = "showDistance";
 
-        private const float ValueShowDistanceIDD = 800;
+        private const float ValueShowDistanceIDD = 1200;
 
         public W2EntFilePatcher(ILocalizedStringSource localizedStringSource) : base(localizedStringSource)
         {
@@ -247,10 +247,11 @@ namespace WolvenKit.CR2W.FilePatchers
                 }
             }
 
-            if (!cFXTrackItemParticlesFound)
-            {
-                throw new System.InvalidOperationException("File '" + w2EntFilePath + "' contains no chunk of type '" + TypeCFXTrackItemParticles + "'.");
-            }
+            // TODO maybe enable this check again for some final testing but it should be removed in the release version
+            //if (!cFXTrackItemParticlesFound)
+            //{
+            //    throw new System.InvalidOperationException("File '" + w2EntFilePath + "' contains no chunk of type '" + TypeCFXTrackItemParticles + "'.");
+            //}
         }
 
         private static void PatchW2PFilePath(CSoft variableCSoftParticleSystem, string relativeRenamedW2PFilePath)
@@ -329,7 +330,15 @@ namespace WolvenKit.CR2W.FilePatchers
 
         private static bool IsFire(CVariable variable)
         {
-            return variable is CName && ((CName)variable).Value.Contains(LabelFire);
+            if (!(variable is CName))
+            {
+                return false;
+            }
+
+            string variableValue = ((CName)variable).Value;
+
+            return variableValue.Contains(LabelFire) || variableValue.Contains("torch") || variableValue.Contains("destroy") || variableValue.Contains("light_on")
+                || variableValue.Equals("effects") || variableValue.Equals("active") || variableValue.Equals("candle") || variableValue.Equals("smoke") || variableValue.Equals("burn") || variableValue.Equals("active_effect");
         }
 
         private static bool IsSharedDataBuffer(CVariable variable)

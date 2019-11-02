@@ -17,7 +17,7 @@ namespace WolvenKit.CR2W.BatchProcessors
         private const string VariableNameEditorName = "editorName";
         private const string VariableNameLODs = "lods";
 
-        private const float ValueAutoHideDistanceIDD = 800;
+        private const float ValueAutoHideDistanceIDD = 1200;
         private const float ValueLOD1IDD = 80;
         private const float ValueIncrementLODIDD = 40;
 
