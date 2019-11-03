@@ -38,9 +38,11 @@ namespace WolvenKit.CR2W.FilePatchers
         private const string VariableNameFlatCompiledData = "flatCompiledData";
         private const string VariableNameShowDistance = "showDistance";
         private const string VariableNameStreamingDataBuffer = "streamingDataBuffer";
+        private const string VariableNameStreamingDistance = "streamingDistance";
         private const string VariableNameTransform = "transform";
 
         private const float ValueShowDistanceIDD = 1200;
+        private const byte ValueStreamingDistanceIDD = 100;
 
         private const float MinValueTransformYForCandles = 0.01F;
 
@@ -83,7 +85,8 @@ namespace WolvenKit.CR2W.FilePatchers
 
             if (streamingDataBufferForFires != null)
             {
-                PatchW2EntFilePath(filePath, streamingDataBufferForFires, relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap);
+                PatchStreamingDistance(filePath, w2EntFile);
+                PatchW2MeshFilePath(filePath, streamingDataBufferForFires, relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap);
 
                 WriteCByteArrayContainer(streamingDataBufferForFires);
             }
@@ -370,7 +373,47 @@ namespace WolvenKit.CR2W.FilePatchers
             return cPointLightComponentFound;
         }
 
-        private void PatchW2EntFilePath(string w2EntFilePath, CByteArrayContainer streamingDataBufferForFires, Dictionary<string, string> relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap)
+        private void PatchStreamingDistance(string filePath, CR2WFile w2EntFile)
+        {
+            bool streamingDistanceFound = false;
+
+            foreach (CR2WChunk chunk in w2EntFile.chunks)
+            {
+                if (!IsTypeWithStreamingDataBuffer(chunk))
+                {
+                    continue;
+                }
+
+                CVector chunkData = (CVector)chunk.data;
+
+                foreach (CVariable variable in chunkData.variables)
+                {
+                    if (IsStreamingDistance(variable))
+                    {
+                        if (streamingDistanceFound)
+                        {
+                            throw new System.InvalidOperationException("File '" + filePath + "' contains more than one attribute '" + VariableNameStreamingDistance + "'.");
+                        }
+
+                        PatchStreamingDistance(variable);
+
+                        streamingDistanceFound = true;
+                    }
+                }
+            }
+
+            if (!streamingDistanceFound)
+            {
+                throw new System.InvalidOperationException("File '" + filePath + "' does not contain attribute '" + VariableNameStreamingDistance + "'.");
+            }
+        }
+
+        private static void PatchStreamingDistance(CVariable variableStreamingDistance)
+        {
+            ((CUInt8)variableStreamingDistance).SetValue(ValueStreamingDistanceIDD);
+        }
+
+        private void PatchW2MeshFilePath(string w2EntFilePath, CByteArrayContainer streamingDataBufferForFires, Dictionary<string, string> relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap)
         {
             foreach (CR2WChunk chunk in streamingDataBufferForFires.Content.chunks)
             {
@@ -398,7 +441,7 @@ namespace WolvenKit.CR2W.FilePatchers
 
                         if (relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap.TryGetValue(relativeW2MeshFilePath, out relativeRenamedW2MeshFilePath))
                         {
-                            PatchW2EntFilePath(variableCHandleMesh, relativeRenamedW2MeshFilePath);
+                            PatchW2MeshFilePath(variableCHandleMesh, relativeRenamedW2MeshFilePath);
                         }
                         else if (!relativeW2MeshFilePath.EndsWith(W2XFileHandler.FileNameSuffixILOD + W2XFileHandler.FileExtensionW2Mesh))
                         {
@@ -417,7 +460,7 @@ namespace WolvenKit.CR2W.FilePatchers
             }
         }
 
-        private static void PatchW2EntFilePath(CHandle variableCHandleMesh, string relativeRenamedW2MeshFilePath)
+        private static void PatchW2MeshFilePath(CHandle variableCHandleMesh, string relativeRenamedW2MeshFilePath)
         {
             variableCHandleMesh.Handle = relativeRenamedW2MeshFilePath;
         }
@@ -628,6 +671,11 @@ namespace WolvenKit.CR2W.FilePatchers
         private static bool IsStreamingDataBuffer(CVariable variable)
         {
             return variable is CByteArray && variable.Name.Equals(VariableNameStreamingDataBuffer) && variable.Type.Equals(TypeSharedDataBuffer);
+        }
+
+        private static bool IsStreamingDistance(CVariable variable)
+        {
+            return variable is CUInt8 && variable.Name.Equals(VariableNameStreamingDistance);
         }
 
         private static bool IsShowDistance(CVariable variable)
