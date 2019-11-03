@@ -7,7 +7,7 @@ using WolvenKit.CR2W.Types;
 
 namespace WolvenKit.CR2W.BatchProcessors
 {
-    public sealed class W2PFilePatcher : W2XFilePatcher
+    public sealed class W2AFilePatcher : W2XFilePatcher
     {
         private const string TypeCParticleEmitter = "CParticleEmitter";
         private const string TypeCParticleSystem = "CParticleSystem";
@@ -19,7 +19,7 @@ namespace WolvenKit.CR2W.BatchProcessors
         private const float ValueLOD1IDD = 80;
         private const float ValueIncrementLODIDD = 40;
 
-        public W2PFilePatcher(ILocalizedStringSource localizedStringSource) : base(localizedStringSource)
+        public W2AFilePatcher(ILocalizedStringSource localizedStringSource) : base(localizedStringSource)
         {
         }
 

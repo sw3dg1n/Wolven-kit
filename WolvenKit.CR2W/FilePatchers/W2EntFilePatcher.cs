@@ -48,7 +48,8 @@ namespace WolvenKit.CR2W.FilePatchers
         {
         }
 
-        public void PatchForIncreasedDrawDistance(string filePath, Dictionary<string, string> relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap)
+        public void PatchForIncreasedDrawDistance(string filePath, Dictionary<string, string> relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap,
+            Dictionary<string, string> relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap)
         {
             CR2WFile w2EntFile = ReadW2EntFile(filePath, localizedStringSource);
 
@@ -78,6 +79,15 @@ namespace WolvenKit.CR2W.FilePatchers
                 WriteCByteArrayContainer(flatCompiledData);
             }
 
+            CByteArrayContainer streamingDataBufferForFires = ReadStreamingDataBufferForFires(w2EntFile);
+
+            if (streamingDataBufferForFires != null)
+            {
+                PatchW2EntFilePath(filePath, streamingDataBufferForFires, relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap);
+
+                WriteCByteArrayContainer(streamingDataBufferForFires);
+            }
+            
             // TODO probably get rid of the 2nd arg
             WriteCR2WFile(w2EntFile, w2EntFile.FileName);
         }
@@ -360,6 +370,58 @@ namespace WolvenKit.CR2W.FilePatchers
             return cPointLightComponentFound;
         }
 
+        private void PatchW2EntFilePath(string w2EntFilePath, CByteArrayContainer streamingDataBufferForFires, Dictionary<string, string> relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap)
+        {
+            foreach (CR2WChunk chunk in streamingDataBufferForFires.Content.chunks)
+            {
+                if (!IsMeshComponent(chunk))
+                {
+                    continue;
+                }
+
+                if (chunk.data == null || !(chunk.data is CVector))
+                {
+                    throw new System.InvalidOperationException("File '" + w2EntFilePath + "' contains either no or invalid chunk data for a mesh type.");
+                }
+
+                CVector chunkData = (CVector)chunk.data;
+                bool meshFilePathFound = false;
+
+                foreach (CVariable variable in chunkData.variables)
+                {
+                    if (IsCHandleMesh(variable))
+                    {
+                        CHandle variableCHandleMesh = (CHandle)variable;
+
+                        string relativeW2MeshFilePath = variableCHandleMesh.Handle;
+                        string relativeRenamedW2MeshFilePath;
+
+                        if (relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap.TryGetValue(relativeW2MeshFilePath, out relativeRenamedW2MeshFilePath))
+                        {
+                            PatchW2EntFilePath(variableCHandleMesh, relativeRenamedW2MeshFilePath);
+                        }
+                        else if (!relativeW2MeshFilePath.EndsWith(W2XFileHandler.FileNameSuffixILOD + W2XFileHandler.FileExtensionW2Mesh))
+                        {
+                            // TODO this should be tracked but the processing should still finish
+                            //throw new System.InvalidOperationException("File '" + w2EntFilePath + "' contains a w2ent path '" + relativeW2EntFilePath + "' which is not yet renamed.");
+                        }
+
+                        meshFilePathFound = true;
+                    }
+                }
+
+                if (!meshFilePathFound)
+                {
+                    throw new System.InvalidOperationException("File '" + w2EntFilePath + "' contains a mesh component without a specified file path.");
+                }
+            }
+        }
+
+        private static void PatchW2EntFilePath(CHandle variableCHandleMesh, string relativeRenamedW2MeshFilePath)
+        {
+            variableCHandleMesh.Handle = relativeRenamedW2MeshFilePath;
+        }
+
         internal static CByteArrayContainer ReadStreamingDataBufferForFires(CR2WFile w2EntFile)
         {
             CByteArrayContainer streamingDataBufferForFires = null;
@@ -494,7 +556,7 @@ namespace WolvenKit.CR2W.FilePatchers
 
                 if (!meshFilePathFound)
                 {
-                    throw new System.InvalidOperationException("File '" + w2EntFilePath + "' contains either a mesh component without a specified file path.");
+                    throw new System.InvalidOperationException("File '" + w2EntFilePath + "' contains a mesh component without a specified file path.");
                 }
             }
 

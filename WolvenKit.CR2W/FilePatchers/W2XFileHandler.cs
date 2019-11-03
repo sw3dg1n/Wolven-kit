@@ -9,10 +9,12 @@ namespace WolvenKit.CR2W.FilePatchers
 {
     public sealed class W2XFileHandler
     {
+        public const string FileExtensionSuffixW2MeshBuffer = ".1.buffer";
+
         public const string FileExtensionW2Ent = ".w2ent";
         public const string FileExtensionW2L = ".w2l";
         public const string FileExtensionW2Mesh = ".w2mesh";
-        public const string FileExtensionW2MeshBuffer = ".1.buffer";
+        public const string FileExtensionW2MeshBuffer = FileExtensionW2Mesh + FileExtensionSuffixW2MeshBuffer;
         public const string FileExtensionW2P = ".w2p";
 
         public const string FileNameSuffixILOD = "_ilod";
@@ -94,7 +96,7 @@ namespace WolvenKit.CR2W.FilePatchers
                                 {
                                     foreach (string w2MeshFilePathForFire in w2MeshFilePathsForFires)
                                     {
-                                        string w2MeshBufferFilePathForFire = w2MeshFilePathForFire + FileExtensionW2MeshBuffer;
+                                        string w2MeshBufferFilePathForFire = w2MeshFilePathForFire + FileExtensionSuffixW2MeshBuffer;
 
                                         W2MeshFilePathsForFires.Add(w2MeshFilePathForFire);
                                         W2MeshBufferFilePathsForFires.Add(w2MeshBufferFilePathForFire);
@@ -107,6 +109,7 @@ namespace WolvenKit.CR2W.FilePatchers
                             }
                             else
                             {
+                                // TODO look for meshes directly in the initial chunk list, there are at least a few w2ents which have it defined like this
                                 ErrorMessages.Add("No streaming data buffer could be found in file '" + absoluteModFilePath + "'.");
                             }
                         }
@@ -126,55 +129,64 @@ namespace WolvenKit.CR2W.FilePatchers
             W2MeshBufferFilePathsForFires = W2MeshBufferFilePathsForFires.Distinct().ToList();
             W2PFilePathsForFires = W2PFilePathsForFires.Distinct().ToList();
 
-            string w2entsource = "C:\\Users\\mkaltenb\\source\\repos\\fire_files\\w2ent";
+            //string w2entsource = "C:\\Users\\mkaltenb\\source\\repos\\fire_files\\w2ent";
 
-            foreach (string fullPath in W2EntFilePathsForFires)
-            {
-                string newPath = w2entsource + fullPath.Substring(fullPath.IndexOf(PathBundle) + PathBundle.Length);
+            //foreach (string fullPath in W2EntFilePathsForFires)
+            //{
+            //    string newPath = w2entsource + fullPath.Substring(fullPath.IndexOf(PathBundle) + PathBundle.Length);
 
-                if (File.Exists(fullPath) && !File.Exists(newPath))
-                {
-                    Directory.CreateDirectory(Path.GetDirectoryName(newPath));
-                    File.Copy(fullPath, newPath);
-                }
-            }
+            //    if (File.Exists(fullPath) && !File.Exists(newPath))
+            //    {
+            //        Directory.CreateDirectory(Path.GetDirectoryName(newPath));
+            //        File.Copy(fullPath, newPath);
+            //    }
+            //}
 
-            string w2meshsource = "C:\\Users\\mkaltenb\\source\\repos\\fire_files\\w2mesh";
+            //string w2meshsource = "C:\\Users\\mkaltenb\\source\\repos\\fire_files\\w2mesh";
 
-            foreach (string fullPath in W2MeshFilePathsForFires)
-            {
-                string newPath = w2meshsource + fullPath.Substring(fullPath.IndexOf(PathBundle) + PathBundle.Length);
+            //foreach (string fullPath in W2MeshFilePathsForFires)
+            //{
+            //    string newPath = w2meshsource + fullPath.Substring(fullPath.IndexOf(PathBundle) + PathBundle.Length);
 
-                if (File.Exists(fullPath) && !File.Exists(newPath))
-                {
-                    Directory.CreateDirectory(Path.GetDirectoryName(newPath));
-                    File.Copy(fullPath, newPath);
-                }
-            }
+            //    if (File.Exists(fullPath) && !File.Exists(newPath))
+            //    {
+            //        Directory.CreateDirectory(Path.GetDirectoryName(newPath));
+            //        File.Copy(fullPath, newPath);
+            //    }
+            //}
 
-            foreach (string fullPath in W2MeshBufferFilePathsForFires)
-            {
-                string newPath = w2meshsource + fullPath.Substring(fullPath.IndexOf(PathBundle) + PathBundle.Length);
+            //foreach (string fullPath in W2MeshBufferFilePathsForFires)
+            //{
+            //    string newPath = w2meshsource + fullPath.Substring(fullPath.IndexOf(PathBundle) + PathBundle.Length);
 
-                if (File.Exists(fullPath) && !File.Exists(newPath))
-                {
-                    Directory.CreateDirectory(Path.GetDirectoryName(newPath));
-                    File.Copy(fullPath, newPath);
-                }
-            }
+            //    if (File.Exists(fullPath) && !File.Exists(newPath))
+            //    {
+            //        Directory.CreateDirectory(Path.GetDirectoryName(newPath));
+            //        File.Copy(fullPath, newPath);
+            //    }
+            //}
 
-            string w2psource = "C:\\Users\\mkaltenb\\source\\repos\\fire_files\\w2p";
+            //string w2psource = "C:\\Users\\mkaltenb\\source\\repos\\fire_files\\w2p";
 
-            foreach (string fullPath in W2PFilePathsForFires)
-            {
-                string newPath = w2psource + fullPath.Substring(fullPath.IndexOf(PathBundle) + PathBundle.Length);
+            //foreach (string fullPath in W2PFilePathsForFires)
+            //{
+            //    string newPath = w2psource + fullPath.Substring(fullPath.IndexOf(PathBundle) + PathBundle.Length);
 
-                if (File.Exists(fullPath) && !File.Exists(newPath))
-                {
-                    Directory.CreateDirectory(Path.GetDirectoryName(newPath));
-                    File.Copy(fullPath, newPath);
-                }
-            }
+            //    if (File.Exists(fullPath) && !File.Exists(newPath))
+            //    {
+            //        Directory.CreateDirectory(Path.GetDirectoryName(newPath));
+            //        File.Copy(fullPath, newPath);
+            //    }
+            //}
+        }
+
+        public static (Dictionary<string, string> relativeOriginalFilePathToRelativeRenamedFilePathMap, List<string> absoluteRenamedFilePaths) CopyAndRenameW2MeshFiles(List<string> absoluteW2MeshFilePaths, string dlcDirectory)
+        {
+            return CopyAndRenameFiles(absoluteW2MeshFilePaths, dlcDirectory, FileExtensionW2Mesh);
+        }
+        public static (Dictionary<string, string> relativeOriginalFilePathToRelativeRenamedFilePathMap, List<string> absoluteRenamedFilePaths) CopyAndRenameW2MeshBufferFiles(List<string> absoluteW2MeshBufferFilePaths, string dlcDirectory)
+        {
+            return CopyAndRenameFiles(absoluteW2MeshBufferFilePaths, dlcDirectory, FileExtensionW2MeshBuffer);
         }
 
         public static (Dictionary<string, string> relativeOriginalFilePathToRelativeRenamedFilePathMap, List<string> absoluteRenamedFilePaths) CopyAndRenameW2PFiles(List<string> absoluteW2PFilePaths, string dlcDirectory)

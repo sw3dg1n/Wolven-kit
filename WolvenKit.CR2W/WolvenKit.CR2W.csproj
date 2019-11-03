@@ -95,6 +95,7 @@
   <ItemGroup>
     <Compile Include="FilePatchers\SharedDataBuffer.cs" />
     <Compile Include="FilePatchers\W2EntFilePatcher.cs" />
+    <Compile Include="FilePatchers\W2MeshFilePatcher.cs" />
     <Compile Include="FilePatchers\W2PFilePatcher.cs" />
     <Compile Include="FilePatchers\W2XFileHandler.cs" />
     <Compile Include="FilePatchers\W2XFilePatcher.cs" />

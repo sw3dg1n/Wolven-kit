@@ -101,11 +101,11 @@ namespace WolvenKit.Forms
             IEnumerable<string> w2PFilePathsInModButNotInFires = w2PFilePathsInMod.Except(w2XFileHandler.W2PFilePathsForFires);
             IEnumerable<string> w2PFilePathsInFiresButNotInMod = w2XFileHandler.W2PFilePathsForFires.Except(w2PFilePathsInMod);
 
-            //log.AddText("w2EntFilePathsInModButNotInFires:\n", frmOutput.Logtype.Important);
-            //foreach (string file in w2EntFilePathsInModButNotInFires)
-            //{
-            //    log.AddText(file + "\n", frmOutput.Logtype.Error);
-            //}
+            log.AddText("w2EntFilePathsInModButNotInFires:\n", frmOutput.Logtype.Important);
+            foreach (string file in w2EntFilePathsInModButNotInFires)
+            {
+                log.AddText(file + "\n", frmOutput.Logtype.Error);
+            }
 
             log.AddText("w2EntFilePathsInFiresButNotInMod:\n", frmOutput.Logtype.Important);
             foreach (string file in w2EntFilePathsInFiresButNotInMod)
@@ -113,11 +113,11 @@ namespace WolvenKit.Forms
                 log.AddText(file + "\n", frmOutput.Logtype.Error);
             }
 
-            //log.AddText("w2MeshFilePathsInModButNotInFires:\n", frmOutput.Logtype.Important);
-            //foreach (string file in w2MeshFilePathsInModButNotInFires)
-            //{
-            //    log.AddText(file + "\n", frmOutput.Logtype.Error);
-            //}
+            log.AddText("w2MeshFilePathsInModButNotInFires:\n", frmOutput.Logtype.Important);
+            foreach (string file in w2MeshFilePathsInModButNotInFires)
+            {
+                log.AddText(file + "\n", frmOutput.Logtype.Error);
+            }
 
             log.AddText("w2MeshFilePathsInFiresButNotInMod:\n", frmOutput.Logtype.Important);
             foreach (string file in w2MeshFilePathsInFiresButNotInMod)
@@ -125,11 +125,11 @@ namespace WolvenKit.Forms
                 log.AddText(file + "\n", frmOutput.Logtype.Error);
             }
 
-            //log.AddText("w2PFilePathsInModButNotInFires:\n", frmOutput.Logtype.Important);
-            //foreach (string file in w2PFilePathsInModButNotInFires)
-            //{
-            //    log.AddText(file + "\n", frmOutput.Logtype.Error);
-            //}
+            log.AddText("w2PFilePathsInModButNotInFires:\n", frmOutput.Logtype.Important);
+            foreach (string file in w2PFilePathsInModButNotInFires)
+            {
+                log.AddText(file + "\n", frmOutput.Logtype.Error);
+            }
 
             log.AddText("w2PFilePathsInFiresButNotInMod:\n", frmOutput.Logtype.Important);
             foreach (string file in w2PFilePathsInFiresButNotInMod)
@@ -137,19 +137,28 @@ namespace WolvenKit.Forms
                 log.AddText(file + "\n", frmOutput.Logtype.Error);
             }
 
-            return;
-            
+            //return;
+
             // TODO maybe also patch fire w2p files which are not found in w2ent files
             // TODO maybe also check w2l files for fires as apparently they can also reference w2p files directly
-            
-            (Dictionary<string, string> relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap, List<string> absoluteRenamedW2PFilePaths) = W2XFileHandler.CopyAndRenameW2PFiles(w2XFileHandler.W2PFilePathsForFires, activeMod.DlcDirectory);
 
-            patchW2EntFilesForFires(w2XFileHandler.W2EntFilePathsForFires, relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap);
+            (Dictionary<string, string> relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap, List<string> absoluteRenamedW2MeshFilePaths)
+                = W2XFileHandler.CopyAndRenameW2MeshFiles(w2XFileHandler.W2MeshFilePathsForFires, activeMod.DlcDirectory);
+
+            W2XFileHandler.CopyAndRenameW2MeshBufferFiles(w2XFileHandler.W2MeshBufferFilePathsForFires, activeMod.DlcDirectory);
+
+            (Dictionary<string, string> relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap, List<string> absoluteRenamedW2PFilePaths)
+                = W2XFileHandler.CopyAndRenameW2PFiles(w2XFileHandler.W2PFilePathsForFires, activeMod.DlcDirectory);
+
+            patchW2EntFilesForFires(w2XFileHandler.W2EntFilePathsForFires, relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap, relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap);
+
+            patchW2MeshFilesForFires(absoluteRenamedW2MeshFilePaths);
 
             patchW2PFilesForFires(absoluteRenamedW2PFilePaths);
         }
 
-        private void patchW2EntFilesForFires(List<string> w2EntFilePathsForFires, Dictionary<string, string> relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap)
+        private void patchW2EntFilesForFires(List<string> w2EntFilePathsForFires, Dictionary<string, string> relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap,
+            Dictionary<string, string> relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap)
         {
             W2EntFilePatcher w2EntFilePatcher = new W2EntFilePatcher(MainController.Get());
 
@@ -164,7 +173,7 @@ namespace WolvenKit.Forms
 
                 try
                 {
-                    w2EntFilePatcher.PatchForIncreasedDrawDistance(w2EntFilePathForFire, relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap);
+                    w2EntFilePatcher.PatchForIncreasedDrawDistance(w2EntFilePathForFire, relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap, relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap);
                 }
                 catch (Exception e)
                 {
@@ -177,9 +186,37 @@ namespace WolvenKit.Forms
             }
         }
 
+        private void patchW2MeshFilesForFires(List<string> w2MeshFilePathsForFires)
+        {
+            W2MeshFilePatcher w2MeshFilePatcher = new W2MeshFilePatcher(MainController.Get());
+
+            foreach (string w2MeshFilePathForFire in w2MeshFilePathsForFires)
+            {
+                if (!File.Exists(w2MeshFilePathForFire))
+                {
+                    log.AddText("File '" + w2MeshFilePathForFire + "' does not exist.\n", frmOutput.Logtype.Error);
+
+                    continue;
+                }
+
+                try
+                {
+                    w2MeshFilePatcher.PatchForIncreasedDrawDistance(w2MeshFilePathForFire);
+                }
+                catch (Exception e)
+                {
+                    log.AddText("An unexpected exception occurred while processing file '" + w2MeshFilePathForFire + "': " + e.Message + "\n", frmOutput.Logtype.Error);
+
+                    continue;
+                }
+
+                log.AddText("Successfully processed file '" + w2MeshFilePathForFire + "\n", frmOutput.Logtype.Success);
+            }
+        }
+
         private void patchW2PFilesForFires(List<string> w2PFilePathsForFires)
         {
-            W2PFilePatcher w2PFilePatcher = new W2PFilePatcher(MainController.Get());
+            W2AFilePatcher w2PFilePatcher = new W2AFilePatcher(MainController.Get());
 
             foreach (string w2PFilePathForFire in w2PFilePathsForFires)
             {
