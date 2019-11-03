@@ -12,6 +12,7 @@ namespace WolvenKit.CR2W.FilePatchers
     public sealed class W2EntFilePatcher : W2XFilePatcher
     {
         private const string TypeCEntityTemplate = "CEntityTemplate";
+        private const string TypeEngineTransform = "EngineTransform";
         private const string TypeCFXDefinition = "CFXDefinition";
         private const string TypeCFXTrackItemParticles = "CFXTrackItemParticles";
         private const string TypeCParticleSystem = "CParticleSystem";
@@ -22,8 +23,11 @@ namespace WolvenKit.CR2W.FilePatchers
         private const string VariableNameCookedEffects = "cookedEffects";
         private const string VariableNameFlatCompiledData = "flatCompiledData";
         private const string VariableNameShowDistance = "showDistance";
+        private const string VariableNameTransform = "transform";
 
         private const float ValueShowDistanceIDD = 1200;
+
+        private const float MinValueTransformYForCandles = 0.01F;
 
         public W2EntFilePatcher(ILocalizedStringSource localizedStringSource) : base(localizedStringSource)
         {
@@ -230,7 +234,7 @@ namespace WolvenKit.CR2W.FilePatchers
 
         private static void PatchW2PFilePath(string w2EntFilePath, CByteArrayContainer sharedDataBuffer, Dictionary<string, string> relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap)
         {
-            bool cFXTrackItemParticlesFound = false;
+            //bool cFXTrackItemParticlesFound = false;
 
             foreach (CR2WChunk chunk in sharedDataBuffer.Content.chunks)
             {
@@ -239,7 +243,7 @@ namespace WolvenKit.CR2W.FilePatchers
                     continue;
                 }
 
-                cFXTrackItemParticlesFound = true;
+                //cFXTrackItemParticlesFound = true;
 
                 if (chunk.data == null || !(chunk.data is CVector))
                 {
@@ -316,6 +320,19 @@ namespace WolvenKit.CR2W.FilePatchers
 
                         autoHideDistanceFound = true;
                     }
+                    // TODO maybe the campfires should be restricted further, so far only campfire_01.w2ent was observed to have issues
+                    else if (IsTransform(variable) && (Path.GetFileName(w2EntFilePath).Contains("candle") || Path.GetFileName(w2EntFilePath).Contains("campfire_")))
+                    {
+                        CEngineTransform transform = (CEngineTransform)variable;
+
+                        float valueY = transform.y.val;
+
+                        // For some reason changing some coordinates slightly makes the glow render at a bigger distance for a few of the light sources...
+                        if (valueY <= 0)
+                        {
+                            transform.y.SetValue(MinValueTransformYForCandles);
+                        }
+                    }
                 }
 
                 if (!autoHideDistanceFound)
@@ -357,7 +374,8 @@ namespace WolvenKit.CR2W.FilePatchers
                         string absoluteW2PFilePath = initialPath + Path.DirectorySeparatorChar + W2XFileHandler.PathBundle + Path.DirectorySeparatorChar + relativeW2PFilePath;
                         string w2pFileName = relativeW2PFilePath.Substring(relativeW2PFilePath.LastIndexOf(Path.DirectorySeparatorChar) + 1);
 
-                        if ((w2pFileName.Contains(LabelFire) || w2pFileName.Contains(LabelFlame) || w2pFileName.Contains("_candle") || w2pFileName.Contains("_brazier") || w2pFileName.Contains("torch") || w2pFileName.Contains("chandelier"))
+                        if ((w2pFileName.Contains(LabelFire) || w2pFileName.Contains(LabelFlame) || w2pFileName.Contains("_candle") || w2pFileName.Contains("_brazier") || w2pFileName.Contains("torch")
+                            || w2pFileName.Contains("chandelier") || (w2pFileName.Contains("coal") && !w2pFileName.Contains("smoke")))
                             && !relativeW2PFilePath.Contains("arson") && !relativeW2PFilePath.Contains("arachas") && !relativeW2PFilePath.Contains("weapons") && !relativeW2PFilePath.Contains("gameplay")
                             && !relativeW2PFilePath.Contains("monsters") && !relativeW2PFilePath.Contains("characters") && !relativeW2PFilePath.Contains("environment") && !relativeW2PFilePath.Contains("work")
                             && !relativeW2PFilePath.Contains("igni"))
@@ -427,6 +445,10 @@ namespace WolvenKit.CR2W.FilePatchers
         private static bool IsShowDistance(CVariable variable)
         {
             return variable is CFloat && variable.Name.Equals(VariableNameShowDistance);
+        }
+        private static bool IsTransform(CVariable variable)
+        {
+            return variable is CEngineTransform && variable.Name.Equals(VariableNameTransform) && variable.Type.Equals(TypeEngineTransform);
         }
     }
 }
