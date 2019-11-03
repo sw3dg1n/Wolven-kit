@@ -11,18 +11,33 @@ namespace WolvenKit.CR2W.FilePatchers
 {
     public sealed class W2EntFilePatcher : W2XFilePatcher
     {
+        private const string TypeCActionPoint = "CActionPoint";
+        private const string TypeCEntity = "CEntity";
         private const string TypeCEntityTemplate = "CEntityTemplate";
         private const string TypeEngineTransform = "EngineTransform";
         private const string TypeCFXDefinition = "CFXDefinition";
         private const string TypeCFXTrackItemParticles = "CFXTrackItemParticles";
+        private const string TypeCGameplayEntity = "CGameplayEntity";
+        private const string TypeCMesh = "CMesh";
+        private const string TypeCMeshComponent = "CMeshComponent";
         private const string TypeCParticleSystem = "CParticleSystem";
         private const string TypeCPointLightComponent = "CPointLightComponent";
+        private const string TypeCRigidMeshComponent = "CRigidMeshComponent";
+        private const string TypeCStaticMeshComponent = "CStaticMeshComponent";
         private const string TypeSharedDataBuffer = "SharedDataBuffer";
+        private const string TypeW3AnimationInteractionEntity = "W3AnimationInteractionEntity";
+        private const string TypeW3Campfire = "W3Campfire";
+        private const string TypeW3FireSource = "W3FireSource";
+        private const string TypeW3FireSourceLifeRegen = "W3FireSourceLifeRegen";
+        private const string TypeW3LightEntityDamaging = "W3LightEntityDamaging";
+        private const string TypeW3LightSource = "W3LightSource";
+        private const string TypeW3MonsterClue = "W3MonsterClue";
 
         private const string VariableNameBuffer = "buffer";
         private const string VariableNameCookedEffects = "cookedEffects";
         private const string VariableNameFlatCompiledData = "flatCompiledData";
         private const string VariableNameShowDistance = "showDistance";
+        private const string VariableNameStreamingDataBuffer = "streamingDataBuffer";
         private const string VariableNameTransform = "transform";
 
         private const float ValueShowDistanceIDD = 1200;
@@ -36,6 +51,12 @@ namespace WolvenKit.CR2W.FilePatchers
         public void PatchForIncreasedDrawDistance(string filePath, Dictionary<string, string> relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap)
         {
             CR2WFile w2EntFile = ReadW2EntFile(filePath, localizedStringSource);
+
+            if (w2EntFile == null)
+            {
+                throw new System.InvalidOperationException("File '" + filePath + "' could not be loaded.");
+            }
+
             (List<CByteArrayContainer> sharedDataBuffersForFires, CByteArrayContainer flatCompiledData) = ReadSharedDataBuffersAndFlatCompiledDataForFires(w2EntFile);
 
             if (sharedDataBuffersForFires == null || !sharedDataBuffersForFires.Any())
@@ -43,7 +64,8 @@ namespace WolvenKit.CR2W.FilePatchers
                 throw new System.InvalidOperationException("File '" + filePath + "' contains no shared data buffer.");
             }
 
-            foreach (CByteArrayContainer sharedDataBufferForFire in sharedDataBuffersForFires) {
+            foreach (CByteArrayContainer sharedDataBufferForFire in sharedDataBuffersForFires)
+            {
 
                 PatchFireShowDistance(filePath, sharedDataBufferForFire);
                 PatchW2PFilePath(filePath, sharedDataBufferForFire, relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap);
@@ -51,7 +73,7 @@ namespace WolvenKit.CR2W.FilePatchers
                 WriteCByteArrayContainer(sharedDataBufferForFire);
             }
 
-            if(PatchGlowAutoHideDistance(filePath, flatCompiledData))
+            if (PatchGlowAutoHideDistance(filePath, flatCompiledData))
             {
                 WriteCByteArrayContainer(flatCompiledData);
             }
@@ -71,12 +93,6 @@ namespace WolvenKit.CR2W.FilePatchers
             CByteArrayContainer flatCompiledData = null;
 
             string filePath = w2EntFile.FileName;
-
-            if (w2EntFile == null)
-            {
-                throw new System.InvalidOperationException("File '" + filePath + "' could not be loaded.");
-            }
-
             bool cEntityTemplateFound = false;
 
             foreach (CR2WChunk chunk in w2EntFile.chunks)
@@ -344,7 +360,58 @@ namespace WolvenKit.CR2W.FilePatchers
             return cPointLightComponentFound;
         }
 
-        internal static List<string> GetW2PFilePathsForFires(CByteArrayContainer sharedDataBuffer, string w2EntFilePath, string modDirectory, string dlcDirectory, ILocalizedStringSource localizedStringSource)
+        internal static CByteArrayContainer ReadStreamingDataBufferForFires(CR2WFile w2EntFile)
+        {
+            CByteArrayContainer streamingDataBufferForFires = null;
+
+            string filePath = w2EntFile.FileName;
+            bool typeWithStreamingDataBufferFound = false;
+
+            foreach (CR2WChunk chunk in w2EntFile.chunks)
+            {
+                if (!IsTypeWithStreamingDataBuffer(chunk))
+                {
+                    continue;
+                }
+                else if (typeWithStreamingDataBufferFound)
+                {
+                    throw new System.InvalidOperationException("File '" + filePath + "' contains more than one chunk with a streaming data buffer.");
+                }
+
+                typeWithStreamingDataBufferFound = true;
+
+                if (chunk.data == null || !(chunk.data is CVector))
+                {
+                    throw new System.InvalidOperationException("File '" + filePath + "' contains either no or invalid chunk data with a streaming data buffer.");
+                }
+
+                CVector chunkData = (CVector)chunk.data;
+
+                foreach (CVariable variable in chunkData.variables)
+                {
+                    if (IsStreamingDataBuffer(variable))
+                    {
+                        if (streamingDataBufferForFires != null)
+                        {
+                            throw new System.InvalidOperationException("File '" + filePath + "' contains more than one cooked effects variable with streaming data buffers.");
+                        }
+
+                        CR2WFile streamingDataBufferContent = ReadCByteArrayContainerContent((CByteArray)variable, w2EntFile.LocalizedStringSource);
+
+                        if (streamingDataBufferContent == null)
+                        {
+                            throw new System.InvalidOperationException("File '" + filePath + "' contains a streaming data buffer which could not be read.");
+                        }
+
+                        streamingDataBufferForFires = new CByteArrayContainer(streamingDataBufferContent, (CByteArray)variable);
+                    }
+                }
+            }
+
+            return streamingDataBufferForFires;
+        }
+
+        internal static List<string> GetW2PFilePathsForFires(CByteArrayContainer sharedDataBuffer, string w2EntFilePath, string modDirectory, string dlcDirectory)
         {
             List<string> w2PFilePathsForFires = new List<string>();
 
@@ -380,13 +447,58 @@ namespace WolvenKit.CR2W.FilePatchers
                             && !relativeW2PFilePath.Contains("monsters") && !relativeW2PFilePath.Contains("characters") && !relativeW2PFilePath.Contains("environment") && !relativeW2PFilePath.Contains("work")
                             && !relativeW2PFilePath.Contains("igni"))
                         {
-                            w2PFilePathsForFires.Add(absoluteW2PFilePath); 
+                            w2PFilePathsForFires.Add(absoluteW2PFilePath);
                         }
                     }
                 }
             }
 
             return w2PFilePathsForFires;
+        }
+
+        internal static List<string> GetW2MeshFilePathsForFires(CByteArrayContainer streamingDataBufferForFires, string w2EntFilePath, string modDirectory, string dlcDirectory)
+        {
+            List<string> w2MeshFilePathsForFires = new List<string>();
+
+            foreach (CR2WChunk chunk in streamingDataBufferForFires.Content.chunks)
+            {
+                if (!IsMeshComponent(chunk))
+                {
+                    continue;
+                }
+
+                if (chunk.data == null || !(chunk.data is CVector))
+                {
+                    throw new System.InvalidOperationException("File '" + w2EntFilePath + "' contains either no or invalid chunk data for a mesh type.");
+                }
+
+                CVector chunkData = (CVector)chunk.data;
+                bool meshFilePathFound = false;
+
+                foreach (CVariable variable in chunkData.variables)
+                {
+                    if (IsCHandleMesh(variable))
+                    {
+                        CHandle variableCHandleMesh = (CHandle)variable;
+
+                        string relativeW2MeshFilePath = variableCHandleMesh.Handle;
+                        string initialPath = relativeW2MeshFilePath.StartsWith(W2XFileHandler.PathDLC) ? dlcDirectory : modDirectory;
+
+                        string absoluteW2MeshFilePath = initialPath + Path.DirectorySeparatorChar + W2XFileHandler.PathBundle + Path.DirectorySeparatorChar + relativeW2MeshFilePath;
+                        
+                        w2MeshFilePathsForFires.Add(absoluteW2MeshFilePath);
+
+                        meshFilePathFound = true;
+                    }
+                }
+
+                if (!meshFilePathFound)
+                {
+                    throw new System.InvalidOperationException("File '" + w2EntFilePath + "' contains either a mesh component without a specified file path.");
+                }
+            }
+
+            return w2MeshFilePathsForFires;
         }
 
         private static bool IsCEntityTemplate(CR2WChunk chunk)
@@ -402,6 +514,11 @@ namespace WolvenKit.CR2W.FilePatchers
         private static bool IsCFXTrackItemParticles(CR2WChunk chunk)
         {
             return chunk.Type.Equals(TypeCFXTrackItemParticles);
+        }
+
+        private static bool IsCHandleMesh(CVariable variable)
+        {
+            return variable is CHandle && ((CHandle)variable).FileType.Equals(TypeCMesh);
         }
 
         private static bool IsCookedEffects(CVariable variable)
@@ -436,10 +553,19 @@ namespace WolvenKit.CR2W.FilePatchers
         {
             return variable is CByteArray && variable.Name.Equals(VariableNameFlatCompiledData);
         }
+        private static bool IsMeshComponent(CR2WChunk chunk)
+        {
+            return chunk.Type.Equals(TypeCMeshComponent) || chunk.Type.Equals(TypeCRigidMeshComponent) || chunk.Type.Equals(TypeCStaticMeshComponent); 
+        }
 
         private static bool IsSharedDataBuffer(CVariable variable)
         {
             return variable is CByteArray && variable.Name.Equals(VariableNameBuffer) && variable.Type.Equals(TypeSharedDataBuffer);
+        }
+
+        private static bool IsStreamingDataBuffer(CVariable variable)
+        {
+            return variable is CByteArray && variable.Name.Equals(VariableNameStreamingDataBuffer) && variable.Type.Equals(TypeSharedDataBuffer);
         }
 
         private static bool IsShowDistance(CVariable variable)
@@ -449,6 +575,12 @@ namespace WolvenKit.CR2W.FilePatchers
         private static bool IsTransform(CVariable variable)
         {
             return variable is CEngineTransform && variable.Name.Equals(VariableNameTransform) && variable.Type.Equals(TypeEngineTransform);
+        }
+        
+        private static bool IsTypeWithStreamingDataBuffer(CR2WChunk chunk)
+        {
+            return chunk.Type.Equals(TypeCActionPoint) || chunk.Type.Equals(TypeCEntity) || chunk.Type.Equals(TypeCGameplayEntity) || chunk.Type.Equals(TypeW3AnimationInteractionEntity) || chunk.Type.Equals(TypeW3Campfire)
+                || chunk.Type.Equals(TypeW3FireSource) || chunk.Type.Equals(TypeW3FireSourceLifeRegen) || chunk.Type.Equals(TypeW3LightEntityDamaging) || chunk.Type.Equals(TypeW3LightSource) || chunk.Type.Equals(TypeW3MonsterClue);
         }
     }
 }

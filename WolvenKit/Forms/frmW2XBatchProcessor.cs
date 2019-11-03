@@ -66,6 +66,7 @@ namespace WolvenKit.Forms
             }
 
             List<string> w2EntFilePathsInMod = new List<string>();
+            List<string> w2MeshFilePathsInMod = new List<string>();
             List<string> w2PFilePathsInMod = new List<string>();
 
             foreach (string relativeModFilePath in activeMod.Files)
@@ -81,7 +82,7 @@ namespace WolvenKit.Forms
                         // TODO add
                         continue;
                     case FileExtensionW2Mesh:
-                        // TODO add
+                        w2MeshFilePathsInMod.Add(absoluteModFilePath);
                         continue;
                     case FileExtensionW2P:
                         w2PFilePathsInMod.Add(absoluteModFilePath);
@@ -94,14 +95,17 @@ namespace WolvenKit.Forms
             IEnumerable<string> w2EntFilePathsInModButNotInFires = w2EntFilePathsInMod.Except(w2XFileHandler.W2EntFilePathsForFires);
             IEnumerable<string> w2EntFilePathsInFiresButNotInMod = w2XFileHandler.W2EntFilePathsForFires.Except(w2EntFilePathsInMod);
 
+            IEnumerable<string> w2MeshFilePathsInModButNotInFires = w2MeshFilePathsInMod.Except(w2XFileHandler.W2MeshFilePathsForFires);
+            IEnumerable<string> w2MeshFilePathsInFiresButNotInMod = w2XFileHandler.W2MeshFilePathsForFires.Except(w2MeshFilePathsInMod);
+
             IEnumerable<string> w2PFilePathsInModButNotInFires = w2PFilePathsInMod.Except(w2XFileHandler.W2PFilePathsForFires);
             IEnumerable<string> w2PFilePathsInFiresButNotInMod = w2XFileHandler.W2PFilePathsForFires.Except(w2PFilePathsInMod);
 
-            log.AddText("w2EntFilePathsInModButNotInFires:\n", frmOutput.Logtype.Important);
-            foreach (string file in w2EntFilePathsInModButNotInFires)
-            {
-                log.AddText(file + "\n", frmOutput.Logtype.Error);
-            }
+            //log.AddText("w2EntFilePathsInModButNotInFires:\n", frmOutput.Logtype.Important);
+            //foreach (string file in w2EntFilePathsInModButNotInFires)
+            //{
+            //    log.AddText(file + "\n", frmOutput.Logtype.Error);
+            //}
 
             log.AddText("w2EntFilePathsInFiresButNotInMod:\n", frmOutput.Logtype.Important);
             foreach (string file in w2EntFilePathsInFiresButNotInMod)
@@ -109,11 +113,23 @@ namespace WolvenKit.Forms
                 log.AddText(file + "\n", frmOutput.Logtype.Error);
             }
 
-            log.AddText("w2PFilePathsInModButNotInFires:\n", frmOutput.Logtype.Important);
-            foreach (string file in w2PFilePathsInModButNotInFires)
+            //log.AddText("w2MeshFilePathsInModButNotInFires:\n", frmOutput.Logtype.Important);
+            //foreach (string file in w2MeshFilePathsInModButNotInFires)
+            //{
+            //    log.AddText(file + "\n", frmOutput.Logtype.Error);
+            //}
+
+            log.AddText("w2MeshFilePathsInFiresButNotInMod:\n", frmOutput.Logtype.Important);
+            foreach (string file in w2MeshFilePathsInFiresButNotInMod)
             {
                 log.AddText(file + "\n", frmOutput.Logtype.Error);
             }
+
+            //log.AddText("w2PFilePathsInModButNotInFires:\n", frmOutput.Logtype.Important);
+            //foreach (string file in w2PFilePathsInModButNotInFires)
+            //{
+            //    log.AddText(file + "\n", frmOutput.Logtype.Error);
+            //}
 
             log.AddText("w2PFilePathsInFiresButNotInMod:\n", frmOutput.Logtype.Important);
             foreach (string file in w2PFilePathsInFiresButNotInMod)
@@ -121,8 +137,8 @@ namespace WolvenKit.Forms
                 log.AddText(file + "\n", frmOutput.Logtype.Error);
             }
 
-            //return;
-            // TODO add missing fires
+            return;
+            
             // TODO maybe also patch fire w2p files which are not found in w2ent files
             // TODO maybe also check w2l files for fires as apparently they can also reference w2p files directly
             
