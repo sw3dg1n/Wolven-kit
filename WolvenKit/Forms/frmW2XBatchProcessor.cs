@@ -101,11 +101,11 @@ namespace WolvenKit.Forms
             IEnumerable<string> w2PFilePathsInModButNotInFires = w2PFilePathsInMod.Except(w2XFileHandler.W2PFilePathsForFires);
             IEnumerable<string> w2PFilePathsInFiresButNotInMod = w2XFileHandler.W2PFilePathsForFires.Except(w2PFilePathsInMod);
 
-            log.AddText("w2EntFilePathsInModButNotInFires:\n", frmOutput.Logtype.Important);
-            foreach (string file in w2EntFilePathsInModButNotInFires)
-            {
-                log.AddText(file + "\n", frmOutput.Logtype.Error);
-            }
+            //log.AddText("w2EntFilePathsInModButNotInFires:\n", frmOutput.Logtype.Important);
+            //foreach (string file in w2EntFilePathsInModButNotInFires)
+            //{
+            //    log.AddText(file + "\n", frmOutput.Logtype.Error);
+            //}
 
             log.AddText("w2EntFilePathsInFiresButNotInMod:\n", frmOutput.Logtype.Important);
             foreach (string file in w2EntFilePathsInFiresButNotInMod)
@@ -113,11 +113,11 @@ namespace WolvenKit.Forms
                 log.AddText(file + "\n", frmOutput.Logtype.Error);
             }
 
-            log.AddText("w2MeshFilePathsInModButNotInFires:\n", frmOutput.Logtype.Important);
-            foreach (string file in w2MeshFilePathsInModButNotInFires)
-            {
-                log.AddText(file + "\n", frmOutput.Logtype.Error);
-            }
+            //log.AddText("w2MeshFilePathsInModButNotInFires:\n", frmOutput.Logtype.Important);
+            //foreach (string file in w2MeshFilePathsInModButNotInFires)
+            //{
+            //    log.AddText(file + "\n", frmOutput.Logtype.Error);
+            //}
 
             log.AddText("w2MeshFilePathsInFiresButNotInMod:\n", frmOutput.Logtype.Important);
             foreach (string file in w2MeshFilePathsInFiresButNotInMod)
@@ -125,11 +125,11 @@ namespace WolvenKit.Forms
                 log.AddText(file + "\n", frmOutput.Logtype.Error);
             }
 
-            log.AddText("w2PFilePathsInModButNotInFires:\n", frmOutput.Logtype.Important);
-            foreach (string file in w2PFilePathsInModButNotInFires)
-            {
-                log.AddText(file + "\n", frmOutput.Logtype.Error);
-            }
+            //log.AddText("w2PFilePathsInModButNotInFires:\n", frmOutput.Logtype.Important);
+            //foreach (string file in w2PFilePathsInModButNotInFires)
+            //{
+            //    log.AddText(file + "\n", frmOutput.Logtype.Error);
+            //}
 
             log.AddText("w2PFilePathsInFiresButNotInMod:\n", frmOutput.Logtype.Important);
             foreach (string file in w2PFilePathsInFiresButNotInMod)

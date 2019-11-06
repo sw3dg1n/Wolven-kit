@@ -344,7 +344,7 @@ namespace WolvenKit.CR2W.FilePatchers
                         autoHideDistanceFound = true;
                     }
                     // TODO maybe the campfires should be restricted further, so far only campfire_01.w2ent was observed to have issues
-                    else if (IsTransform(variable) && (Path.GetFileName(w2EntFilePath).Contains("candle") || Path.GetFileName(w2EntFilePath).Contains("campfire_")))
+                    else if (IsTransform(variable) && (Path.GetFileName(w2EntFilePath).Contains("candle") || Path.GetFileName(w2EntFilePath).Contains("campfire_") || Path.GetFileName(w2EntFilePath).Contains("chandelier_small")))
                     {
                         CEngineTransform transform = (CEngineTransform)variable;
 
