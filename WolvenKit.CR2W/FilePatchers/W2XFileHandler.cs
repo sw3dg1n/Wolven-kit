@@ -123,7 +123,6 @@ namespace WolvenKit.CR2W.FilePatchers
                 }
             }
 
-            // TODO this should simply be replaced with a set
             W2EntFilePathsForFires = W2EntFilePathsForFires.Distinct().ToList();
             W2MeshFilePathsForFires = W2MeshFilePathsForFires.Distinct().ToList();
             W2MeshBufferFilePathsForFires = W2MeshBufferFilePathsForFires.Distinct().ToList();
@@ -233,7 +232,7 @@ namespace WolvenKit.CR2W.FilePatchers
                         File.Copy(absoluteOriginalFilePath, absoluteRenamedFilePath);
                     }
 
-                    // TODO probably delete the original file once everything is stable
+                    // TODO delete the original file once everything is stable
                 }
 
                 if (!relativeOriginalFilePathToRelativeRenamedFilePathMap.ContainsKey(relativeOriginalFilePath))

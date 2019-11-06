@@ -91,8 +91,7 @@ namespace WolvenKit.CR2W.FilePatchers
                 WriteCByteArrayContainer(streamingDataBufferForFires);
             }
             
-            // TODO probably get rid of the 2nd arg
-            WriteCR2WFile(w2EntFile, w2EntFile.FileName);
+            WriteCR2WFile(w2EntFile);
         }
 
         internal static CR2WFile ReadW2EntFile(string filePath, ILocalizedStringSource localizedStringSource)
@@ -294,11 +293,6 @@ namespace WolvenKit.CR2W.FilePatchers
                         {
                             PatchW2PFilePath(variableCSoftParticleSystem, relativeRenamedW2PFilePath);
                         }
-                        else if (!relativeW2PFilePath.EndsWith(W2XFileHandler.FileNameSuffixILOD + W2XFileHandler.FileExtensionW2P))
-                        {
-                            // TODO this should be tracked but the processing should still finish
-                            //throw new System.InvalidOperationException("File '" + w2EntFilePath + "' contains a w2p path '" + relativeW2PFilePath + "' which is not yet renamed.");
-                        }
                     }
                 }
             }
@@ -442,11 +436,6 @@ namespace WolvenKit.CR2W.FilePatchers
                         if (relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap.TryGetValue(relativeW2MeshFilePath, out relativeRenamedW2MeshFilePath))
                         {
                             PatchW2MeshFilePath(variableCHandleMesh, relativeRenamedW2MeshFilePath);
-                        }
-                        else if (!relativeW2MeshFilePath.EndsWith(W2XFileHandler.FileNameSuffixILOD + W2XFileHandler.FileExtensionW2Mesh))
-                        {
-                            // TODO this should be tracked but the processing should still finish
-                            //throw new System.InvalidOperationException("File '" + w2EntFilePath + "' contains a w2ent path '" + relativeW2EntFilePath + "' which is not yet renamed.");
                         }
 
                         meshFilePathFound = true;

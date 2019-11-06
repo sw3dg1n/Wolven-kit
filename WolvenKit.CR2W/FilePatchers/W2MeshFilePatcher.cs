@@ -84,7 +84,7 @@ namespace WolvenKit.CR2W.FilePatchers
                 throw new System.InvalidOperationException("File '" + filePath + "' contains no chunk of type '" + TypeCMesh + "'.");
             }
 
-            WriteCR2WFile(w2MeshFile, filePath);
+            WriteCR2WFile(w2MeshFile);
         }
 
         private static void PatchLODs(CVector variableCookedData)

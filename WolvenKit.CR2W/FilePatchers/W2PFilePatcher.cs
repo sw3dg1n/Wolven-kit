@@ -71,8 +71,6 @@ namespace WolvenKit.CR2W.BatchProcessors
                     else if (IsLODs(variable))
                     {
                         PatchLODs(variable);
-
-                        // TODO not sure if LODs should be added if not present but probably not
                     }
                 }
 
@@ -87,7 +85,7 @@ namespace WolvenKit.CR2W.BatchProcessors
                 throw new System.InvalidOperationException("File '" + filePath + "' contains no chunk of type '" + TypeCParticleSystem + "'.");
             }
 
-            WriteCR2WFile(w2PFile, filePath);
+            WriteCR2WFile(w2PFile);
         }
 
         private static void PatchLODs(CVariable variableLODs)
@@ -111,7 +109,7 @@ namespace WolvenKit.CR2W.BatchProcessors
             }
         }
 
-        // TODO probably remove it it turns out that it is really not required
+        // TODO remove if it turns out that it is really not required
         //internal static bool W2PFileContainsFireParticleEmitter(string w2PFilePath, ILocalizedStringSource localizedStringSource)
         //{
         //    CR2WFile file;

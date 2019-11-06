@@ -46,7 +46,7 @@ namespace WolvenKit.CR2W.BatchProcessors
             return file;
         }
 
-        protected static void WriteCR2WFile(CR2WFile file, string filePath)
+        protected static void WriteCR2WFile(CR2WFile file)
         {
             using (var stream = new MemoryStream())
             {
@@ -55,7 +55,7 @@ namespace WolvenKit.CR2W.BatchProcessors
                     file.Write(writer);
                     stream.Seek(0, SeekOrigin.Begin);
 
-                    using (var fs = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+                    using (var fs = new FileStream(file.FileName, FileMode.Create, FileAccess.Write))
                     {
                         stream.WriteTo(fs);
                     }
