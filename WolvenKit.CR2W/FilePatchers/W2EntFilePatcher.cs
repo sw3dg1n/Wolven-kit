@@ -547,27 +547,30 @@ namespace WolvenKit.CR2W.FilePatchers
 
             bool cFXTrackItemParticlesFound = false;
 
-            foreach (CR2WChunk chunk in sharedDataBuffer.Content.chunks)
+            if (sharedDataBuffer != null)
             {
-                if (!IsCFXTrackItemParticles(chunk))
+                foreach (CR2WChunk chunk in sharedDataBuffer.Content.chunks)
                 {
-                    continue;
-                }
-
-                if (chunk.data == null || !(chunk.data is CVector))
-                {
-                    throw new System.InvalidOperationException("File '" + w2EntFilePath + "' contains either no or invalid chunk data for type '" + TypeCFXTrackItemParticles + "'.");
-                }
-
-                cFXTrackItemParticlesFound = true;
-
-                CVector chunkData = (CVector)chunk.data;
-
-                foreach (CVariable variable in chunkData.variables)
-                {
-                    if (IsCSoftParticleSystem(variable))
+                    if (!IsCFXTrackItemParticles(chunk))
                     {
-                        AddW2PFilePath(w2PFilePathsForFires, ((CSoft)variable).Handle, modDirectory, dlcDirectory);
+                        continue;
+                    }
+
+                    if (chunk.data == null || !(chunk.data is CVector))
+                    {
+                        throw new System.InvalidOperationException("File '" + w2EntFilePath + "' contains either no or invalid chunk data for type '" + TypeCFXTrackItemParticles + "'.");
+                    }
+
+                    cFXTrackItemParticlesFound = true;
+
+                    CVector chunkData = (CVector)chunk.data;
+
+                    foreach (CVariable variable in chunkData.variables)
+                    {
+                        if (IsCSoftParticleSystem(variable))
+                        {
+                            AddW2PFilePath(w2PFilePathsForFires, ((CSoft)variable).Handle, modDirectory, dlcDirectory);
+                        }
                     }
                 }
             }
@@ -609,21 +612,21 @@ namespace WolvenKit.CR2W.FilePatchers
             string absoluteW2PFilePath = initialPath + Path.DirectorySeparatorChar + W2XFileHandler.PathBundle + Path.DirectorySeparatorChar + relativeW2PFilePath;
             string w2pFileName = relativeW2PFilePath.Substring(relativeW2PFilePath.LastIndexOf(Path.DirectorySeparatorChar) + 1);
 
-            if ((w2pFileName.Contains(LabelFire) || w2pFileName.Contains(LabelFlame) || w2pFileName.Contains("_candle") || w2pFileName.Contains("_brazier") || w2pFileName.Contains("torch")
-                || w2pFileName.Contains("chandelier") || (w2pFileName.Contains("coal") && !w2pFileName.Contains("smoke")))
-                && !relativeW2PFilePath.Contains("arson") && !relativeW2PFilePath.Contains("arachas") && !relativeW2PFilePath.Contains("weapons") && !relativeW2PFilePath.Contains("gameplay")
+            if ((w2pFileName.Contains(LabelFire) || w2pFileName.Contains(LabelFlame) || (w2pFileName.Contains("candle") && !w2pFileName.Contains("wraith") && !w2pFileName.Contains("smoke") && !w2pFileName.Contains("spark")) 
+                || w2pFileName.Contains("_brazier") || w2pFileName.Contains("torch") || w2pFileName.Contains("chandelier") || (w2pFileName.Contains("coal") && !w2pFileName.Contains("smoke")))
+                && !relativeW2PFilePath.Contains("arson") && !relativeW2PFilePath.Contains("arachas") && !relativeW2PFilePath.Contains("weapons") && !relativeW2PFilePath.Contains("beehive")
                 && !relativeW2PFilePath.Contains("monsters") && !relativeW2PFilePath.Contains("characters") && !relativeW2PFilePath.Contains("environment") && !relativeW2PFilePath.Contains("work")
-                && !relativeW2PFilePath.Contains("igni"))
+                && !relativeW2PFilePath.Contains("igni") && !relativeW2PFilePath.Contains("oil_barrel"))
             {
                 w2PFilePathsForFires.Add(absoluteW2PFilePath);
             }
         }
 
-        internal static List<string> GetW2MeshFilePathsForFires(CByteArrayContainer streamingDataBufferForFires, string w2EntFilePath, string modDirectory, string dlcDirectory)
+        internal static List<string> GetW2MeshFilePathsForFires(List<CR2WChunk> chunks, string w2EntFilePath, string modDirectory, string dlcDirectory)
         {
             List<string> w2MeshFilePathsForFires = new List<string>();
 
-            foreach (CR2WChunk chunk in streamingDataBufferForFires.Content.chunks)
+            foreach (CR2WChunk chunk in chunks)
             {
                 if (!IsMeshComponent(chunk))
                 {
@@ -636,32 +639,48 @@ namespace WolvenKit.CR2W.FilePatchers
                 }
 
                 CVector chunkData = (CVector)chunk.data;
-                bool meshFilePathFound = false;
 
                 foreach (CVariable variable in chunkData.variables)
                 {
                     if (IsCHandleMesh(variable))
                     {
-                        CHandle variableCHandleMesh = (CHandle)variable;
-
-                        string relativeW2MeshFilePath = variableCHandleMesh.Handle;
-                        string initialPath = relativeW2MeshFilePath.StartsWith(W2XFileHandler.PathDLC) ? dlcDirectory : modDirectory;
-
-                        string absoluteW2MeshFilePath = initialPath + Path.DirectorySeparatorChar + W2XFileHandler.PathBundle + Path.DirectorySeparatorChar + relativeW2MeshFilePath;
-                        
-                        w2MeshFilePathsForFires.Add(absoluteW2MeshFilePath);
-
-                        meshFilePathFound = true;
+                        AddW2MeshFilePath(w2MeshFilePathsForFires, ((CHandle)variable).Handle, modDirectory, dlcDirectory);
                     }
-                }
-
-                if (!meshFilePathFound)
-                {
-                    throw new System.InvalidOperationException("File '" + w2EntFilePath + "' contains a mesh component without a specified file path.");
                 }
             }
 
             return w2MeshFilePathsForFires;
+        }
+
+        private static void AddW2MeshFilePath(List<string> w2MeshFilePathsForFires, string relativeW2MeshFilePath, string modDirectory, string dlcDirectory)
+        {
+            string initialPath = relativeW2MeshFilePath.StartsWith(W2XFileHandler.PathDLC) ? dlcDirectory : modDirectory;
+
+            string absoluteW2MeshFilePath = initialPath + Path.DirectorySeparatorChar + W2XFileHandler.PathBundle + Path.DirectorySeparatorChar + relativeW2MeshFilePath;
+            string w2MeshFileName = relativeW2MeshFilePath.Substring(relativeW2MeshFilePath.LastIndexOf(Path.DirectorySeparatorChar) + 1);
+
+            // TODO extend filters
+            //if (!w2MeshFileName.Contains("proxy") && !w2MeshFileName.Contains("uercus_branch")
+            //    && !relativeW2MeshFilePath.Contains("characters") && !relativeW2MeshFilePath.Contains("weapons") && !relativeW2MeshFilePath.Contains("near_water")
+            //    && (!relativeW2MeshFilePath.Contains("items") || w2MeshFileName.Contains("torch") || w2MeshFileName.Contains("pyre")))
+            //{
+            //if ((w2MeshFileName.Contains("fire") || w2MeshFileName.Contains("flame") || (w2MeshFileName.Contains("candle") && !w2MeshFileName.Contains("wraith") && !w2MeshFileName.Contains("smoke") && !w2MeshFileName.Contains("spark"))
+            //    || w2MeshFileName.Contains("_brazier") || w2MeshFileName.Contains("torch") || w2MeshFileName.Contains("chandelier") || (w2MeshFileName.Contains("coal") && !w2MeshFileName.Contains("smoke")))
+            //    && !relativeW2MeshFilePath.Contains("arson") && !relativeW2MeshFilePath.Contains("arachas") && !relativeW2MeshFilePath.Contains("weapons") //&& !relativeW2MeshFilePath.Contains("gameplay") // TODO maybe remove gameplay again or replace it with something else. fx\gameplay\burned_corpses\burned_corpse_fire.w2p should be included 
+            //    && !relativeW2MeshFilePath.Contains("monsters") && !relativeW2MeshFilePath.Contains("characters") && !relativeW2MeshFilePath.Contains("environment") && !relativeW2MeshFilePath.Contains("work")
+            //    && !relativeW2MeshFilePath.Contains("igni"))
+            //{
+            //}
+
+            // TODO uncomment
+            //if ((w2MeshFileName.Contains("torch") || w2MeshFileName.Contains("fence") || w2MeshFileName.Contains("fire") || w2MeshFileName.Contains("pillar") || w2MeshFileName.Contains("chain")
+            //    || w2MeshFileName.Contains("pole") || w2MeshFileName.Contains("brazier") || w2MeshFileName.Contains("corp") || w2MeshFileName.Contains("burn") || w2MeshFileName.Contains("candelabra")
+            //    || w2MeshFileName.Contains("pile") || w2MeshFileName.Contains("cauldron") || w2MeshFileName.Contains("roast") || w2MeshFileName.Contains("candle") || w2MeshFileName.Contains("forge")
+            //    || w2MeshFileName.Contains("chandelier") || w2MeshFileName.Contains("coal") || w2MeshFileName.Contains("lamp") || w2MeshFileName.Contains("pot")
+            //    || w2MeshFileName.Contains("stove") || w2MeshFileName.Contains("shrine")) && !w2MeshFileName.Contains("proxy") || w2MeshFileName.Contains("pyre") || w2MeshFileName.Contains("lantern"))
+            //{
+            w2MeshFilePathsForFires.Add(absoluteW2MeshFilePath);
+            //}
         }
 
         private static bool IsCEntityTemplate(CR2WChunk chunk)

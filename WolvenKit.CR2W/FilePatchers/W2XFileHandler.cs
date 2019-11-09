@@ -83,34 +83,51 @@ namespace WolvenKit.CR2W.FilePatchers
                                 }
                             }
                         }
-
-                        if (w2EntFileContainsFires)
+                        else
                         {
+                            // TODO check if this makes any difference, otherwise remove the code again, also the null checks
+                            List<string> w2PFilePathsForFires = W2EntFilePatcher.GetW2PFilePathsForFires(null, flatCompiledData, absoluteModFilePath, modDirectory, dlcDirectory);
+
+                            if (w2PFilePathsForFires.Any())
+                            {
+                                W2PFilePathsForFires.AddRange(w2PFilePathsForFires);
+                                W2EntFilePathsForFires.Add(absoluteModFilePath);
+
+                                w2EntFileContainsFires = true;
+                            }
+                        }
+
+                        if (w2EntFileContainsFires || relativeModFilePath.Contains("hanging_lamp") || relativeModFilePath.Contains("lantern"))
+                        {
+                            if (!w2EntFileContainsFires)
+                            {
+                                W2EntFilePathsForFires.Add(absoluteModFilePath);
+                            }
+
+                            List<string> w2MeshFilePathsForFires = new List<string>();
+
                             CByteArrayContainer streamingDataBufferForFires = W2EntFilePatcher.ReadStreamingDataBufferForFires(w2EntFile);
 
                             if (streamingDataBufferForFires != null)
                             {
-                                List<string> w2MeshFilePathsForFires = W2EntFilePatcher.GetW2MeshFilePathsForFires(streamingDataBufferForFires, absoluteModFilePath, modDirectory, dlcDirectory);
+                                w2MeshFilePathsForFires.AddRange(W2EntFilePatcher.GetW2MeshFilePathsForFires(streamingDataBufferForFires.Content.chunks, absoluteModFilePath, modDirectory, dlcDirectory));
+                            }
+                            
+                            w2MeshFilePathsForFires.AddRange(W2EntFilePatcher.GetW2MeshFilePathsForFires(w2EntFile.chunks, absoluteModFilePath, modDirectory, dlcDirectory));
 
-                                if (w2MeshFilePathsForFires.Any())
+                            if (w2MeshFilePathsForFires.Any())
+                            {
+                                foreach (string w2MeshFilePathForFire in w2MeshFilePathsForFires)
                                 {
-                                    foreach (string w2MeshFilePathForFire in w2MeshFilePathsForFires)
-                                    {
-                                        string w2MeshBufferFilePathForFire = w2MeshFilePathForFire + FileExtensionSuffixW2MeshBuffer;
+                                    string w2MeshBufferFilePathForFire = w2MeshFilePathForFire + FileExtensionSuffixW2MeshBuffer;
 
-                                        W2MeshFilePathsForFires.Add(w2MeshFilePathForFire);
-                                        W2MeshBufferFilePathsForFires.Add(w2MeshBufferFilePathForFire);
-                                    }
-                                }
-                                else
-                                {
-                                    ErrorMessages.Add("No mesh files could be found in file '" + absoluteModFilePath + "'.");
+                                    W2MeshFilePathsForFires.Add(w2MeshFilePathForFire);
+                                    W2MeshBufferFilePathsForFires.Add(w2MeshBufferFilePathForFire);
                                 }
                             }
                             else
                             {
-                                // TODO look for meshes directly in the initial chunk list, there are at least a few w2ents which have it defined like this
-                                ErrorMessages.Add("No streaming data buffer could be found in file '" + absoluteModFilePath + "'.");
+                                //ErrorMessages.Add("No mesh files could be found in file '" + absoluteModFilePath + "'.");
                             }
                         }
                     }
@@ -128,55 +145,55 @@ namespace WolvenKit.CR2W.FilePatchers
             W2MeshBufferFilePathsForFires = W2MeshBufferFilePathsForFires.Distinct().ToList();
             W2PFilePathsForFires = W2PFilePathsForFires.Distinct().ToList();
 
-            //string w2entsource = "C:\\Users\\mkaltenb\\source\\repos\\fire_files\\w2ent";
+            string w2entsource = "D:\\_\\w2ent";
 
-            //foreach (string fullPath in W2EntFilePathsForFires)
-            //{
-            //    string newPath = w2entsource + fullPath.Substring(fullPath.IndexOf(PathBundle) + PathBundle.Length);
+            foreach (string fullPath in W2EntFilePathsForFires)
+            {
+                string newPath = w2entsource + fullPath.Substring(fullPath.IndexOf(PathBundle) + PathBundle.Length);
 
-            //    if (File.Exists(fullPath) && !File.Exists(newPath))
-            //    {
-            //        Directory.CreateDirectory(Path.GetDirectoryName(newPath));
-            //        File.Copy(fullPath, newPath);
-            //    }
-            //}
+                if (File.Exists(fullPath) && !File.Exists(newPath))
+                {
+                    Directory.CreateDirectory(Path.GetDirectoryName(newPath));
+                    File.Copy(fullPath, newPath);
+                }
+            }
 
-            //string w2meshsource = "C:\\Users\\mkaltenb\\source\\repos\\fire_files\\w2mesh";
+            string w2meshsource = "D:\\_\\w2mesh";
 
-            //foreach (string fullPath in W2MeshFilePathsForFires)
-            //{
-            //    string newPath = w2meshsource + fullPath.Substring(fullPath.IndexOf(PathBundle) + PathBundle.Length);
+            foreach (string fullPath in W2MeshFilePathsForFires)
+            {
+                string newPath = w2meshsource + fullPath.Substring(fullPath.IndexOf(PathBundle) + PathBundle.Length);
 
-            //    if (File.Exists(fullPath) && !File.Exists(newPath))
-            //    {
-            //        Directory.CreateDirectory(Path.GetDirectoryName(newPath));
-            //        File.Copy(fullPath, newPath);
-            //    }
-            //}
+                if (File.Exists(fullPath) && !File.Exists(newPath))
+                {
+                    Directory.CreateDirectory(Path.GetDirectoryName(newPath));
+                    File.Copy(fullPath, newPath);
+                }
+            }
 
-            //foreach (string fullPath in W2MeshBufferFilePathsForFires)
-            //{
-            //    string newPath = w2meshsource + fullPath.Substring(fullPath.IndexOf(PathBundle) + PathBundle.Length);
+            foreach (string fullPath in W2MeshBufferFilePathsForFires)
+            {
+                string newPath = w2meshsource + fullPath.Substring(fullPath.IndexOf(PathBundle) + PathBundle.Length);
 
-            //    if (File.Exists(fullPath) && !File.Exists(newPath))
-            //    {
-            //        Directory.CreateDirectory(Path.GetDirectoryName(newPath));
-            //        File.Copy(fullPath, newPath);
-            //    }
-            //}
+                if (File.Exists(fullPath) && !File.Exists(newPath))
+                {
+                    Directory.CreateDirectory(Path.GetDirectoryName(newPath));
+                    File.Copy(fullPath, newPath);
+                }
+            }
 
-            //string w2psource = "C:\\Users\\mkaltenb\\source\\repos\\fire_files\\w2p";
+            string w2psource = "D:\\_\\w2p";
 
-            //foreach (string fullPath in W2PFilePathsForFires)
-            //{
-            //    string newPath = w2psource + fullPath.Substring(fullPath.IndexOf(PathBundle) + PathBundle.Length);
+            foreach (string fullPath in W2PFilePathsForFires)
+            {
+                string newPath = w2psource + fullPath.Substring(fullPath.IndexOf(PathBundle) + PathBundle.Length);
 
-            //    if (File.Exists(fullPath) && !File.Exists(newPath))
-            //    {
-            //        Directory.CreateDirectory(Path.GetDirectoryName(newPath));
-            //        File.Copy(fullPath, newPath);
-            //    }
-            //}
+                if (File.Exists(fullPath) && !File.Exists(newPath))
+                {
+                    Directory.CreateDirectory(Path.GetDirectoryName(newPath));
+                    File.Copy(fullPath, newPath);
+                }
+            }
         }
 
         public static (Dictionary<string, string> relativeOriginalFilePathToRelativeRenamedFilePathMap, List<string> absoluteRenamedFilePaths) CopyAndRenameW2MeshFiles(List<string> absoluteW2MeshFilePaths, string dlcDirectory)

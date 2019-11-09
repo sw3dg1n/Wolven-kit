@@ -137,7 +137,7 @@ namespace WolvenKit.Forms
                 log.AddText(file + "\n", frmOutput.Logtype.Error);
             }
 
-            //return;
+            return;
 
             // TODO maybe also patch fire w2p files which are not found in w2ent files
             // TODO maybe also check w2l files for fires as apparently they can also reference w2p files directly
