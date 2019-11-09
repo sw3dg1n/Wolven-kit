@@ -20,6 +20,7 @@ namespace WolvenKit.CR2W.FilePatchers
         private const string TypeCGameplayEntity = "CGameplayEntity";
         private const string TypeCMesh = "CMesh";
         private const string TypeCMeshComponent = "CMeshComponent";
+        private const string TypeCParticleComponent = "CParticleComponent";
         private const string TypeCParticleSystem = "CParticleSystem";
         private const string TypeCPointLightComponent = "CPointLightComponent";
         private const string TypeCRigidMeshComponent = "CRigidMeshComponent";
@@ -36,6 +37,7 @@ namespace WolvenKit.CR2W.FilePatchers
         private const string VariableNameBuffer = "buffer";
         private const string VariableNameCookedEffects = "cookedEffects";
         private const string VariableNameFlatCompiledData = "flatCompiledData";
+        private const string VariableNameParticleSystem = "particleSystem";
         private const string VariableNameShowDistance = "showDistance";
         private const string VariableNameStreamingDataBuffer = "streamingDataBuffer";
         private const string VariableNameStreamingDistance = "streamingDistance";
@@ -71,7 +73,7 @@ namespace WolvenKit.CR2W.FilePatchers
             {
 
                 PatchFireShowDistance(filePath, sharedDataBufferForFire);
-                PatchW2PFilePath(filePath, sharedDataBufferForFire, relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap);
+                PatchW2PFilePath(filePath, sharedDataBufferForFire, flatCompiledData, relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap);
 
                 WriteCByteArrayContainer(sharedDataBufferForFire);
             }
@@ -260,9 +262,9 @@ namespace WolvenKit.CR2W.FilePatchers
             chunkData.variables.Add(showDistanceVariable);
         }
 
-        private static void PatchW2PFilePath(string w2EntFilePath, CByteArrayContainer sharedDataBuffer, Dictionary<string, string> relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap)
+        private static void PatchW2PFilePath(string w2EntFilePath, CByteArrayContainer sharedDataBuffer, CByteArrayContainer flatCompiledData, Dictionary<string, string> relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap)
         {
-            //bool cFXTrackItemParticlesFound = false;
+            bool cFXTrackItemParticlesFound = false;
 
             foreach (CR2WChunk chunk in sharedDataBuffer.Content.chunks)
             {
@@ -271,7 +273,7 @@ namespace WolvenKit.CR2W.FilePatchers
                     continue;
                 }
 
-                //cFXTrackItemParticlesFound = true;
+                cFXTrackItemParticlesFound = true;
 
                 if (chunk.data == null || !(chunk.data is CVector))
                 {
@@ -284,29 +286,61 @@ namespace WolvenKit.CR2W.FilePatchers
                 {
                     if (IsCSoftParticleSystem(variable))
                     {
-                        CSoft variableCSoftParticleSystem = (CSoft)variable;
+                        PatchW2PFilePath(relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap, variable);
+                    }
+                }
+            }
 
-                        string relativeW2PFilePath = variableCSoftParticleSystem.Handle;
-                        string relativeRenamedW2PFilePath;
+            // Some w2ent files have different structures and have the w2p references in CParticleComponents in flatCompiledData
+            if (!cFXTrackItemParticlesFound)
+            {
+                foreach (CR2WChunk chunk in flatCompiledData.Content.chunks)
+                {
+                    if (!IsCParticleComponent(chunk))
+                    {
+                        continue;
+                    }
 
-                        if (relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap.TryGetValue(relativeW2PFilePath, out relativeRenamedW2PFilePath))
+                    if (chunk.data == null || !(chunk.data is CVector))
+                    {
+                        throw new System.InvalidOperationException("File '" + w2EntFilePath + "' contains either no or invalid chunk data for type '" + TypeCParticleComponent + "'.");
+                    }
+
+                    CVector chunkData = (CVector)chunk.data;
+
+                    foreach (CVariable variable in chunkData.variables)
+                    {
+                        if (IsCHandleParticleSystem(variable))
                         {
-                            PatchW2PFilePath(variableCSoftParticleSystem, relativeRenamedW2PFilePath);
+                            PatchW2PFilePath(relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap, variable);
                         }
                     }
                 }
             }
 
-            // TODO maybe enable this check again for some final testing but it should be removed in the release version
-            //if (!cFXTrackItemParticlesFound)
+            // TODO maybe enable a check again for some final testing but it should be removed in the release version
+            //if (!cFXTrackItemParticlesFound && !cParticleComponentFound)
             //{
-            //    throw new System.InvalidOperationException("File '" + w2EntFilePath + "' contains no chunk of type '" + TypeCFXTrackItemParticles + "'.");
+            //    throw new System.InvalidOperationException("File '" + w2EntFilePath + "' contains no chunk of type '" + TypeCFXTrackItemParticles + "' nor '" + TypeCParticleComponent + "'.");
             //}
         }
 
-        private static void PatchW2PFilePath(CSoft variableCSoftParticleSystem, string relativeRenamedW2PFilePath)
+        private static void PatchW2PFilePath(Dictionary<string, string> relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap, CVariable variableParticleSystem)
         {
-            variableCSoftParticleSystem.Handle = relativeRenamedW2PFilePath;
+            string relativeW2PFilePath = variableParticleSystem is CSoft ? ((CSoft)variableParticleSystem).Handle : ((CHandle)variableParticleSystem).Handle;
+            string relativeRenamedW2PFilePath;
+
+            if (relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap.TryGetValue(relativeW2PFilePath, out relativeRenamedW2PFilePath))
+            {
+                if (variableParticleSystem is CSoft)
+                {
+                    ((CSoft)variableParticleSystem).Handle = relativeRenamedW2PFilePath;
+                }
+                else
+                {
+                    ((CHandle)variableParticleSystem).Handle = relativeRenamedW2PFilePath;
+                }
+            }
         }
 
         private bool PatchGlowAutoHideDistance(string w2EntFilePath, CByteArrayContainer flatCompiledData)
@@ -350,8 +384,8 @@ namespace WolvenKit.CR2W.FilePatchers
 
                         float valueY = transform.y.val;
 
-                        // For some reason changing some coordinates slightly makes the glow render at a bigger distance for a few of the light sources...
-                        if (valueY <= 0)
+                        // For some reason changing some coordinates slightly makes the glow not clip anymore at a certain distance for some of the light sources...
+                        if (valueY < MinValueTransformYForCandles)
                         {
                             transform.y.SetValue(MinValueTransformYForCandles);
                         }
@@ -428,6 +462,8 @@ namespace WolvenKit.CR2W.FilePatchers
                 {
                     if (IsCHandleMesh(variable))
                     {
+                        // TODO copy the original mesh component chunk and change the name
+                        
                         CHandle variableCHandleMesh = (CHandle)variable;
 
                         string relativeW2MeshFilePath = variableCHandleMesh.Handle;
@@ -505,9 +541,11 @@ namespace WolvenKit.CR2W.FilePatchers
             return streamingDataBufferForFires;
         }
 
-        internal static List<string> GetW2PFilePathsForFires(CByteArrayContainer sharedDataBuffer, string w2EntFilePath, string modDirectory, string dlcDirectory)
+        internal static List<string> GetW2PFilePathsForFires(CByteArrayContainer sharedDataBuffer, CByteArrayContainer flatCompiledData, string w2EntFilePath, string modDirectory, string dlcDirectory)
         {
             List<string> w2PFilePathsForFires = new List<string>();
+
+            bool cFXTrackItemParticlesFound = false;
 
             foreach (CR2WChunk chunk in sharedDataBuffer.Content.chunks)
             {
@@ -521,33 +559,64 @@ namespace WolvenKit.CR2W.FilePatchers
                     throw new System.InvalidOperationException("File '" + w2EntFilePath + "' contains either no or invalid chunk data for type '" + TypeCFXTrackItemParticles + "'.");
                 }
 
+                cFXTrackItemParticlesFound = true;
+
                 CVector chunkData = (CVector)chunk.data;
 
                 foreach (CVariable variable in chunkData.variables)
                 {
                     if (IsCSoftParticleSystem(variable))
                     {
-                        CSoft variableCSoftParticleSystem = (CSoft)variable;
+                        AddW2PFilePath(w2PFilePathsForFires, ((CSoft)variable).Handle, modDirectory, dlcDirectory);
+                    }
+                }
+            }
 
-                        string relativeW2PFilePath = variableCSoftParticleSystem.Handle;
-                        string initialPath = relativeW2PFilePath.StartsWith(W2XFileHandler.PathDLC) ? dlcDirectory : modDirectory;
+            // Some w2ent files have different structures and have the w2p references in CParticleComponents in flatCompiledData
+            if (!cFXTrackItemParticlesFound)
+            {
+                foreach (CR2WChunk chunk in flatCompiledData.Content.chunks)
+                {
+                    if (!IsCParticleComponent(chunk))
+                    {
+                        continue;
+                    }
 
-                        string absoluteW2PFilePath = initialPath + Path.DirectorySeparatorChar + W2XFileHandler.PathBundle + Path.DirectorySeparatorChar + relativeW2PFilePath;
-                        string w2pFileName = relativeW2PFilePath.Substring(relativeW2PFilePath.LastIndexOf(Path.DirectorySeparatorChar) + 1);
+                    if (chunk.data == null || !(chunk.data is CVector))
+                    {
+                        throw new System.InvalidOperationException("File '" + w2EntFilePath + "' contains either no or invalid chunk data for type '" + TypeCParticleComponent + "'.");
+                    }
 
-                        if ((w2pFileName.Contains(LabelFire) || w2pFileName.Contains(LabelFlame) || w2pFileName.Contains("_candle") || w2pFileName.Contains("_brazier") || w2pFileName.Contains("torch")
-                            || w2pFileName.Contains("chandelier") || (w2pFileName.Contains("coal") && !w2pFileName.Contains("smoke")))
-                            && !relativeW2PFilePath.Contains("arson") && !relativeW2PFilePath.Contains("arachas") && !relativeW2PFilePath.Contains("weapons") && !relativeW2PFilePath.Contains("gameplay")
-                            && !relativeW2PFilePath.Contains("monsters") && !relativeW2PFilePath.Contains("characters") && !relativeW2PFilePath.Contains("environment") && !relativeW2PFilePath.Contains("work")
-                            && !relativeW2PFilePath.Contains("igni"))
+                    CVector chunkData = (CVector)chunk.data;
+
+                    foreach (CVariable variable in chunkData.variables)
+                    {
+                        if (IsCHandleParticleSystem(variable))
                         {
-                            w2PFilePathsForFires.Add(absoluteW2PFilePath);
+                            AddW2PFilePath(w2PFilePathsForFires, ((CHandle)variable).Handle, modDirectory, dlcDirectory);
                         }
                     }
                 }
             }
 
             return w2PFilePathsForFires;
+        }
+
+        private static void AddW2PFilePath(List<string> w2PFilePathsForFires, String relativeW2PFilePath, string modDirectory, string dlcDirectory)
+        {
+            string initialPath = relativeW2PFilePath.StartsWith(W2XFileHandler.PathDLC) ? dlcDirectory : modDirectory;
+
+            string absoluteW2PFilePath = initialPath + Path.DirectorySeparatorChar + W2XFileHandler.PathBundle + Path.DirectorySeparatorChar + relativeW2PFilePath;
+            string w2pFileName = relativeW2PFilePath.Substring(relativeW2PFilePath.LastIndexOf(Path.DirectorySeparatorChar) + 1);
+
+            if ((w2pFileName.Contains(LabelFire) || w2pFileName.Contains(LabelFlame) || w2pFileName.Contains("_candle") || w2pFileName.Contains("_brazier") || w2pFileName.Contains("torch")
+                || w2pFileName.Contains("chandelier") || (w2pFileName.Contains("coal") && !w2pFileName.Contains("smoke")))
+                && !relativeW2PFilePath.Contains("arson") && !relativeW2PFilePath.Contains("arachas") && !relativeW2PFilePath.Contains("weapons") && !relativeW2PFilePath.Contains("gameplay")
+                && !relativeW2PFilePath.Contains("monsters") && !relativeW2PFilePath.Contains("characters") && !relativeW2PFilePath.Contains("environment") && !relativeW2PFilePath.Contains("work")
+                && !relativeW2PFilePath.Contains("igni"))
+            {
+                w2PFilePathsForFires.Add(absoluteW2PFilePath);
+            }
         }
 
         internal static List<string> GetW2MeshFilePathsForFires(CByteArrayContainer streamingDataBufferForFires, string w2EntFilePath, string modDirectory, string dlcDirectory)
@@ -615,19 +684,29 @@ namespace WolvenKit.CR2W.FilePatchers
             return variable is CHandle && ((CHandle)variable).FileType.Equals(TypeCMesh);
         }
 
+        private static bool IsCHandleParticleSystem(CVariable variable)
+        {
+            return variable is CHandle && ((CHandle)variable).FileType.Equals(TypeCParticleSystem) && variable.Name.Equals(VariableNameParticleSystem);
+        }
+
         private static bool IsCookedEffects(CVariable variable)
         {
             return variable is CArray && variable.Name.Equals(VariableNameCookedEffects);
         }
 
-        private static bool IsCSoftParticleSystem(CVariable variable)
+        private static bool IsCParticleComponent(CR2WChunk chunk)
         {
-            return variable is CSoft && ((CSoft)variable).FileType.Equals(TypeCParticleSystem);
+            return chunk.Type.Equals(TypeCParticleComponent);
         }
 
         private static bool IsCPointLightComponent(CR2WChunk chunk)
         {
             return chunk.Type.Equals(TypeCPointLightComponent);
+        }
+
+        private static bool IsCSoftParticleSystem(CVariable variable)
+        {
+            return variable is CSoft && ((CSoft)variable).FileType.Equals(TypeCParticleSystem);
         }
 
         private static bool IsFire(CVariable variable)

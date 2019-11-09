@@ -201,6 +201,7 @@ namespace WolvenKit.Forms
 
                 try
                 {
+                    // TODO patch the original w2mesh files for DECREASED draw distance if there is a renamed version
                     w2MeshFilePatcher.PatchForIncreasedDrawDistance(w2MeshFilePathForFire);
                 }
                 catch (Exception e)

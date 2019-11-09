@@ -72,7 +72,7 @@ namespace WolvenKit.CR2W.FilePatchers
                         {
                             foreach (CByteArrayContainer sharedDataBufferForFire in sharedDataBuffersForFires)
                             {
-                                List<string> w2PFilePathsForFires = W2EntFilePatcher.GetW2PFilePathsForFires(sharedDataBufferForFire, absoluteModFilePath, modDirectory, dlcDirectory);
+                                List<string> w2PFilePathsForFires = W2EntFilePatcher.GetW2PFilePathsForFires(sharedDataBufferForFire, flatCompiledData, absoluteModFilePath, modDirectory, dlcDirectory);
 
                                 if (w2PFilePathsForFires.Any())
                                 {
