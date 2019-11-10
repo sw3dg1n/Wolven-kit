@@ -91,13 +91,13 @@ namespace WolvenKit.CR2W.FilePatchers
             if (streamingDataBufferForFires != null)
             {
                 PatchStreamingDistance(filePath, w2EntFile);
-                PatchW2MeshFilePath(filePath, streamingDataBufferForFires, relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap);
+                PatchW2MeshFilePath(filePath, streamingDataBufferForFires.Content.chunks, relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap);
 
                 WriteCByteArrayContainer(streamingDataBufferForFires);
             }
 
-            // TODO additionally patch w2mesh file path in regular chunks directly in the root file
-            
+            PatchW2MeshFilePath(filePath, w2EntFile.chunks, relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap);
+
             WriteCR2WFile(w2EntFile);
         }
 
@@ -449,9 +449,9 @@ namespace WolvenKit.CR2W.FilePatchers
             ((CUInt8)variableStreamingDistance).SetValue(ValueStreamingDistanceIDD);
         }
 
-        private void PatchW2MeshFilePath(string w2EntFilePath, CByteArrayContainer streamingDataBufferForFires, Dictionary<string, string> relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap)
+        private void PatchW2MeshFilePath(string w2EntFilePath, List<CR2WChunk> chunks, Dictionary<string, string> relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap)
         {
-            foreach (CR2WChunk chunk in streamingDataBufferForFires.Content.chunks)
+            foreach (CR2WChunk chunk in chunks)
             {
                 if (!IsMeshComponent(chunk))
                 {
