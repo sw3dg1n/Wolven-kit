@@ -68,7 +68,6 @@ namespace WolvenKit.CR2W.FilePatchers
             {
                 foreach (CByteArrayContainer sharedDataBufferForFire in sharedDataBuffersForFires)
                 {
-
                     PatchFireShowDistance(filePath, sharedDataBufferForFire);
                     PatchW2PFilePath(filePath, sharedDataBufferForFire, flatCompiledData, relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap);
 

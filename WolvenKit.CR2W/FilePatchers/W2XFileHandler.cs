@@ -65,43 +65,29 @@ namespace WolvenKit.CR2W.FilePatchers
                             throw new System.InvalidOperationException("File '" + absoluteModFilePath + "' could not be loaded.");
                         }
 
-                        (List<CByteArrayContainer> sharedDataBuffersForFires, CByteArrayContainer flatCompiledData) = W2EntFilePatcher.ReadSharedDataBuffersAndFlatCompiledDataForFires(w2EntFile);
-                        bool w2EntFileContainsFires = false;
+                        List<string> w2PFilePathsForFires = new List<string>();
 
+                        (List<CByteArrayContainer> sharedDataBuffersForFires, CByteArrayContainer flatCompiledData) = W2EntFilePatcher.ReadSharedDataBuffersAndFlatCompiledDataForFires(w2EntFile);
+                        
                         if (sharedDataBuffersForFires != null)
                         {
                             foreach (CByteArrayContainer sharedDataBufferForFire in sharedDataBuffersForFires)
                             {
-                                List<string> w2PFilePathsForFires = W2EntFilePatcher.GetW2PFilePathsForFires(sharedDataBufferForFire, flatCompiledData, absoluteModFilePath, modDirectory, dlcDirectory);
-
-                                if (w2PFilePathsForFires.Any())
-                                {
-                                    W2PFilePathsForFires.AddRange(w2PFilePathsForFires);
-                                    W2EntFilePathsForFires.Add(absoluteModFilePath);
-
-                                    w2EntFileContainsFires = true;
-                                }
+                                w2PFilePathsForFires.AddRange(W2EntFilePatcher.GetW2PFilePathsForFires(sharedDataBufferForFire, flatCompiledData, absoluteModFilePath, modDirectory, dlcDirectory));
                             }
                         }
                         else
                         {
-                            // TODO refactor
-                            List<string> w2PFilePathsForFires = W2EntFilePatcher.GetW2PFilePathsForFires(null, flatCompiledData, absoluteModFilePath, modDirectory, dlcDirectory);
+                            w2PFilePathsForFires.AddRange(W2EntFilePatcher.GetW2PFilePathsForFires(null, flatCompiledData, absoluteModFilePath, modDirectory, dlcDirectory));
+                        }
+
+                        if (w2PFilePathsForFires.Any() || relativeModFilePath.Contains("hanging_lamp") || relativeModFilePath.Contains("lantern"))
+                        {
+                            W2EntFilePathsForFires.Add(absoluteModFilePath);
 
                             if (w2PFilePathsForFires.Any())
                             {
                                 W2PFilePathsForFires.AddRange(w2PFilePathsForFires);
-                                W2EntFilePathsForFires.Add(absoluteModFilePath);
-
-                                w2EntFileContainsFires = true;
-                            }
-                        }
-
-                        if (w2EntFileContainsFires || relativeModFilePath.Contains("hanging_lamp") || relativeModFilePath.Contains("lantern"))
-                        {
-                            if (!w2EntFileContainsFires)
-                            {
-                                W2EntFilePathsForFires.Add(absoluteModFilePath);
                             }
 
                             List<string> w2MeshFilePathsForFires = new List<string>();
