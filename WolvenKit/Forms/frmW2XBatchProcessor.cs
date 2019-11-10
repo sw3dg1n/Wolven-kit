@@ -150,15 +150,17 @@ namespace WolvenKit.Forms
             (Dictionary<string, string> relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap, List<string> absoluteRenamedW2PFilePaths)
                 = W2XFileHandler.CopyAndRenameW2PFiles(w2XFileHandler.W2PFilePathsForFires, activeMod.DlcDirectory);
 
-            patchW2EntFilesForFires(w2XFileHandler.W2EntFilePathsForFires, relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap, relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap);
+            // TODO centrally define these settings per component types
+            patchW2EntFilesForFires(w2XFileHandler.W2EntFilePathsForFires, relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap, relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap, new W2EntSettings(1200, 1200, 0.01F, 100));
 
-            patchW2MeshFilesForFires(absoluteRenamedW2MeshFilePaths);
+            patchW2MeshFilesForFires(absoluteRenamedW2MeshFilePaths, new W2MeshSettings(1200, 80, 40));
+            //patchW2MeshFilesForFires(w2XFileHandler.W2MeshFilePathsForFires, new W2MeshSettings(1, 1, 1));
 
-            patchW2PFilesForFires(absoluteRenamedW2PFilePaths);
+            patchW2PFilesForFires(absoluteRenamedW2PFilePaths, new W2PSettings(1200, 80, 40));
         }
 
         private void patchW2EntFilesForFires(List<string> w2EntFilePathsForFires, Dictionary<string, string> relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap,
-            Dictionary<string, string> relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap)
+            Dictionary<string, string> relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap, W2EntSettings w2EntSettings)
         {
             W2EntFilePatcher w2EntFilePatcher = new W2EntFilePatcher(MainController.Get());
 
@@ -173,7 +175,7 @@ namespace WolvenKit.Forms
 
                 try
                 {
-                    w2EntFilePatcher.PatchForIncreasedDrawDistance(w2EntFilePathForFire, relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap, relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap);
+                    w2EntFilePatcher.PatchForIncreasedDrawDistance(w2EntFilePathForFire, relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap, relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap, w2EntSettings);
                 }
                 catch (Exception e)
                 {
@@ -186,7 +188,7 @@ namespace WolvenKit.Forms
             }
         }
 
-        private void patchW2MeshFilesForFires(List<string> w2MeshFilePathsForFires)
+        private void patchW2MeshFilesForFires(List<string> w2MeshFilePathsForFires, W2MeshSettings w2MeshSettings)
         {
             W2MeshFilePatcher w2MeshFilePatcher = new W2MeshFilePatcher(MainController.Get());
 
@@ -201,8 +203,7 @@ namespace WolvenKit.Forms
 
                 try
                 {
-                    // TODO patch the original w2mesh files for DECREASED draw distance if there is a renamed version
-                    w2MeshFilePatcher.PatchForIncreasedDrawDistance(w2MeshFilePathForFire);
+                    w2MeshFilePatcher.PatchDrawDistance(w2MeshFilePathForFire, w2MeshSettings);
                 }
                 catch (Exception e)
                 {
@@ -215,7 +216,7 @@ namespace WolvenKit.Forms
             }
         }
 
-        private void patchW2PFilesForFires(List<string> w2PFilePathsForFires)
+        private void patchW2PFilesForFires(List<string> w2PFilePathsForFires, W2PSettings w2PSettings)
         {
             W2AFilePatcher w2PFilePatcher = new W2AFilePatcher(MainController.Get());
 
@@ -230,7 +231,7 @@ namespace WolvenKit.Forms
 
                 try
                 {
-                    w2PFilePatcher.PatchForIncreasedDrawDistance(w2PFilePathForFire);
+                    w2PFilePatcher.PatchForIncreasedDrawDistance(w2PFilePathForFire, w2PSettings);
                 }
                 catch (Exception e)
                 {

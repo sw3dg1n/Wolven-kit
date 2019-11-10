@@ -15,11 +15,6 @@ namespace WolvenKit.CR2W.BatchProcessors
 
         protected const string VariableNameAutoHideDistance = "autoHideDistance";
 
-        protected const string LabelFire = "fire";
-        protected const string LabelFlame = "flame";
-
-        protected const float ValueAutoHideDistanceIDD = 1200;
-
         protected readonly ILocalizedStringSource localizedStringSource;
 
         public W2XFilePatcher(ILocalizedStringSource localizedStringSource)
@@ -100,18 +95,18 @@ namespace WolvenKit.CR2W.BatchProcessors
             return variable is CFloat && variable.Name.Equals(VariableNameAutoHideDistance);
         }
 
-        protected static void PatchAutoHideDistance(CVariable variableAutoHideDistance)
+        protected static void PatchAutoHideDistance(CVariable variableAutoHideDistance, W2XSettings w2XSettings)
         {
-            ((CFloat)variableAutoHideDistance).SetValue(ValueAutoHideDistanceIDD);
+            ((CFloat)variableAutoHideDistance).SetValue(w2XSettings.AutoHideDistance);
         }
 
-        protected static void AddAutoHideDistance(CR2WFile file, CVector chunkData)
+        protected static void AddAutoHideDistance(CR2WFile file, CVector chunkData, W2XSettings w2XSettings)
         {
             CFloat autoHideDistanceVariable = new CFloat(file);
 
             autoHideDistanceVariable.Type = CVariableTypeFloat;
             autoHideDistanceVariable.Name = VariableNameAutoHideDistance;
-            autoHideDistanceVariable.SetValue(ValueAutoHideDistanceIDD);
+            autoHideDistanceVariable.SetValue(w2XSettings.AutoHideDistance);
 
             chunkData.variables.Add(autoHideDistanceVariable);
         }

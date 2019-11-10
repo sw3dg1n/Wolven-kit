@@ -42,18 +42,13 @@ namespace WolvenKit.CR2W.FilePatchers
         private const string VariableNameStreamingDataBuffer = "streamingDataBuffer";
         private const string VariableNameStreamingDistance = "streamingDistance";
         private const string VariableNameTransform = "transform";
-
-        private const float ValueShowDistanceIDD = 1200;
-        private const byte ValueStreamingDistanceIDD = 100;
-
-        private const float MinValueTransformYForCandles = 0.01F;
-
+        
         public W2EntFilePatcher(ILocalizedStringSource localizedStringSource) : base(localizedStringSource)
         {
         }
         
         public void PatchForIncreasedDrawDistance(string filePath, Dictionary<string, string> relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap,
-            Dictionary<string, string> relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap)
+            Dictionary<string, string> relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap, W2EntSettings w2EntSettings)
         {
             CR2WFile w2EntFile = ReadW2EntFile(filePath, localizedStringSource);
 
@@ -68,7 +63,7 @@ namespace WolvenKit.CR2W.FilePatchers
             {
                 foreach (CByteArrayContainer sharedDataBufferForFire in sharedDataBuffersForFires)
                 {
-                    PatchFireShowDistance(filePath, sharedDataBufferForFire);
+                    PatchFireShowDistance(filePath, sharedDataBufferForFire, w2EntSettings);
                     PatchW2PFilePath(filePath, sharedDataBufferForFire, flatCompiledData, relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap);
 
                     WriteCByteArrayContainer(sharedDataBufferForFire);
@@ -81,7 +76,7 @@ namespace WolvenKit.CR2W.FilePatchers
                 WriteCByteArrayContainer(flatCompiledData);
             }
 
-            if (PatchGlowAutoHideDistance(filePath, flatCompiledData))
+            if (PatchGlowAutoHideDistance(filePath, flatCompiledData, w2EntSettings))
             {
                 WriteCByteArrayContainer(flatCompiledData);
             }
@@ -90,7 +85,7 @@ namespace WolvenKit.CR2W.FilePatchers
 
             if (streamingDataBufferForFires != null)
             {
-                PatchStreamingDistance(filePath, w2EntFile);
+                PatchMeshStreamingDistance(filePath, w2EntFile, w2EntSettings);
                 PatchW2MeshFilePath(filePath, streamingDataBufferForFires.Content.chunks, relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap);
 
                 WriteCByteArrayContainer(streamingDataBufferForFires);
@@ -199,7 +194,7 @@ namespace WolvenKit.CR2W.FilePatchers
             return sharedDataBuffersForFires;
         }
 
-        private static void PatchFireShowDistance(string filePath, CByteArrayContainer sharedDataBufferForFire)
+        private static void PatchFireShowDistance(string filePath, CByteArrayContainer sharedDataBufferForFire, W2EntSettings w2EntSettings)
         {
             bool cFXDefinitionFound = false;
 
@@ -233,7 +228,7 @@ namespace WolvenKit.CR2W.FilePatchers
                             throw new System.InvalidOperationException("File '" + filePath + "' contains more than one attribute '" + VariableNameShowDistance + "'.");
                         }
 
-                        PatchShowDistance(variable);
+                        PatchShowDistance(variable, w2EntSettings);
 
                         showDistanceFound = true;
                     }
@@ -241,7 +236,7 @@ namespace WolvenKit.CR2W.FilePatchers
 
                 if (!showDistanceFound)
                 {
-                    AddShowDistance(sharedDataBufferForFire.Content, chunkData);
+                    AddShowDistance(sharedDataBufferForFire.Content, chunkData, w2EntSettings);
                 }
             }
 
@@ -251,18 +246,18 @@ namespace WolvenKit.CR2W.FilePatchers
             }
         }
 
-        private static void PatchShowDistance(CVariable variableShowDistance)
+        private static void PatchShowDistance(CVariable variableShowDistance, W2EntSettings w2EntSettings)
         {
-            ((CFloat)variableShowDistance).SetValue(ValueShowDistanceIDD);
+            ((CFloat)variableShowDistance).SetValue(w2EntSettings.FireShowDistance);
         }
 
-        private static void AddShowDistance(CR2WFile file, CVector chunkData)
+        private static void AddShowDistance(CR2WFile file, CVector chunkData, W2EntSettings w2EntSettings)
         {
             CFloat showDistanceVariable = new CFloat(file);
 
             showDistanceVariable.Type = CVariableTypeFloat;
             showDistanceVariable.Name = VariableNameShowDistance;
-            showDistanceVariable.SetValue(ValueShowDistanceIDD);
+            showDistanceVariable.SetValue(w2EntSettings.FireShowDistance);
 
             chunkData.variables.Add(showDistanceVariable);
         }
@@ -351,7 +346,7 @@ namespace WolvenKit.CR2W.FilePatchers
             }
         }
 
-        private bool PatchGlowAutoHideDistance(string w2EntFilePath, CByteArrayContainer flatCompiledData)
+        private bool PatchGlowAutoHideDistance(string w2EntFilePath, CByteArrayContainer flatCompiledData, W2EntSettings w2EntSettings)
         {
             bool cPointLightComponentFound = false;
 
@@ -381,35 +376,33 @@ namespace WolvenKit.CR2W.FilePatchers
                             throw new System.InvalidOperationException("File '" + w2EntFilePath + "' contains more than one attribute '" + VariableNameAutoHideDistance + "'.");
                         }
 
-                        PatchAutoHideDistance(variable);
+                        PatchAutoHideDistance(variable, w2EntSettings);
 
                         autoHideDistanceFound = true;
                     }
                     // TODO maybe the campfires should be restricted further, so far only campfire_01.w2ent was observed to have issues
                     else if (IsTransform(variable) && (Path.GetFileName(w2EntFilePath).Contains("candle") || Path.GetFileName(w2EntFilePath).Contains("campfire_") || Path.GetFileName(w2EntFilePath).Contains("chandelier_small")))
                     {
-                        CEngineTransform transform = (CEngineTransform)variable;
-
-                        float valueY = transform.y.val;
-
                         // For some reason changing some coordinates slightly makes the glow not clip anymore at a certain distance for some of the light sources...
-                        if (valueY < MinValueTransformYForCandles)
-                        {
-                            transform.y.SetValue(MinValueTransformYForCandles);
-                        }
+                        PatchMinimumTransformY((CEngineTransform)variable, w2EntSettings);
                     }
                 }
 
                 if (!autoHideDistanceFound)
                 {
-                    AddAutoHideDistance(flatCompiledData.Content, chunkData);
+                    AddAutoHideDistance(flatCompiledData.Content, chunkData, w2EntSettings);
                 }
             }
 
             return cPointLightComponentFound;
         }
 
-        private void PatchStreamingDistance(string filePath, CR2WFile w2EntFile)
+        private static void PatchMinimumTransformY(CEngineTransform variableTransform, W2EntSettings w2EntSettings)
+        {
+            variableTransform.y.SetValue(Math.Max(w2EntSettings.MinimumGlowTransformY, variableTransform.y.val));
+        }
+
+        private void PatchMeshStreamingDistance(string filePath, CR2WFile w2EntFile, W2EntSettings w2EntSettings)
         {
             bool streamingDistanceFound = false;
 
@@ -431,7 +424,7 @@ namespace WolvenKit.CR2W.FilePatchers
                             throw new System.InvalidOperationException("File '" + filePath + "' contains more than one attribute '" + VariableNameStreamingDistance + "'.");
                         }
 
-                        PatchStreamingDistance(variable);
+                        PatchMinimumStreamingDistance((CUInt8)variable, w2EntSettings);
 
                         streamingDistanceFound = true;
                     }
@@ -444,9 +437,9 @@ namespace WolvenKit.CR2W.FilePatchers
             }
         }
 
-        private static void PatchStreamingDistance(CVariable variableStreamingDistance)
+        private static void PatchMinimumStreamingDistance(CUInt8 variableStreamingDistance, W2EntSettings w2EntSettings)
         {
-            ((CUInt8)variableStreamingDistance).SetValue(ValueStreamingDistanceIDD);
+            variableStreamingDistance.SetValue(Math.Max(w2EntSettings.MinimumMeshStreamingDistance, variableStreamingDistance.val));
         }
 
         private void PatchW2MeshFilePath(string w2EntFilePath, List<CR2WChunk> chunks, Dictionary<string, string> relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap)
@@ -620,7 +613,7 @@ namespace WolvenKit.CR2W.FilePatchers
             string absoluteW2PFilePath = initialPath + Path.DirectorySeparatorChar + W2XFileHandler.PathBundle + Path.DirectorySeparatorChar + relativeW2PFilePath;
             string w2pFileName = relativeW2PFilePath.Substring(relativeW2PFilePath.LastIndexOf(Path.DirectorySeparatorChar) + 1);
 
-            if ((w2pFileName.Contains(LabelFire) || w2pFileName.Contains(LabelFlame) || (w2pFileName.Contains("candle") && !w2pFileName.Contains("wraith") && !w2pFileName.Contains("smoke") && !w2pFileName.Contains("spark")) 
+            if ((w2pFileName.Contains("fire") || w2pFileName.Contains("flame") || (w2pFileName.Contains("candle") && !w2pFileName.Contains("wraith") && !w2pFileName.Contains("smoke") && !w2pFileName.Contains("spark")) 
                 || w2pFileName.Contains("_brazier") || w2pFileName.Contains("torch") || w2pFileName.Contains("chandelier") || (w2pFileName.Contains("coal") && !w2pFileName.Contains("smoke")))
                 && !relativeW2PFilePath.Contains("arson") && !relativeW2PFilePath.Contains("arachas") && !relativeW2PFilePath.Contains("weapons") && !relativeW2PFilePath.Contains("beehive")
                 && !relativeW2PFilePath.Contains("monsters") && !relativeW2PFilePath.Contains("characters") && !relativeW2PFilePath.Contains("environment") && !relativeW2PFilePath.Contains("work")
@@ -732,7 +725,7 @@ namespace WolvenKit.CR2W.FilePatchers
 
             string variableValue = ((CName)variable).Value;
 
-            return variableValue.Contains(LabelFire) || variableValue.Contains("torch") || variableValue.Contains("destroy") || variableValue.Contains("light_on")
+            return variableValue.Contains("fire") || variableValue.Contains("torch") || variableValue.Contains("destroy") || variableValue.Contains("light_on")
                 || variableValue.Equals("effects") || variableValue.Equals("active") || variableValue.Equals("candle") || variableValue.Equals("smoke") || variableValue.Equals("burn") || variableValue.Equals("active_effect");
         }
 

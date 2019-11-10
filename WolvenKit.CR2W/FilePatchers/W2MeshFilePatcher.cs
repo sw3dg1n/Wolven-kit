@@ -15,14 +15,11 @@ namespace WolvenKit.CR2W.FilePatchers
         private const string VariableNameCookedData = "cookedData";
         private const string VariableNameRenderedLODs = "renderedLODs";
 
-        private const float ValueLOD1IDD = 80;
-        private const float ValueIncrementLODIDD = 40;
-
         public W2MeshFilePatcher(ILocalizedStringSource localizedStringSource) : base(localizedStringSource)
         {
         }
 
-        public void PatchForIncreasedDrawDistance(string filePath)
+        public void PatchDrawDistance(string filePath, W2MeshSettings w2MeshSettings)
         {
             CR2WFile w2MeshFile = ReadCR2WFile(filePath, localizedStringSource);
 
@@ -63,19 +60,19 @@ namespace WolvenKit.CR2W.FilePatchers
                             throw new System.InvalidOperationException("File '" + filePath + "' contains more than one attribute '" + VariableNameAutoHideDistance + "'.");
                         }
 
-                        PatchAutoHideDistance(variable);
+                        PatchAutoHideDistance(variable, w2MeshSettings);
 
                         autoHideDistanceFound = true;
                     }
                     else if (IsCookedData(variable))
                     {
-                        PatchLODs((CVector) variable);
+                        PatchLODs((CVector) variable, w2MeshSettings);
                     }
                 }
 
                 if (!autoHideDistanceFound)
                 {
-                    AddAutoHideDistance(w2MeshFile, chunkData);
+                    AddAutoHideDistance(w2MeshFile, chunkData, w2MeshSettings);
                 }
             }
 
@@ -87,9 +84,9 @@ namespace WolvenKit.CR2W.FilePatchers
             WriteCR2WFile(w2MeshFile);
         }
 
-        private static void PatchLODs(CVector variableCookedData)
+        private static void PatchLODs(CVector variableCookedData, W2MeshSettings w2MeshSettings)
         {
-            float valueLODIDD = ValueLOD1IDD;
+            float valueLOD = w2MeshSettings.LOD1;
 
             foreach (CVariable cookedDataEntry in variableCookedData.variables)
             {
@@ -99,9 +96,9 @@ namespace WolvenKit.CR2W.FilePatchers
 
                     for (int i = 1; i < renderedLODs.array.Count; i++)
                     {
-                        ((CFloat)renderedLODs.ElementAt(i)).SetValue(valueLODIDD);
+                        ((CFloat)renderedLODs.ElementAt(i)).SetValue(valueLOD);
 
-                        valueLODIDD += ValueIncrementLODIDD;
+                        valueLOD += w2MeshSettings.LODIncrement;
                     }
 
                     break;

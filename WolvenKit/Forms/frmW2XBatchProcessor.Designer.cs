@@ -51,9 +51,9 @@
             // 
             this.dockPanel.AutoSize = true;
             this.dockPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.dockPanel.Location = new System.Drawing.Point(0, -255);
+            this.dockPanel.Location = new System.Drawing.Point(0, 7);
             this.dockPanel.Name = "dockPanel";
-            this.dockPanel.Size = new System.Drawing.Size(1728, 816);
+            this.dockPanel.Size = new System.Drawing.Size(1728, 554);
             this.dockPanel.TabIndex = 1;
             this.dockPanel.ActiveContentChanged += new System.EventHandler(this.dockPanel_ActiveContentChanged);
             // 

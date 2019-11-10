@@ -16,10 +16,6 @@ namespace WolvenKit.CR2W.Types
 
         public override void Read(BinaryReader file, uint size)
         {
-            //if ((int)size < 0)
-            //{
-            //    return;
-            //}
             Bytes = file.ReadBytes((int) size);
         }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WolvenKit.CR2W.FilePatchers;
 using WolvenKit.CR2W.Types;
 
 namespace WolvenKit.CR2W.BatchProcessors
@@ -16,14 +17,11 @@ namespace WolvenKit.CR2W.BatchProcessors
         private const string VariableNameEditorName = "editorName";
         private const string VariableNameLODs = "lods";
 
-        private const float ValueLOD1IDD = 80;
-        private const float ValueIncrementLODIDD = 40;
-
         public W2AFilePatcher(ILocalizedStringSource localizedStringSource) : base(localizedStringSource)
         {
         }
 
-        public void PatchForIncreasedDrawDistance(string filePath)
+        public void PatchForIncreasedDrawDistance(string filePath, W2PSettings w2PSettings)
         {
             CR2WFile w2PFile = ReadCR2WFile(filePath, localizedStringSource);
 
@@ -64,19 +62,19 @@ namespace WolvenKit.CR2W.BatchProcessors
                             throw new System.InvalidOperationException("File '" + filePath + "' contains more than one attribute '" + VariableNameAutoHideDistance + "'.");
                         }
 
-                        PatchAutoHideDistance(variable);
+                        PatchAutoHideDistance(variable, w2PSettings);
 
                         autoHideDistanceFound = true;
                     }
                     else if (IsLODs(variable))
                     {
-                        PatchLODs(variable);
+                        PatchLODs(variable, w2PSettings);
                     }
                 }
 
                 if (!autoHideDistanceFound)
                 {
-                    AddAutoHideDistance(w2PFile, chunkData);
+                    AddAutoHideDistance(w2PFile, chunkData, w2PSettings);
                 }
             }
 
@@ -88,9 +86,9 @@ namespace WolvenKit.CR2W.BatchProcessors
             WriteCR2WFile(w2PFile);
         }
 
-        private static void PatchLODs(CVariable variableLODs)
+        private static void PatchLODs(CVariable variableLODs, W2PSettings w2PSettings)
         {
-            float valueLODIDD = ValueLOD1IDD;
+            float valueLODIDD = w2PSettings.LOD1;
 
             foreach (CVariable lodEntry in ((CArray)variableLODs).array)
             {
@@ -102,7 +100,7 @@ namespace WolvenKit.CR2W.BatchProcessors
                         {
                             ((CFloat)lodVariable).SetValue(valueLODIDD);
 
-                            valueLODIDD += ValueIncrementLODIDD;
+                            valueLODIDD += w2PSettings.LODIncrement;
                         }
                     }
                 }
