@@ -56,6 +56,8 @@ namespace WolvenKit.Forms
         {
             ShowLog();
 
+            log.AddText("Initializing file lists...\n", frmOutput.Logtype.Normal);
+
             W2XFileHandler w2XFileHandler = new W2XFileHandler();
 
             w2XFileHandler.Initialize(activeMod.Files, activeMod.FileDirectory, activeMod.ModDirectory, activeMod.DlcDirectory, MainController.Get());
@@ -150,18 +152,26 @@ namespace WolvenKit.Forms
             (Dictionary<string, string> relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap, List<string> absoluteRenamedW2PFilePaths)
                 = W2XFileHandler.CopyAndRenameW2PFiles(w2XFileHandler.W2PFilePathsForFires, activeMod.DlcDirectory);
 
+            log.AddText("Patching w2ent files for increased draw distance...\n", frmOutput.Logtype.Normal);
             // TODO centrally define these settings per component types
-            patchW2EntFilesForFires(w2XFileHandler.W2EntFilePathsForFires, relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap, relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap, new W2EntSettings(1200, 1200, 0.01F, 100));
+            List<string> absoluteCollisionMeshFilePaths = patchW2EntFilesForFires(w2XFileHandler.W2EntFilePathsForFires, activeMod.ModDirectory, activeMod.DlcDirectory, relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap,
+                relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap, new W2EntSettings(1200, 1200, 0.01F, 1));
 
+            log.AddText("Patching w2mesh files for increased draw distance...\n", frmOutput.Logtype.Normal);
             patchW2MeshFilesForFires(absoluteRenamedW2MeshFilePaths, new W2MeshSettings(1200, 80, 40));
-            //patchW2MeshFilesForFires(w2XFileHandler.W2MeshFilePathsForFires, new W2MeshSettings(1, 1, 1));
 
+            log.AddText("Patching w2ent files used for collisions...\n", frmOutput.Logtype.Normal);
+            patchW2MeshFilesForFires(absoluteCollisionMeshFilePaths, new W2MeshSettings(1, 1, 1));
+
+            log.AddText("Patching w2p files for increased draw distance...\n", frmOutput.Logtype.Normal);
             patchW2PFilesForFires(absoluteRenamedW2PFilePaths, new W2PSettings(1200, 80, 40));
         }
 
-        private void patchW2EntFilesForFires(List<string> w2EntFilePathsForFires, Dictionary<string, string> relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap,
+        private List<string> patchW2EntFilesForFires(List<string> w2EntFilePathsForFires, string modDirectory, string dlcDirectory, Dictionary<string, string> relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap,
             Dictionary<string, string> relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap, W2EntSettings w2EntSettings)
         {
+            List<string> absoluteCollisionMeshFilePaths = new List<string>();
+            
             W2EntFilePatcher w2EntFilePatcher = new W2EntFilePatcher(MainController.Get());
 
             foreach (string w2EntFilePathForFire in w2EntFilePathsForFires)
@@ -175,7 +185,13 @@ namespace WolvenKit.Forms
 
                 try
                 {
-                    w2EntFilePatcher.PatchForIncreasedDrawDistance(w2EntFilePathForFire, relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap, relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap, w2EntSettings);
+                    foreach (string relativeCollisionMeshFilePath in w2EntFilePatcher.PatchForIncreasedDrawDistance(w2EntFilePathForFire, relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap,
+                        relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap, w2EntSettings))
+                    {
+                        string initialPath = relativeCollisionMeshFilePath.StartsWith(W2XFileHandler.PathDLC) ? dlcDirectory : modDirectory;
+                        
+                        absoluteCollisionMeshFilePaths.Add(initialPath + Path.DirectorySeparatorChar + W2XFileHandler.PathBundle + Path.DirectorySeparatorChar + relativeCollisionMeshFilePath);
+                    }
                 }
                 catch (Exception e)
                 {
@@ -186,6 +202,8 @@ namespace WolvenKit.Forms
 
                 log.AddText("Successfully processed file '" + w2EntFilePathForFire + "\n", frmOutput.Logtype.Success);
             }
+
+            return absoluteCollisionMeshFilePaths.Distinct().ToList();
         }
 
         private void patchW2MeshFilesForFires(List<string> w2MeshFilePathsForFires, W2MeshSettings w2MeshSettings)
