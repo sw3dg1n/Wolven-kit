@@ -152,19 +152,19 @@ namespace WolvenKit.Forms
             (Dictionary<string, string> relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap, List<string> absoluteRenamedW2PFilePaths)
                 = W2XFileHandler.CopyAndRenameW2PFiles(w2XFileHandler.W2PFilePathsForFires, activeMod.DlcDirectory);
 
-            log.AddText("Patching w2ent files for increased draw distance...\n", frmOutput.Logtype.Normal);
             // TODO centrally define these settings per component types
+            log.AddText("Patching w2ent files for increased draw distance...\n", frmOutput.Logtype.Normal);
             List<string> absoluteCollisionMeshFilePaths = patchW2EntFilesForFires(w2XFileHandler.W2EntFilePathsForFires, activeMod.ModDirectory, activeMod.DlcDirectory, relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap,
                 relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap, new W2EntSettings(1200, 1200, 0.01F, 1));
 
             log.AddText("Patching w2mesh files for increased draw distance...\n", frmOutput.Logtype.Normal);
-            patchW2MeshFilesForFires(absoluteRenamedW2MeshFilePaths, new W2MeshSettings(1200, 80, 40));
+            patchW2MeshFilesForFires(absoluteRenamedW2MeshFilePaths, new W2MeshSettings(1200, 0, 0));
 
             log.AddText("Patching w2ent files used for collisions...\n", frmOutput.Logtype.Normal);
             patchW2MeshFilesForFires(absoluteCollisionMeshFilePaths, new W2MeshSettings(1, 1, 1));
 
             log.AddText("Patching w2p files for increased draw distance...\n", frmOutput.Logtype.Normal);
-            patchW2PFilesForFires(absoluteRenamedW2PFilePaths, new W2PSettings(1200, 80, 40));
+            patchW2PFilesForFires(absoluteRenamedW2PFilePaths, new W2PSettings(1200, 0, 40));
         }
 
         private List<string> patchW2EntFilesForFires(List<string> w2EntFilePathsForFires, string modDirectory, string dlcDirectory, Dictionary<string, string> relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap,

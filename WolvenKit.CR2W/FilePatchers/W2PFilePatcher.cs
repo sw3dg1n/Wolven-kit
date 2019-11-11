@@ -90,6 +90,11 @@ namespace WolvenKit.CR2W.BatchProcessors
         {
             float valueLODIDD = w2PSettings.LOD1;
 
+            if (valueLODIDD == 0)
+            {
+                return;
+            }
+
             foreach (CVariable lodEntry in ((CArray)variableLODs).array)
             {
                 if (lodEntry is CVector && ((CVector)lodEntry).variables != null)

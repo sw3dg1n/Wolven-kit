@@ -37,6 +37,7 @@ namespace WolvenKit.CR2W.FilePatchers
         private const string VariableNameBuffer = "buffer";
         private const string VariableNameCookedEffects = "cookedEffects";
         private const string VariableNameFlatCompiledData = "flatCompiledData";
+        private const string VariableNameName = "name";
         private const string VariableNameParticleSystem = "particleSystem";
         private const string VariableNameShowDistance = "showDistance";
         private const string VariableNameStreamingDataBuffer = "streamingDataBuffer";
@@ -784,8 +785,7 @@ namespace WolvenKit.CR2W.FilePatchers
 
         private static bool IsCStringName(CVariable variable)
         {
-            //TODO
-            return variable is CString && variable.Name.Equals("name");
+            return variable is CString && variable.Name.Equals(VariableNameName);
         }
 
         private static bool IsFire(CVariable variable)

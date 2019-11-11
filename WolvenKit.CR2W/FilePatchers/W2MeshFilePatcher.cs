@@ -13,7 +13,7 @@ namespace WolvenKit.CR2W.FilePatchers
         private const string TypeCMesh = "CMesh";
 
         private const string VariableNameCookedData = "cookedData";
-        private const string VariableNameRenderedLODs = "renderedLODs";
+        private const string VariableNameRenderLODs = "renderLODs";
 
         public W2MeshFilePatcher(ILocalizedStringSource localizedStringSource) : base(localizedStringSource)
         {
@@ -88,6 +88,11 @@ namespace WolvenKit.CR2W.FilePatchers
         {
             float valueLOD = w2MeshSettings.LOD1;
 
+            if (valueLOD == 0)
+            {
+                return;
+            }
+
             foreach (CVariable cookedDataEntry in variableCookedData.variables)
             {
                 if (isRenderedLODs(cookedDataEntry) && ((CArray)cookedDataEntry).array != null && ((CArray)cookedDataEntry).array.Count > 1)
@@ -112,7 +117,7 @@ namespace WolvenKit.CR2W.FilePatchers
         }
         private static bool isRenderedLODs(CVariable variable)
         {
-            return variable is CArray && variable.Name.Equals(VariableNameRenderedLODs);
+            return variable is CArray && variable.Name.Equals(VariableNameRenderLODs);
         }
     }
 }
