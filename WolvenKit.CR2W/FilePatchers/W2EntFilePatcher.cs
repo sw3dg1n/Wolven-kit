@@ -388,7 +388,8 @@ namespace WolvenKit.CR2W.FilePatchers
                         autoHideDistanceFound = true;
                     }
                     // TODO maybe the campfires should be restricted further, so far only campfire_01.w2ent was observed to have issues
-                    else if (IsTransform(variable) && (Path.GetFileName(w2EntFilePath).Contains("candle") || Path.GetFileName(w2EntFilePath).Contains("campfire_") || Path.GetFileName(w2EntFilePath).Contains("chandelier_small")))
+                    else if (IsTransform(variable) && (Path.GetFileName(w2EntFilePath).Contains("candle") || Path.GetFileName(w2EntFilePath).Contains("campfire_") || Path.GetFileName(w2EntFilePath).Contains("chandelier_small")
+                        || Path.GetFileName(w2EntFilePath).Contains("coal_small_noshadow")))
                     {
                         // For some reason changing some coordinates slightly makes the glow not clip anymore at a certain distance for some of the light sources...
                         PatchMinimumTransformY((CEngineTransform)variable, w2EntSettings);
