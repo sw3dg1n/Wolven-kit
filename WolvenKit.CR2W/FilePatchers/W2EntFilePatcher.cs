@@ -49,7 +49,7 @@ namespace WolvenKit.CR2W.FilePatchers
         public W2EntFilePatcher(ILocalizedStringSource localizedStringSource) : base(localizedStringSource)
         {
         }
-        
+
         public List<string> PatchForIncreasedDrawDistance(string filePath, Dictionary<string, string> relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap,
             Dictionary<string, string> relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap, W2EntSettings w2EntSettings)
         {
@@ -383,7 +383,7 @@ namespace WolvenKit.CR2W.FilePatchers
                             throw new System.InvalidOperationException("File '" + w2EntFilePath + "' contains more than one attribute '" + VariableNameAutoHideDistance + "'.");
                         }
 
-                        PatchAutoHideDistance(variable, w2EntSettings);
+                        PatchAutoHideDistance(variable, w2EntSettings.GlowAutoHideDistance);
 
                         autoHideDistanceFound = true;
                     }
@@ -396,7 +396,7 @@ namespace WolvenKit.CR2W.FilePatchers
 
                 if (!autoHideDistanceFound)
                 {
-                    AddAutoHideDistance(flatCompiledData.Content, chunkData, w2EntSettings);
+                    AddAutoHideDistance(flatCompiledData.Content, chunkData, w2EntSettings.GlowAutoHideDistance);
                 }
             }
 
@@ -684,7 +684,7 @@ namespace WolvenKit.CR2W.FilePatchers
             string absoluteW2PFilePath = initialPath + Path.DirectorySeparatorChar + W2XFileHandler.PathBundle + Path.DirectorySeparatorChar + relativeW2PFilePath;
             string w2pFileName = relativeW2PFilePath.Substring(relativeW2PFilePath.LastIndexOf(Path.DirectorySeparatorChar) + 1);
 
-            if ((w2pFileName.Contains("fire") || w2pFileName.Contains("flame") || (w2pFileName.Contains("candle") && !w2pFileName.Contains("wraith") && !w2pFileName.Contains("smoke") && !w2pFileName.Contains("spark")) 
+            if ((w2pFileName.Contains("fire") || w2pFileName.Contains("flame") || (w2pFileName.Contains("candle") && !w2pFileName.Contains("wraith") && !w2pFileName.Contains("smoke") && !w2pFileName.Contains("spark"))
                 || w2pFileName.Contains("_brazier") || w2pFileName.Contains("torch") || w2pFileName.Contains("chandelier") || (w2pFileName.Contains("coal") && !w2pFileName.Contains("smoke"))) && !w2pFileName.Contains("geralt")
                 && !relativeW2PFilePath.Contains("arson") && !relativeW2PFilePath.Contains("arachas") && !relativeW2PFilePath.Contains("weapons") && !relativeW2PFilePath.Contains("beehive")
                 && !relativeW2PFilePath.Contains("monsters") && !relativeW2PFilePath.Contains("characters") && !relativeW2PFilePath.Contains("environment") && !relativeW2PFilePath.Contains("work")
@@ -812,7 +812,7 @@ namespace WolvenKit.CR2W.FilePatchers
         }
         private static bool IsMeshComponent(CR2WChunk chunk)
         {
-            return chunk.Type.Equals(TypeCMeshComponent) || chunk.Type.Equals(TypeCRigidMeshComponent) || chunk.Type.Equals(TypeCStaticMeshComponent); 
+            return chunk.Type.Equals(TypeCMeshComponent) || chunk.Type.Equals(TypeCRigidMeshComponent) || chunk.Type.Equals(TypeCStaticMeshComponent);
         }
 
         private static bool IsSharedDataBuffer(CVariable variable)
@@ -838,7 +838,7 @@ namespace WolvenKit.CR2W.FilePatchers
         {
             return variable is CEngineTransform && variable.Name.Equals(VariableNameTransform) && variable.Type.Equals(TypeEngineTransform);
         }
-        
+
         private static bool IsTypeWithStreamingDataBuffer(CR2WChunk chunk)
         {
             return chunk.Type.Equals(TypeCActionPoint) || chunk.Type.Equals(TypeCEntity) || chunk.Type.Equals(TypeCGameplayEntity) || chunk.Type.Equals(TypeW3AnimationInteractionEntity) || chunk.Type.Equals(TypeW3Campfire)

@@ -60,19 +60,19 @@ namespace WolvenKit.CR2W.FilePatchers
                             throw new System.InvalidOperationException("File '" + filePath + "' contains more than one attribute '" + VariableNameAutoHideDistance + "'.");
                         }
 
-                        PatchAutoHideDistance(variable, w2MeshSettings);
+                        PatchAutoHideDistance(variable, w2MeshSettings.AutoHideDistance.Value);
 
                         autoHideDistanceFound = true;
                     }
                     else if (IsCookedData(variable))
                     {
-                        PatchLODs((CVector) variable, w2MeshSettings);
+                        PatchLODs((CVector)variable, w2MeshSettings);
                     }
                 }
 
                 if (!autoHideDistanceFound)
                 {
-                    AddAutoHideDistance(w2MeshFile, chunkData, w2MeshSettings);
+                    AddAutoHideDistance(w2MeshFile, chunkData, w2MeshSettings.AutoHideDistance.Value);
                 }
             }
 
@@ -86,12 +86,12 @@ namespace WolvenKit.CR2W.FilePatchers
 
         private static void PatchLODs(CVector variableCookedData, W2MeshSettings w2MeshSettings)
         {
-            float valueLOD = w2MeshSettings.LOD1;
-
-            if (valueLOD == 0)
+            if (w2MeshSettings.LOD1 == null || w2MeshSettings.LODIncrement == null)
             {
                 return;
             }
+
+            float valueLOD = w2MeshSettings.LOD1.Value;
 
             foreach (CVariable cookedDataEntry in variableCookedData.variables)
             {
@@ -103,7 +103,7 @@ namespace WolvenKit.CR2W.FilePatchers
                     {
                         ((CFloat)renderedLODs.ElementAt(i)).SetValue(valueLOD);
 
-                        valueLOD += w2MeshSettings.LODIncrement;
+                        valueLOD += w2MeshSettings.LODIncrement.Value;
                     }
 
                     break;

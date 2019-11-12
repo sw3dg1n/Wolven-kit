@@ -62,7 +62,7 @@ namespace WolvenKit.CR2W.BatchProcessors
                             throw new System.InvalidOperationException("File '" + filePath + "' contains more than one attribute '" + VariableNameAutoHideDistance + "'.");
                         }
 
-                        PatchAutoHideDistance(variable, w2PSettings);
+                        PatchAutoHideDistance(variable, w2PSettings.AutoHideDistance);
 
                         autoHideDistanceFound = true;
                     }
@@ -74,7 +74,7 @@ namespace WolvenKit.CR2W.BatchProcessors
 
                 if (!autoHideDistanceFound)
                 {
-                    AddAutoHideDistance(w2PFile, chunkData, w2PSettings);
+                    AddAutoHideDistance(w2PFile, chunkData, w2PSettings.AutoHideDistance);
                 }
             }
 
@@ -88,12 +88,12 @@ namespace WolvenKit.CR2W.BatchProcessors
 
         private static void PatchLODs(CVariable variableLODs, W2PSettings w2PSettings)
         {
-            float valueLODIDD = w2PSettings.LOD1;
-
-            if (valueLODIDD == 0)
+            if (w2PSettings.LOD1 == null || w2PSettings.LODIncrement == null)
             {
                 return;
             }
+
+            float valueLODIDD = w2PSettings.LOD1.Value;
 
             foreach (CVariable lodEntry in ((CArray)variableLODs).array)
             {
@@ -105,7 +105,7 @@ namespace WolvenKit.CR2W.BatchProcessors
                         {
                             ((CFloat)lodVariable).SetValue(valueLODIDD);
 
-                            valueLODIDD += w2PSettings.LODIncrement;
+                            valueLODIDD += w2PSettings.LODIncrement.Value;
                         }
                     }
                 }

@@ -95,18 +95,18 @@ namespace WolvenKit.CR2W.BatchProcessors
             return variable is CFloat && variable.Name.Equals(VariableNameAutoHideDistance);
         }
 
-        protected static void PatchAutoHideDistance(CVariable variableAutoHideDistance, W2XSettings w2XSettings)
+        protected static void PatchAutoHideDistance(CVariable variableAutoHideDistance, float autoHideDistance)
         {
-            ((CFloat)variableAutoHideDistance).SetValue(w2XSettings.AutoHideDistance);
+            ((CFloat)variableAutoHideDistance).SetValue(autoHideDistance);
         }
 
-        protected static void AddAutoHideDistance(CR2WFile file, CVector chunkData, W2XSettings w2XSettings)
+        protected static void AddAutoHideDistance(CR2WFile file, CVector chunkData, float autoHideDistance)
         {
             CFloat autoHideDistanceVariable = new CFloat(file);
 
             autoHideDistanceVariable.Type = CVariableTypeFloat;
             autoHideDistanceVariable.Name = VariableNameAutoHideDistance;
-            autoHideDistanceVariable.SetValue(w2XSettings.AutoHideDistance);
+            autoHideDistanceVariable.SetValue(autoHideDistance);
 
             chunkData.variables.Add(autoHideDistanceVariable);
         }

@@ -68,7 +68,7 @@ namespace WolvenKit.CR2W.FilePatchers
                         List<string> w2PFilePathsForFires = new List<string>();
 
                         (List<CByteArrayContainer> sharedDataBuffersForFires, CByteArrayContainer flatCompiledData) = W2EntFilePatcher.ReadSharedDataBuffersAndFlatCompiledDataForFires(w2EntFile);
-                        
+
                         if (sharedDataBuffersForFires != null)
                         {
                             foreach (CByteArrayContainer sharedDataBufferForFire in sharedDataBuffersForFires)
@@ -98,7 +98,7 @@ namespace WolvenKit.CR2W.FilePatchers
                             {
                                 w2MeshFilePathsForFires.AddRange(W2EntFilePatcher.GetW2MeshFilePathsForFires(streamingDataBufferForFires.Content.chunks, absoluteModFilePath, modDirectory, dlcDirectory));
                             }
-                            
+
                             w2MeshFilePathsForFires.AddRange(W2EntFilePatcher.GetW2MeshFilePathsForFires(w2EntFile.chunks, absoluteModFilePath, modDirectory, dlcDirectory));
 
                             if (w2MeshFilePathsForFires.Any())
@@ -207,7 +207,7 @@ namespace WolvenKit.CR2W.FilePatchers
                 {
                     continue;
                 }
-                
+
                 string relativeOriginalFilePath;
                 string relativeRenamedFilePath;
                 string absoluteRenamedFilePath;
