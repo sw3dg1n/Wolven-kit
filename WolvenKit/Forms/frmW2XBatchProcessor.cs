@@ -155,7 +155,7 @@ namespace WolvenKit.Forms
             // TODO centrally define these settings per component types
             log.AddText("Patching w2ent files for increased draw distance...\n", frmOutput.Logtype.Normal);
             List<string> absoluteCollisionMeshFilePaths = patchW2EntFilesForFires(w2XFileHandler.W2EntFilePathsForFires, activeMod.ModDirectory, activeMod.DlcDirectory, relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap,
-                relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap, new W2EntSettings(1200, 1200, 0.01F, 1));
+                relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap);
 
             log.AddText("Patching w2mesh files for increased draw distance...\n", frmOutput.Logtype.Normal);
             patchW2MeshFilesForFires(absoluteRenamedW2MeshFilePaths, new W2MeshSettings(1200, 0, 0));
@@ -168,7 +168,7 @@ namespace WolvenKit.Forms
         }
 
         private List<string> patchW2EntFilesForFires(List<string> w2EntFilePathsForFires, string modDirectory, string dlcDirectory, Dictionary<string, string> relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap,
-            Dictionary<string, string> relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap, W2EntSettings w2EntSettings)
+            Dictionary<string, string> relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap)
         {
             List<string> absoluteCollisionMeshFilePaths = new List<string>();
             
@@ -186,7 +186,7 @@ namespace WolvenKit.Forms
                 try
                 {
                     foreach (string relativeCollisionMeshFilePath in w2EntFilePatcher.PatchForIncreasedDrawDistance(w2EntFilePathForFire, relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap,
-                        relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap, w2EntSettings))
+                        relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap, new W2EntSettings(Path.GetFileName(w2EntFilePathForFire), w2EntFilePathForFire, 1200)))
                     {
                         string initialPath = relativeCollisionMeshFilePath.StartsWith(W2XFileHandler.PathDLC) ? dlcDirectory : modDirectory;
                         

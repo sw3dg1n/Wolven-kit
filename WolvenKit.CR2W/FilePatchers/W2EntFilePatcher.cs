@@ -387,9 +387,7 @@ namespace WolvenKit.CR2W.FilePatchers
 
                         autoHideDistanceFound = true;
                     }
-                    // TODO maybe the campfires should be restricted further, so far only campfire_01.w2ent was observed to have issues
-                    else if (IsTransform(variable) && (Path.GetFileName(w2EntFilePath).Contains("candle") || Path.GetFileName(w2EntFilePath).Contains("campfire_") || Path.GetFileName(w2EntFilePath).Contains("chandelier_small")
-                        || Path.GetFileName(w2EntFilePath).Contains("coal_small_noshadow")))
+                    else if (IsTransform(variable))
                     {
                         // For some reason changing some coordinates slightly makes the glow not clip anymore at a certain distance for some of the light sources...
                         PatchMinimumTransformY((CEngineTransform)variable, w2EntSettings);
@@ -407,7 +405,10 @@ namespace WolvenKit.CR2W.FilePatchers
 
         private static void PatchMinimumTransformY(CEngineTransform variableTransform, W2EntSettings w2EntSettings)
         {
-            variableTransform.y.SetValue(Math.Max(w2EntSettings.MinimumGlowTransformY, variableTransform.y.val));
+            if (w2EntSettings.MinimumGlowTransformY != null)
+            {
+                variableTransform.y.SetValue(Math.Max(w2EntSettings.MinimumGlowTransformY.Value, variableTransform.y.val));
+            }
         }
 
         private void PatchMeshStreamingDistance(string filePath, CR2WFile w2EntFile, W2EntSettings w2EntSettings)
@@ -447,7 +448,10 @@ namespace WolvenKit.CR2W.FilePatchers
 
         private static void PatchMinimumStreamingDistance(CUInt8 variableStreamingDistance, W2EntSettings w2EntSettings)
         {
-            variableStreamingDistance.SetValue(Math.Max(w2EntSettings.MinimumMeshStreamingDistance, variableStreamingDistance.val));
+            if (w2EntSettings.MeshStreamingDistance != null)
+            {
+                variableStreamingDistance.SetValue(w2EntSettings.MeshStreamingDistance.Value);
+            }
         }
 
         private List<string> PatchW2MeshFilePath(string w2EntFilePath, List<CR2WChunk> chunks, Dictionary<string, string> relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap)
