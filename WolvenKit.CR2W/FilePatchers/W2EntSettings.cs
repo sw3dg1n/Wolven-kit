@@ -40,7 +40,7 @@ namespace WolvenKit.CR2W.FilePatchers
             get
             {
                 // TODO maybe the campfires should be restricted further, so far only campfire_01.w2ent was observed to have issues
-                if (fileName.Contains("candle") || fileName.Contains("campfire_") || fileName.Contains("chandelier_small") || fileName.Contains("coal_small_noshadow"))
+                if (fileName.Contains("candle") || fileName.Contains("campfire_") || fileName.Contains("chandelier_small") || fileName.Contains("coal_small_noshadow") || fileName.Contains("braziers_wall_square"))
                 {
                     return 0.01F;
                 }
@@ -60,11 +60,10 @@ namespace WolvenKit.CR2W.FilePatchers
                     // TODO This could either be reduced more to avoid the shimmering in the distance or maybe even further extended for higher resolutions, supersampling or better antialiasing e.g. via reshade
                     return 30;
                 }
-                //else if (fileName.Contains("braziers_wall_chain"))
-                //{
-                //    // TODO
-                //    return 10;
-                //}
+                else if (fileName.Contains("braziers_wall_chain"))
+                {
+                    return 50;
+                }
                 else if (fileName.Contains("braziers_wall_round"))
                 {
                     return 30;
