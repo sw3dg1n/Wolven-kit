@@ -145,9 +145,11 @@ namespace WolvenKit.Forms
             // TODO maybe also check w2l files for fires as apparently they can also reference w2p files directly
 
             (Dictionary<string, string> relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap, List<string> absoluteRenamedW2MeshFilePaths)
-                = W2XFileHandler.CopyAndRenameW2MeshFiles(w2XFileHandler.W2MeshFilePathsForFires, activeMod.DlcDirectory);
+                = W2XFileHandler.CopyAndRenameW2MeshFiles(w2XFileHandler.W2MeshFilePathsForFiresRenamed, activeMod.DlcDirectory);
 
-            W2XFileHandler.CopyAndRenameW2MeshBufferFiles(w2XFileHandler.W2MeshBufferFilePathsForFires, activeMod.DlcDirectory);
+            W2XFileHandler.CopyAndRenameW2MeshBufferFiles(w2XFileHandler.W2MeshBufferFilePathsForFiresRenamed, activeMod.DlcDirectory);
+
+            absoluteRenamedW2MeshFilePaths.AddRange(w2XFileHandler.W2MeshFilePathsForFires);
 
             (Dictionary<string, string> relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap, List<string> absoluteRenamedW2PFilePaths)
                 = W2XFileHandler.CopyAndRenameW2PFiles(w2XFileHandler.W2PFilePathsForFires, activeMod.DlcDirectory);

@@ -39,8 +39,8 @@ namespace WolvenKit.CR2W.FilePatchers
         {
             get
             {
-                // TODO maybe the campfires should be restricted further, so far only campfire_01.w2ent was observed to have issues
-                if (fileName.Contains("candle") || fileName.Contains("campfire_") || fileName.Contains("chandelier_small") || fileName.Contains("coal_small_noshadow") || fileName.Contains("braziers_wall_square"))
+                if (fileName.Contains("candle") || fileName.Contains("campfire_") || fileName.Contains("chandelier_small") || fileName.Contains("coal_small_noshadow") || fileName.Contains("braziers_wall_square")
+                     || (fileName.Contains("lantern") && !fileName.Contains("dwarf"))/*|| fileName.Contains("hanging_lamp") || fileName.Contains("lighthouse_fire")*/)
                 {
                     return 0.01F;
                 }
@@ -78,9 +78,17 @@ namespace WolvenKit.CR2W.FilePatchers
                 }
                 else if (fileName.Contains("hanging_lamp"))
                 {
-                    // TODO This could still be increased if the issue with the missing glow mesh cannot be resolved and there is still enough headroom
+                    // TODO This could still be increased if the issue with the missing "glow" mesh cannot be resolved and there is still enough headroom
                     return 30;
                 }
+                else if (fileName.Contains("lantern") && !fileName.Contains("dwarf"))
+                {
+                    return 20;
+                }
+                //else if (fileName.Contains("candle") && !fileName.Contains("holder") && !fileName.Contains("shelf"))
+                //{
+                //    return 50;
+                //}
                 else if (fileName.Contains("shrine_of_ethernal"))
                 {
                     return 100;

@@ -518,11 +518,10 @@ namespace WolvenKit.CR2W.FilePatchers
                         string relativeW2MeshFilePath = variableCHandleMesh.Handle;
                         string w2MeshFileName = relativeW2MeshFilePath.Substring(relativeW2MeshFilePath.LastIndexOf(Path.DirectorySeparatorChar) + 1);
 
-                        if (!w2MeshFileName.Contains("wax_pile") && !w2MeshFileName.Contains("brazier_fuel") && !w2MeshFileName.Contains("chandelier") && !w2MeshFileName.Contains("hanging_lamp")
-                            && !w2MeshFileName.Contains("hanging_lamp") && !w2MeshFileName.Contains("dwarf") && !w2MeshFileName.Contains("harbour_shore_pillar")
-                            && (!w2MeshFileName.Contains("candle") || w2MeshFileName.Contains("holder") || w2MeshFileName.Contains("shelf") || w2MeshFileName.Contains("tick"))
-                            && (!w2MeshFileName.Contains("torch") || w2MeshFileName.Contains("wall"))
-                            && !meshComponentsWithAttachments.Contains(meshComponentToCopyAndRename))
+                        if (!meshComponentsWithAttachments.Contains(meshComponentToCopyAndRename)
+                            && (w2MeshFileName.Contains("braziers_floor") || w2MeshFileName.Contains("braziers_wall")
+                            || w2MeshFileName.Contains("shrine_of_ethernal_fire_altar") || w2MeshFileName.Contains("shipyard_pole_support")
+                            || w2MeshFileName.Contains("torch_wall") || w2MeshFileName.Contains("lantern_red_table.w2mesh")))
                         {
                             CR2WChunk copiedMeshComponent = CR2WCopyAction.CopyChunk(meshComponentToCopyAndRename, meshComponentToCopyAndRename.CR2WOwner);
 

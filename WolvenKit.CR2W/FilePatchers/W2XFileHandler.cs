@@ -27,6 +27,8 @@ namespace WolvenKit.CR2W.FilePatchers
         public List<string> W2EntFilePathsForFires { get; private set; }
         public List<string> W2MeshFilePathsForFires { get; private set; }
         public List<string> W2MeshBufferFilePathsForFires { get; private set; }
+        public List<string> W2MeshFilePathsForFiresRenamed { get; private set; }
+        public List<string> W2MeshBufferFilePathsForFiresRenamed { get; private set; }
         public List<string> W2PFilePathsForFires { get; private set; }
 
         public W2XFileHandler()
@@ -35,6 +37,8 @@ namespace WolvenKit.CR2W.FilePatchers
             W2EntFilePathsForFires = new List<string>();
             W2MeshFilePathsForFires = new List<string>();
             W2MeshBufferFilePathsForFires = new List<string>();
+            W2MeshFilePathsForFiresRenamed = new List<string>();
+            W2MeshBufferFilePathsForFiresRenamed = new List<string>();
             W2PFilePathsForFires = new List<string>();
         }
 
@@ -105,10 +109,22 @@ namespace WolvenKit.CR2W.FilePatchers
                             {
                                 foreach (string w2MeshFilePathForFire in w2MeshFilePathsForFires)
                                 {
+                                    string w2MeshFileName = Path.GetFileName(w2MeshFilePathForFire);
                                     string w2MeshBufferFilePathForFire = w2MeshFilePathForFire + FileExtensionSuffixW2MeshBuffer;
 
-                                    W2MeshFilePathsForFires.Add(w2MeshFilePathForFire);
-                                    W2MeshBufferFilePathsForFires.Add(w2MeshBufferFilePathForFire);
+                                    if (w2MeshFileName.Contains("braziers_floor") || w2MeshFileName.Contains("braziers_wall") || w2MeshFileName.Contains("torch_hand") || w2MeshFileName.Contains("hanging_lamp.w2mesh")
+                                        || w2MeshFileName.Contains("shrine_of_ethernal_fire_altar") || w2MeshFileName.Contains("shipyard_pole_support") || w2MeshFileName.Contains("chandelier_small")
+                                        || w2MeshFileName.Contains("torch_wall") || w2MeshFileName.Contains("lantern_red.w2mesh") || w2MeshFileName.Contains("lantern_red_table.w2mesh")
+                                        || (w2MeshFileName.Contains("candle") && !w2MeshFileName.Contains("holder") && !w2MeshFileName.Contains("shelf")))
+                                    {
+                                        W2MeshFilePathsForFiresRenamed.Add(w2MeshFilePathForFire);
+                                        W2MeshBufferFilePathsForFiresRenamed.Add(w2MeshBufferFilePathForFire);
+                                    }
+                                    else
+                                    {
+                                        W2MeshFilePathsForFires.Add(w2MeshFilePathForFire);
+                                        W2MeshBufferFilePathsForFires.Add(w2MeshBufferFilePathForFire);
+                                    }
                                 }
                             }
                         }
@@ -125,6 +141,8 @@ namespace WolvenKit.CR2W.FilePatchers
             W2EntFilePathsForFires = W2EntFilePathsForFires.Distinct().ToList();
             W2MeshFilePathsForFires = W2MeshFilePathsForFires.Distinct().ToList();
             W2MeshBufferFilePathsForFires = W2MeshBufferFilePathsForFires.Distinct().ToList();
+            W2MeshFilePathsForFiresRenamed = W2MeshFilePathsForFiresRenamed.Distinct().ToList();
+            W2MeshBufferFilePathsForFiresRenamed = W2MeshBufferFilePathsForFiresRenamed.Distinct().ToList();
             W2PFilePathsForFires = W2PFilePathsForFires.Distinct().ToList();
 
             //string w2entsource = "D:\\_\\w2ent";
