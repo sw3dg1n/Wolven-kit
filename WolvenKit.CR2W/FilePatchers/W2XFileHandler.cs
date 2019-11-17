@@ -112,10 +112,12 @@ namespace WolvenKit.CR2W.FilePatchers
                                     string w2MeshFileName = Path.GetFileName(w2MeshFilePathForFire);
                                     string w2MeshBufferFilePathForFire = w2MeshFilePathForFire + FileExtensionSuffixW2MeshBuffer;
 
-                                    if (w2MeshFileName.Contains("braziers_floor") || w2MeshFileName.Contains("braziers_wall") || w2MeshFileName.Contains("torch_hand") || w2MeshFileName.Contains("hanging_lamp.w2mesh")
-                                        || w2MeshFileName.Contains("shrine_of_ethernal_fire_altar") || w2MeshFileName.Contains("shipyard_pole_support") || w2MeshFileName.Contains("chandelier_small")
-                                        || w2MeshFileName.Contains("torch_wall") || w2MeshFileName.Contains("lantern_red.w2mesh") || w2MeshFileName.Contains("lantern_red_table.w2mesh")
-                                        || (w2MeshFileName.Contains("candle") && !w2MeshFileName.Contains("holder") && !w2MeshFileName.Contains("shelf")))
+                                    if (w2MeshFileName.Contains("braziers_floor") || w2MeshFileName.Contains("braziers_wall") || w2MeshFileName.Contains("torch_hand")
+                                        || (w2MeshFileName.Contains("hanging_lamp") && !w2MeshFileName.Contains("holder"))
+                                        || (w2MeshFileName.Contains("shrine_of_ethernal_fire_altar") && !w2MeshFileName.Contains("small"))
+                                        || w2MeshFileName.Contains("shipyard_pole_support") || w2MeshFileName.Contains("chandelier_small")
+                                        || (w2MeshFileName.Contains("candle") && (!w2MeshFileName.Contains("holder") || w2MeshFileName.Contains("small")) && !w2MeshFileName.Contains("shelf"))
+                                        || w2MeshFileName.Contains("torch_wall") || w2MeshFileName.Contains("lantern_red.w2mesh") || w2MeshFileName.Contains("lantern_red_table.w2mesh"))
                                     {
                                         W2MeshFilePathsForFiresRenamed.Add(w2MeshFilePathForFire);
                                         W2MeshBufferFilePathsForFiresRenamed.Add(w2MeshBufferFilePathForFire);

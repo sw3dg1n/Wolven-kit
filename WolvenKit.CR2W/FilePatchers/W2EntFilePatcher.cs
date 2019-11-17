@@ -24,6 +24,7 @@ namespace WolvenKit.CR2W.FilePatchers
         private const string TypeCParticleSystem = "CParticleSystem";
         private const string TypeCPointLightComponent = "CPointLightComponent";
         private const string TypeCRigidMeshComponent = "CRigidMeshComponent";
+        private const string TypeCSpotLightComponent = "CSpotLightComponent";
         private const string TypeCStaticMeshComponent = "CStaticMeshComponent";
         private const string TypeSharedDataBuffer = "SharedDataBuffer";
         private const string TypeW3AnimationInteractionEntity = "W3AnimationInteractionEntity";
@@ -34,11 +35,13 @@ namespace WolvenKit.CR2W.FilePatchers
         private const string TypeW3LightSource = "W3LightSource";
         private const string TypeW3MonsterClue = "W3MonsterClue";
 
+        private const string VariableNameBrightness = "brightness";
         private const string VariableNameBuffer = "buffer";
         private const string VariableNameCookedEffects = "cookedEffects";
         private const string VariableNameFlatCompiledData = "flatCompiledData";
         private const string VariableNameName = "name";
         private const string VariableNameParticleSystem = "particleSystem";
+        private const string VariableNameRadius = "radius";
         private const string VariableNameShowDistance = "showDistance";
         private const string VariableNameStreamingDataBuffer = "streamingDataBuffer";
         private const string VariableNameStreamingDistance = "streamingDistance";
@@ -355,22 +358,47 @@ namespace WolvenKit.CR2W.FilePatchers
 
         private bool PatchGlowAutoHideDistance(string w2EntFilePath, CByteArrayContainer flatCompiledData, W2EntSettings w2EntSettings)
         {
-            bool cPointLightComponentFound = false;
+            List<CR2WChunk> pointAndSpotLightComponents = new List<CR2WChunk>();
+            float maximumPointLightComponentBrightness = 0;
+            float maximumPointLightComponentRadius = 0;
+            float maximumSpotLightComponentRadius = 0;
 
             foreach (CR2WChunk chunk in flatCompiledData.Content.chunks)
             {
-                if (!IsCPointLightComponent(chunk))
+                if (!IsCPointLightComponent(chunk) && !IsCSpotLightComponent(chunk))
                 {
                     continue;
                 }
-
-                cPointLightComponentFound = true;
 
                 if (chunk.data == null || !(chunk.data is CVector))
                 {
                     throw new System.InvalidOperationException("File '" + w2EntFilePath + "' contains either no or invalid chunk data for type '" + TypeCPointLightComponent + "'.");
                 }
 
+                pointAndSpotLightComponents.Add(chunk);
+
+                foreach (CVariable variable in ((CVector)chunk.data).variables)
+                {
+                    if (IsBrightness(variable) && IsCPointLightComponent(chunk))
+                    {
+                        maximumPointLightComponentBrightness = Math.Max(maximumPointLightComponentBrightness, ((CFloat)variable).val);
+                    }
+                    else if (IsRadius(variable))
+                    {
+                        if (IsCPointLightComponent(chunk))
+                        {
+                            maximumPointLightComponentRadius = Math.Max(maximumPointLightComponentRadius, ((CFloat)variable).val);
+                        }
+                        else
+                        {
+                            maximumSpotLightComponentRadius = Math.Max(maximumSpotLightComponentRadius, ((CFloat)variable).val);
+                        }
+                    }
+                }
+            }
+
+            foreach (CR2WChunk chunk in pointAndSpotLightComponents)
+            {
                 CVector chunkData = (CVector)chunk.data;
                 bool autoHideDistanceFound = false;
 
@@ -392,6 +420,14 @@ namespace WolvenKit.CR2W.FilePatchers
                         // For some reason changing some coordinates slightly makes the glow not clip anymore at a certain distance for some of the light sources...
                         PatchMinimumTransformY((CEngineTransform)variable, w2EntSettings);
                     }
+                    else if (IsCSpotLightComponent(chunk) && IsBrightness(variable) && maximumPointLightComponentBrightness > 0)
+                    {
+                        PatchBrightness(variable, maximumPointLightComponentBrightness);
+                    }
+                    else if (IsRadius(variable) && maximumPointLightComponentRadius > 0 && maximumSpotLightComponentRadius > 0 && w2EntSettings.UnifyGlowRadius)
+                    {
+                        PatchRadius(variable, maximumPointLightComponentRadius, maximumSpotLightComponentRadius);
+                    }
                 }
 
                 if (!autoHideDistanceFound)
@@ -400,7 +436,12 @@ namespace WolvenKit.CR2W.FilePatchers
                 }
             }
 
-            return cPointLightComponentFound;
+            return pointAndSpotLightComponents.Any();
+        }
+
+        private static void PatchBrightness(CVariable variableBrightness, float brightness)
+        {
+            ((CFloat)variableBrightness).SetValue(brightness);
         }
 
         private static void PatchMinimumTransformY(CEngineTransform variableTransform, W2EntSettings w2EntSettings)
@@ -411,7 +452,12 @@ namespace WolvenKit.CR2W.FilePatchers
             }
         }
 
-        private void PatchMeshStreamingDistance(string filePath, CR2WFile w2EntFile, W2EntSettings w2EntSettings)
+        private static void PatchRadius(CVariable variableRadius, float radius1, float radius2)
+        {
+            ((CFloat)variableRadius).SetValue(Math.Min(radius1, radius2) + (Math.Abs(radius1 - radius2) / 2));
+        }
+
+        private static void PatchMeshStreamingDistance(string filePath, CR2WFile w2EntFile, W2EntSettings w2EntSettings)
         {
             bool streamingDistanceFound = false;
 
@@ -454,7 +500,7 @@ namespace WolvenKit.CR2W.FilePatchers
             }
         }
 
-        private List<string> PatchW2MeshFilePath(string w2EntFilePath, List<CR2WChunk> chunks, Dictionary<string, string> relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap)
+        private static List<string> PatchW2MeshFilePath(string w2EntFilePath, List<CR2WChunk> chunks, Dictionary<string, string> relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap)
         {
             List<string> relativeCollisionMeshFilePaths = new List<string>();
 
@@ -520,7 +566,8 @@ namespace WolvenKit.CR2W.FilePatchers
 
                         if (!meshComponentsWithAttachments.Contains(meshComponentToCopyAndRename)
                             && (w2MeshFileName.Contains("braziers_floor") || w2MeshFileName.Contains("braziers_wall")
-                            || w2MeshFileName.Contains("shrine_of_ethernal_fire_altar") || w2MeshFileName.Contains("shipyard_pole_support")
+                            || (w2MeshFileName.Contains("shrine_of_ethernal_fire_altar") && !w2MeshFileName.Contains("small"))
+                            || w2MeshFileName.Contains("shipyard_pole_support")
                             || w2MeshFileName.Contains("torch_wall") || w2MeshFileName.Contains("lantern_red_table.w2mesh")))
                         {
                             CR2WChunk copiedMeshComponent = CR2WCopyAction.CopyChunk(meshComponentToCopyAndRename, meshComponentToCopyAndRename.CR2WOwner);
@@ -742,6 +789,11 @@ namespace WolvenKit.CR2W.FilePatchers
             }
         }
 
+        private static bool IsBrightness(CVariable variable)
+        {
+            return variable is CFloat && variable.Name.Equals(VariableNameBrightness);
+        }
+
         private static bool IsCEntityTemplate(CR2WChunk chunk)
         {
             return chunk.Type.Equals(TypeCEntityTemplate);
@@ -787,6 +839,11 @@ namespace WolvenKit.CR2W.FilePatchers
             return variable is CSoft && ((CSoft)variable).FileType.Equals(TypeCParticleSystem);
         }
 
+        private static bool IsCSpotLightComponent(CR2WChunk chunk)
+        {
+            return chunk.Type.Equals(TypeCSpotLightComponent);
+        }
+
         private static bool IsCStringName(CVariable variable)
         {
             return variable is CString && variable.Name.Equals(VariableNameName);
@@ -812,6 +869,11 @@ namespace WolvenKit.CR2W.FilePatchers
         private static bool IsMeshComponent(CR2WChunk chunk)
         {
             return chunk.Type.Equals(TypeCMeshComponent) || chunk.Type.Equals(TypeCRigidMeshComponent) || chunk.Type.Equals(TypeCStaticMeshComponent);
+        }
+
+        private static bool IsRadius(CVariable variable)
+        {
+            return variable is CFloat && variable.Name.Equals(VariableNameRadius);
         }
 
         private static bool IsSharedDataBuffer(CVariable variable)

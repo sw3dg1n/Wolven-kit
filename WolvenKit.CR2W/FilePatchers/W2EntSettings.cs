@@ -85,16 +85,32 @@ namespace WolvenKit.CR2W.FilePatchers
                 {
                     return 20;
                 }
-                //else if (fileName.Contains("candle") && !fileName.Contains("holder") && !fileName.Contains("shelf"))
+                // TODO tweak further
+                //else if (fileName.Contains("candle") && (!fileName.Contains("holder") || fileName.Contains("small")) && !fileName.Contains("shelf"))
                 //{
                 //    return 50;
                 //}
-                else if (fileName.Contains("shrine_of_ethernal"))
+                else if (fileName.Contains("shrine_of_ethernal") && !fileName.Contains("small"))
                 {
                     return 100;
                 }
 
                 return null;
+            }
+
+            private set { }
+        }
+
+        public bool UnifyGlowRadius
+        {
+            get
+            {
+                if (fileName.Contains("candle") && (!fileName.Contains("holder") || fileName.Contains("small")) && !fileName.Contains("shelf"))
+                {
+                    return true;
+                }
+
+                return false;
             }
 
             private set { }

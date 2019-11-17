@@ -48,10 +48,10 @@ namespace WolvenKit.CR2W.FilePatchers
                 {
                     return defaultLOD1;
                 }
-                //else if (fileName.Contains("brazier_fuel"))
-                //{
-                //    return 20;
-                //}
+                else if (fileName.Contains("braziers_wall_chain"))
+                {
+                    return 80;
+                }
 
                 return null;
             }
@@ -67,10 +67,10 @@ namespace WolvenKit.CR2W.FilePatchers
                 {
                     return defaultLODIncrement;
                 }
-                //else if (fileName.Contains("brazier_fuel"))
-                //{
-                //    return 20;
-                //}
+                else if (fileName.Contains("braziers_wall_chain"))
+                {
+                    return 40;
+                }
 
                 return null;
             }
