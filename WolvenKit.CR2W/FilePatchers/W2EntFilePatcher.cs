@@ -564,17 +564,22 @@ namespace WolvenKit.CR2W.FilePatchers
                         string relativeW2MeshFilePath = variableCHandleMesh.Handle;
                         string w2MeshFileName = relativeW2MeshFilePath.Substring(relativeW2MeshFilePath.LastIndexOf(Path.DirectorySeparatorChar) + 1);
 
+                        // The chunks for these meshes get copied to have a dummy mesh for collision since renamed meshes don't support collisions anymore
                         if (!meshComponentsWithAttachments.Contains(meshComponentToCopyAndRename)
                             && (w2MeshFileName.Contains("braziers_floor") || w2MeshFileName.Contains("braziers_wall")
                             || (w2MeshFileName.Contains("shrine_of_ethernal_fire_altar") && !w2MeshFileName.Contains("small"))
-                            || w2MeshFileName.Contains("shipyard_pole_support")
+                            || w2MeshFileName.Contains("shipyard_pole_support") || w2MeshFileName.Contains("bonfire_large")
                             || w2MeshFileName.Contains("torch_wall") || w2MeshFileName.Contains("lantern_red_table.w2mesh")))
                         {
                             CR2WChunk copiedMeshComponent = CR2WCopyAction.CopyChunk(meshComponentToCopyAndRename, meshComponentToCopyAndRename.CR2WOwner);
 
                             patchNameWithILODCollisionSuffix(copiedMeshComponent);
 
-                            relativeCollisionMeshFilePaths.Add(relativeW2MeshFilePath);
+                            // For the meshes specified here, the attributes of the original mesh will not be touched
+                            if (!w2MeshFileName.Contains("bonfire_large"))
+                            {
+                                relativeCollisionMeshFilePaths.Add(relativeW2MeshFilePath);
+                            }
                         }
 
                         string relativeRenamedW2MeshFilePath;

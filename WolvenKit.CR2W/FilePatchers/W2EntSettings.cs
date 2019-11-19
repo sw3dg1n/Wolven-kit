@@ -19,6 +19,11 @@ namespace WolvenKit.CR2W.FilePatchers
         {
             get
             {
+                if (fileName.Contains("bonfire_large"))
+                {
+                    return 4300;
+                }
+
                 return 1200;
             }
 
@@ -55,7 +60,11 @@ namespace WolvenKit.CR2W.FilePatchers
         {
             get
             {
-                if (fileName.Contains("braziers_floor"))
+                if (fileName.Contains("bonfire_large"))
+                {
+                    return 255;
+                }
+                else if (fileName.Contains("braziers_floor"))
                 {
                     // TODO This could either be reduced more to avoid the shimmering in the distance or maybe even further extended for higher resolutions, supersampling or better antialiasing e.g. via reshade
                     return 30;
@@ -86,10 +95,10 @@ namespace WolvenKit.CR2W.FilePatchers
                     return 20;
                 }
                 // TODO tweak further
-                //else if (fileName.Contains("candle") && (!fileName.Contains("holder") || fileName.Contains("small")) && !fileName.Contains("shelf"))
-                //{
-                //    return 50;
-                //}
+                else if (fileName.Contains("candle") && (!fileName.Contains("holder") || fileName.Contains("small")))
+                {
+                    return 20;
+                }
                 else if (fileName.Contains("shrine_of_ethernal") && !fileName.Contains("small"))
                 {
                     return 100;

@@ -19,6 +19,11 @@ namespace WolvenKit.CR2W.FilePatchers
         {
             get
             {
+                if (fileName.Contains("bonfire_large"))
+                {
+                    return 4300;
+                }
+
                 return 1200;
             }
 

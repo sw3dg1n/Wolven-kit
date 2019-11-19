@@ -33,6 +33,10 @@ namespace WolvenKit.CR2W.FilePatchers
                 {
                     return defaultAutoHideDistance;
                 }
+                else if (fileName.Contains("bonfire_large"))
+                {
+                    return 2300;
+                }
 
                 return 1200;
             }
