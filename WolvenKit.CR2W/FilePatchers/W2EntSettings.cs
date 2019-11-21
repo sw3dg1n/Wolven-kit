@@ -23,6 +23,14 @@ namespace WolvenKit.CR2W.FilePatchers
                 {
                     return 4300;
                 }
+                else if (fileName.Contains("bonfire_medium"))
+                {
+                    return 2500;
+                }
+                else if (fileName.Contains("pile_of_bodies"))
+                {
+                    return 1200;
+                }
 
                 return 1200;
             }
@@ -64,6 +72,10 @@ namespace WolvenKit.CR2W.FilePatchers
                 {
                     return 255;
                 }
+                else if (fileName.Contains("bonfire_medium"))
+                {
+                    return 70;
+                }
                 else if (fileName.Contains("braziers_floor"))
                 {
                     // TODO This could either be reduced more to avoid the shimmering in the distance or maybe even further extended for higher resolutions, supersampling or better antialiasing e.g. via reshade
@@ -94,10 +106,14 @@ namespace WolvenKit.CR2W.FilePatchers
                 {
                     return 20;
                 }
-                // TODO tweak further
+                else if (fileName.Contains("pile_of_bodies"))
+                {
+                    return 70;
+                }
                 else if (fileName.Contains("candle") && (!fileName.Contains("holder") || fileName.Contains("small")))
                 {
-                    return 20;
+                    // TODO This could either be even further extended for higher resolutions, supersampling or better antialiasing e.g. via reshade
+                    return 15;
                 }
                 else if (fileName.Contains("shrine_of_ethernal") && !fileName.Contains("small"))
                 {

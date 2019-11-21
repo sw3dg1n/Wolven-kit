@@ -23,6 +23,14 @@ namespace WolvenKit.CR2W.FilePatchers
                 {
                     return 4300;
                 }
+                else if (fileName.Contains("bonfire_medium"))
+                {
+                    return 2500;
+                }
+                else if (fileName.Contains("pile_of_bodies"))
+                {
+                    return 1200;
+                }
 
                 return 1200;
             }
@@ -34,6 +42,15 @@ namespace WolvenKit.CR2W.FilePatchers
         {
             get
             {
+                if (fileName.Contains("bonfire_medium"))
+                {
+                    return 800;
+                }
+                else if (fileName.Contains("pile_of_bodies"))
+                {
+                    return 1000;
+                }
+
                 return null;
             }
 
@@ -44,6 +61,15 @@ namespace WolvenKit.CR2W.FilePatchers
         {
             get
             {
+                if (fileName.Contains("bonfire_medium"))
+                {
+                    return 10;
+                }
+                else if (fileName.Contains("pile_of_bodies"))
+                {
+                    return 100;
+                }
+
                 return null;
             }
 
