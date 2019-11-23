@@ -93,6 +93,11 @@ namespace WolvenKit.CR2W.FilePatchers
                 {
                     return 80;
                 }
+                else if (fileName.Contains("candle") && (!fileName.Contains("holder") || fileName.Contains("small")))
+                {
+                    // TODO This could either be even further extended for higher resolutions, supersampling or better antialiasing e.g. via reshade
+                    return 15;
+                }
                 else if (fileName.Contains("chandelier_small"))
                 {
                     return 80;
@@ -110,14 +115,13 @@ namespace WolvenKit.CR2W.FilePatchers
                 {
                     return 70;
                 }
-                else if (fileName.Contains("candle") && (!fileName.Contains("holder") || fileName.Contains("small")))
-                {
-                    // TODO This could either be even further extended for higher resolutions, supersampling or better antialiasing e.g. via reshade
-                    return 15;
-                }
                 else if (fileName.Contains("shrine_of_ethernal") && !fileName.Contains("small"))
                 {
                     return 100;
+                }
+                else if (fileName.Contains("torch_wall"))
+                {
+                    return 15;
                 }
 
                 return null;

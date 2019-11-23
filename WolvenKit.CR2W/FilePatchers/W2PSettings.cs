@@ -50,6 +50,10 @@ namespace WolvenKit.CR2W.FilePatchers
                 {
                     return 1000;
                 }
+                else if (fileName.Contains("torch_fx1"))
+                {
+                    return 50;
+                }
 
                 return null;
             }
@@ -68,6 +72,10 @@ namespace WolvenKit.CR2W.FilePatchers
                 else if (fileName.Contains("pile_of_bodies"))
                 {
                     return 100;
+                }
+                else if (fileName.Contains("torch_fx1"))
+                {
+                    return 10;
                 }
 
                 return null;
