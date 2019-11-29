@@ -420,7 +420,7 @@ namespace WolvenKit.CR2W.FilePatchers
                         // For some reason changing some coordinates slightly makes the glow not clip anymore at a certain distance for some of the light sources...
                         PatchMinimumTransformY((CEngineTransform)variable, w2EntSettings);
                     }
-                    else if (IsCSpotLightComponent(chunk) && IsBrightness(variable) && maximumPointLightComponentBrightness > 0)
+                    else if (IsCSpotLightComponent(chunk) && IsBrightness(variable) && maximumPointLightComponentBrightness > 0 && w2EntSettings.PatchBrightness)
                     {
                         PatchBrightness(variable, maximumPointLightComponentBrightness);
                     }

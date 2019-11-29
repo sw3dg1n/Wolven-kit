@@ -130,6 +130,21 @@ namespace WolvenKit.CR2W.FilePatchers
             private set { }
         }
 
+        public bool PatchBrightness
+        {
+            get
+            {
+                if (!fileName.Contains("hanging_lamp_complex") && !fileName.Contains("shrine_of_ethernal_fire_bounce"))
+                {
+                    return true;
+                }
+
+                return false;
+            }
+
+            private set { }
+        }
+
         public bool UnifyGlowRadius
         {
             get
