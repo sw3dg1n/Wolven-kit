@@ -27,6 +27,10 @@ namespace WolvenKit.CR2W.FilePatchers
                 {
                     return 2500;
                 }
+                else if (fileName.Contains("lighthouse_fire"))
+                {
+                    return 3000;
+                }
                 else if (fileName.Contains("pile_of_bodies"))
                 {
                     return 1200;
