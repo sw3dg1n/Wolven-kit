@@ -118,7 +118,8 @@ namespace WolvenKit.CR2W.FilePatchers
                                         || (w2MeshFileName.Contains("shrine_of_ethernal_fire_altar") && !w2MeshFileName.Contains("small"))
                                         || w2MeshFileName.Contains("shipyard_pole_support") || w2MeshFileName.Contains("chandelier_small") || w2MeshFileName.Contains("bonfire_large")
                                         || (w2MeshFileName.Contains("candle") && (!w2MeshFileName.Contains("holder") || w2MeshFileName.Contains("small")))
-                                        || w2MeshFileName.Contains("lantern_red.w2mesh") || w2MeshFileName.Contains("lantern_red_table.w2mesh") || w2MeshFileName.Contains("lighthouse_fire"))
+                                        || w2MeshFileName.Contains("lantern_red.w2mesh") || w2MeshFileName.Contains("lantern_red_table.w2mesh") || w2MeshFileName.Contains("lighthouse_fire")
+                                        || w2MeshFileName.Contains("copper_cauldron") || w2MeshFileName.Contains("ob_forge"))
                                     {
                                         W2MeshFilePathsForFiresRenamed.Add(w2MeshFilePathForFire);
                                         W2MeshBufferFilePathsForFiresRenamed.Add(w2MeshBufferFilePathForFire);

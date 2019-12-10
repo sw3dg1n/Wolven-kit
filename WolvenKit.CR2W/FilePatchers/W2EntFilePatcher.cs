@@ -569,14 +569,16 @@ namespace WolvenKit.CR2W.FilePatchers
                             && (w2MeshFileName.Contains("braziers_floor") || w2MeshFileName.Contains("braziers_wall") || w2MeshFileName.Contains("pile_of_bodies")
                             || (w2MeshFileName.Contains("shrine_of_ethernal_fire_altar") && !w2MeshFileName.Contains("small"))
                             || w2MeshFileName.Contains("shipyard_pole_support") || w2MeshFileName.Contains("bonfire_large") || w2MeshFileName.Contains("lighthouse_fire")
-                            || w2MeshFileName.Contains("torch_wall") || w2MeshFileName.Contains("lantern_red_table.w2mesh")))
+                            || w2MeshFileName.Contains("torch_wall") || w2MeshFileName.Contains("lantern_red_table.w2mesh") || w2MeshFileName.Contains("copper_cauldron")
+                            || w2MeshFileName.Contains("ob_forge")))
                         {
                             CR2WChunk copiedMeshComponent = CR2WCopyAction.CopyChunk(meshComponentToCopyAndRename, meshComponentToCopyAndRename.CR2WOwner);
 
                             patchNameWithILODCollisionSuffix(copiedMeshComponent);
 
                             // For the meshes specified here, the attributes of the original mesh will not be touched
-                            if (!w2MeshFileName.Contains("bonfire_large") && !w2MeshFileName.Contains("pile_of_bodies") && !w2MeshFileName.Contains("lighthouse_fire"))
+                            if (!w2MeshFileName.Contains("bonfire_large") && !w2MeshFileName.Contains("pile_of_bodies") && !w2MeshFileName.Contains("lighthouse_fire") && !w2MeshFileName.Contains("copper_cauldron")
+                                && !w2MeshFileName.Contains("ob_forge"))
                             {
                                 relativeCollisionMeshFilePaths.Add(relativeW2MeshFilePath);
                             }

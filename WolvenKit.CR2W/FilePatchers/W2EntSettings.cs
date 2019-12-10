@@ -33,7 +33,7 @@ namespace WolvenKit.CR2W.FilePatchers
                 }
                 else if (fileName.Contains("pile_of_bodies"))
                 {
-                    return 1200;
+                    return 1500;
                 }
 
                 return 1200;
@@ -46,9 +46,21 @@ namespace WolvenKit.CR2W.FilePatchers
         {
             get
             {
-                if (fileName.Contains("lighthouse_fire"))
+                if (fileName.Contains("bonfire_large"))
+                {
+                    return 4300;
+                }
+                else if (fileName.Contains("bonfire_medium"))
+                {
+                    return 2500;
+                }
+                else if (fileName.Contains("lighthouse_fire"))
                 {
                     return 4000;
+                }
+                else if (fileName.Contains("pile_of_bodies"))
+                {
+                    return 1500;
                 }
 
                 return 1200;
@@ -61,10 +73,18 @@ namespace WolvenKit.CR2W.FilePatchers
         {
             get
             {
-                if (fileName.Contains("candle") || fileName.Contains("campfire_") || fileName.Contains("chandelier_small") || fileName.Contains("coal_small_noshadow") || fileName.Contains("braziers_wall_square")
-                     || (fileName.Contains("lantern") && !fileName.Contains("dwarf"))/*|| fileName.Contains("hanging_lamp") || fileName.Contains("lighthouse_fire")*/)
+                if (fileName.Contains("candle_large_group"))
+                {
+                    return 0.15F;
+                }
+                else if (fileName.Contains("candle") || fileName.Contains("campfire_") || fileName.Contains("chandelier_small") || fileName.Contains("coal_small_noshadow") || fileName.Contains("braziers_wall_square")
+                     || (fileName.Contains("lantern") && !fileName.Contains("dwarf")) || fileName.Contains("torch_hand_long") || fileName.Contains("stand_mw_cooking_big_cauldron"))
                 {
                     return 0.01F;
+                }
+                else if (fileName.Contains("ob_forge_px"))
+                {
+                    return 0.7F;
                 }
 
                 return null;
@@ -118,11 +138,15 @@ namespace WolvenKit.CR2W.FilePatchers
                 }
                 else if (fileName.Contains("lantern") && !fileName.Contains("dwarf"))
                 {
-                    return 20;
+                    return 30;
                 }
                 else if (fileName.Contains("lighthouse_fire") || fileName.Contains("mh207_lighthouse_brazier"))
                 {
                     return 150;
+                }
+                else if (fileName.Contains("ob_forge_px"))
+                {
+                    return 30;
                 }
                 else if (fileName.Contains("pile_of_bodies"))
                 {
@@ -131,6 +155,10 @@ namespace WolvenKit.CR2W.FilePatchers
                 else if (fileName.Contains("shrine_of_ethernal") && !fileName.Contains("small"))
                 {
                     return 100;
+                }
+                else if (fileName.Contains("stand_mw_cooking_big_cauldron"))
+                {
+                    return 50;
                 }
                 else if (fileName.Contains("torch_wall"))
                 {
