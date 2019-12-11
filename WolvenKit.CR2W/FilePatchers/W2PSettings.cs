@@ -27,9 +27,21 @@ namespace WolvenKit.CR2W.FilePatchers
                 {
                     return 2500;
                 }
+                else if (fileName.Contains("h_shrine_eternal_fire_wide_materialswap")) // shrine_of_ethernal_fire_altar_wide_bounce
+                {
+                    return 2500;
+                }
+                else if (fileName.Contains("h_shrine_ethernal_fire_bounce")) // shrine_of_ethernal_fire_altar_spot
+                {
+                    return 2000;
+                }
                 else if (fileName.Contains("lighthouse_fire"))
                 {
                     return 2500;
+                }
+                else if (fileName.Contains("p_fire_medium_subuv_spot")) // shrine_of_ethernal_fire_altar_wide
+                {
+                    return 1500;
                 }
                 else if (fileName.Contains("pile_corpses_fire"))
                 {

@@ -35,6 +35,18 @@ namespace WolvenKit.CR2W.FilePatchers
                 {
                     return 1500;
                 }
+                else if (fileName.Contains("shrine_of_ethernal_fire_altar_spot"))
+                {
+                    return 2000;
+                }
+                else if (fileName.Contains("shrine_of_ethernal_fire_altar_wide.w2ent"))
+                {
+                    return 1500;
+                }
+                else if (fileName.Contains("shrine_of_ethernal_fire_altar_wide_bounce"))
+                {
+                    return 2500;
+                }
 
                 return 1200;
             }
@@ -54,6 +66,10 @@ namespace WolvenKit.CR2W.FilePatchers
                 {
                     return 2500;
                 }
+                else if (fileName.Contains("chandelier_small.w2ent"))
+                {
+                    return 3000;
+                }
                 else if (fileName.Contains("lighthouse_fire"))
                 {
                     return 4000;
@@ -61,6 +77,14 @@ namespace WolvenKit.CR2W.FilePatchers
                 else if (fileName.Contains("pile_of_bodies"))
                 {
                     return 1500;
+                }
+                else if (fileName.Contains("shrine_of_ethernal_fire_altar_spot"))
+                {
+                    return 3500;
+                }
+                else if (fileName.Contains("shrine_of_ethernal_fire_altar_wide"))
+                {
+                    return 4000;
                 }
 
                 return 1200;
