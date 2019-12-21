@@ -60,6 +60,30 @@ namespace WolvenKit.CR2W.FilePatchers
                 {
                     return 80;
                 }
+                else if (fileName.Contains("braziers_wall_round"))
+                {
+                    return 50;
+                }
+                else if (fileName.Contains("braziers_wall_square"))
+                {
+                    return 50;
+                }
+                else if (fileName.Contains("braziers_wall_wire"))
+                {
+                    return 50;
+                }
+                else if (fileName.Contains("shrine_of_ethernal_fire_altar_wide"))
+                {
+                    return 300;
+                }
+                else if (fileName.Contains("shrine_of_ethernal_fire_altar"))
+                {
+                    return 100;
+                }
+                else if (fileName.Contains("shrine_of_ethernal_fire_base") || fileName.Contains("shrine_of_ethernal_fire.w2mesh"))
+                {
+                    return 90;
+                }
 
                 return null;
             }
@@ -80,7 +104,7 @@ namespace WolvenKit.CR2W.FilePatchers
                     return 40;
                 }
 
-                return null;
+                return 10;
             }
 
             private set { }

@@ -86,7 +86,7 @@ namespace WolvenKit.CR2W.FilePatchers
 
         private static void PatchLODs(CVector variableCookedData, W2MeshSettings w2MeshSettings)
         {
-            if (w2MeshSettings.LOD1 == null || w2MeshSettings.LODIncrement == null)
+            if (w2MeshSettings.LOD1 == null)
             {
                 return;
             }

@@ -102,7 +102,8 @@ namespace WolvenKit.CR2W.FilePatchers
                     return 0.15F;
                 }
                 else if (fileName.Contains("candle") || fileName.Contains("campfire_") || fileName.Contains("chandelier_small") || fileName.Contains("coal_small_noshadow") || fileName.Contains("braziers_wall_square")
-                     || (fileName.Contains("lantern") && !fileName.Contains("dwarf")) || fileName.Contains("torch_hand_long") || fileName.Contains("stand_mw_cooking_big_cauldron"))
+                     || (fileName.Contains("lantern") && !fileName.Contains("dwarf")) || fileName.Contains("torch_hand_long") || fileName.Contains("stand_mw_cooking_big_cauldron") || fileName.Contains("candelabra_tall_three_point.w2ent")
+                     || fileName.Contains("chandelier_bright_noshadow") || fileName.Contains("candelabra_tall_three_point_complex"))
                 {
                     return 0.01F;
                 }
@@ -179,6 +180,10 @@ namespace WolvenKit.CR2W.FilePatchers
                 else if (fileName.Contains("shrine_of_ethernal") && !fileName.Contains("small"))
                 {
                     return 100;
+                }
+                else if (fileName.Contains("shrine_of_ethernal_fire_altar_small_spot_bounce"))
+                {
+                    return 30;
                 }
                 else if (fileName.Contains("stand_mw_cooking_big_cauldron"))
                 {
