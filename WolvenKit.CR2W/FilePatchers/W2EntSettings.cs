@@ -101,9 +101,15 @@ namespace WolvenKit.CR2W.FilePatchers
                 {
                     return 0.15F;
                 }
-                else if (fileName.Contains("candle") || fileName.Contains("campfire_") || fileName.Contains("chandelier_small") || fileName.Contains("coal_small_noshadow") || fileName.Contains("braziers_wall_square")
+                else if (fileName.Contains("coal_medium"))
+                {
+                    return 0.17F;
+                }
+                else if (fileName.Contains("candle") || fileName.Contains("campfire_") || fileName.Contains("chandelier_small") || fileName.Contains("braziers_wall_square")
                      || (fileName.Contains("lantern") && !fileName.Contains("dwarf")) || fileName.Contains("torch_hand_long") || fileName.Contains("stand_mw_cooking_big_cauldron") || fileName.Contains("candelabra_tall_three_point.w2ent")
-                     || fileName.Contains("chandelier_bright_noshadow") || fileName.Contains("candelabra_tall_three_point_complex"))
+                     || fileName.Contains("chandelier_bright_noshadow") || fileName.Contains("candelabra_tall_three_point_complex") || fileName.Contains("braziers_wall_round.w2ent") || fileName.Contains("hanging_lamp.w2ent")
+                     || (fileName.Contains("coal_small") && !fileName.Contains("double_spotlight.w2ent") && !fileName.Contains("smaller"))
+                     || fileName.Contains("mh308_campfire") || fileName.Contains("mh103_campfire"))
                 {
                     return 0.01F;
                 }
@@ -147,6 +153,10 @@ namespace WolvenKit.CR2W.FilePatchers
                 {
                     return 80;
                 }
+                else if (fileName.StartsWith("campfire_"))
+                {
+                    return 15;
+                }
                 else if (fileName.Contains("candle") && (!fileName.Contains("holder") || fileName.Contains("small")))
                 {
                     // TODO This could either be even further extended for higher resolutions, supersampling or better antialiasing e.g. via reshade
@@ -155,6 +165,10 @@ namespace WolvenKit.CR2W.FilePatchers
                 else if (fileName.Contains("chandelier_small"))
                 {
                     return 80;
+                }
+                else if (fileName.Contains("coal_medium"))
+                {
+                    return 10;
                 }
                 else if (fileName.Contains("hanging_lamp"))
                 {
