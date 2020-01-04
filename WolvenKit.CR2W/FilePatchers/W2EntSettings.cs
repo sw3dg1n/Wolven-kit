@@ -97,7 +97,7 @@ namespace WolvenKit.CR2W.FilePatchers
         {
             get
             {
-                if (fileName.Contains("candle_large_group"))
+                if (fileName.Contains("candle_large_group") || fileName.Contains("candle_small_group_melted_d.w2ent") || fileName.Contains("candle_small_group_melted_d_noshadow"))
                 {
                     return 0.15F;
                 }
@@ -218,7 +218,8 @@ namespace WolvenKit.CR2W.FilePatchers
         {
             get
             {
-                if (!fileName.Contains("hanging_lamp_complex") && !fileName.Contains("shrine_of_ethernal_fire_bounce"))
+                if (!fileName.Contains("hanging_lamp_complex") && !fileName.Contains("shrine_of_ethernal_fire_bounce") && !fileName.Contains("torch_wall") && !fileName.Contains("candle_small_group_melted_d_complex")
+                     && !fileName.Contains("candleholder_small_melted_fake_shadow_complex"))
                 {
                     return true;
                 }
