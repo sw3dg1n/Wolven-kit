@@ -424,9 +424,9 @@ namespace WolvenKit.CR2W.FilePatchers
                     {
                         PatchBrightness(variable, maximumPointLightComponentBrightness);
                     }
-                    else if (IsRadius(variable) && maximumPointLightComponentRadius > 0 && maximumSpotLightComponentRadius > 0 && w2EntSettings.UnifyGlowRadius)
+                    else if (IsCSpotLightComponent(chunk) && IsRadius(variable) && maximumPointLightComponentRadius > 0 && maximumSpotLightComponentRadius > 0 && w2EntSettings.PatchGlowRadius)
                     {
-                        PatchRadius(variable, maximumPointLightComponentRadius, maximumSpotLightComponentRadius);
+                        PatchRadius(variable, maximumPointLightComponentRadius);
                     }
                 }
 
@@ -452,9 +452,9 @@ namespace WolvenKit.CR2W.FilePatchers
             }
         }
 
-        private static void PatchRadius(CVariable variableRadius, float radius1, float radius2)
+        private static void PatchRadius(CVariable variableRadius, float radius)
         {
-            ((CFloat)variableRadius).SetValue(Math.Min(radius1, radius2) + (Math.Abs(radius1 - radius2) / 2));
+            ((CFloat)variableRadius).SetValue(radius);
         }
 
         private static void PatchMeshStreamingDistance(string filePath, CR2WFile w2EntFile, W2EntSettings w2EntSettings)
@@ -570,7 +570,7 @@ namespace WolvenKit.CR2W.FilePatchers
                             || w2MeshFileName.Contains("shrine_of_ethernal_fire_altar")
                             || w2MeshFileName.Contains("shipyard_pole_support") || w2MeshFileName.Contains("bonfire_large") || w2MeshFileName.Contains("lighthouse_fire")
                             || w2MeshFileName.Contains("torch_wall") || w2MeshFileName.Contains("lantern_red_table.w2mesh") || w2MeshFileName.Contains("copper_cauldron")
-                            || w2MeshFileName.Contains("ob_forge")))
+                            || w2MeshFileName.Contains("ob_forge") || w2MeshFileName.Contains("pig_spitroast")))
                         {
                             CR2WChunk copiedMeshComponent = CR2WCopyAction.CopyChunk(meshComponentToCopyAndRename, meshComponentToCopyAndRename.CR2WOwner);
 
@@ -578,7 +578,7 @@ namespace WolvenKit.CR2W.FilePatchers
 
                             // For the meshes specified here, the attributes of the original mesh will not be touched
                             if (!w2MeshFileName.Contains("bonfire_large") && !w2MeshFileName.Contains("pile_of_bodies") && !w2MeshFileName.Contains("lighthouse_fire") && !w2MeshFileName.Contains("copper_cauldron")
-                                && !w2MeshFileName.Contains("ob_forge") && !w2MeshFileName.Contains("shrine_of_ethernal_fire_altar_small"))
+                                && !w2MeshFileName.Contains("ob_forge") && !w2MeshFileName.Contains("shrine_of_ethernal_fire_altar_small") && !w2MeshFileName.Contains("shipyard_pole_support") && !w2MeshFileName.Contains("pig_spitroast"))
                             {
                                 relativeCollisionMeshFilePaths.Add(relativeW2MeshFilePath);
                             }

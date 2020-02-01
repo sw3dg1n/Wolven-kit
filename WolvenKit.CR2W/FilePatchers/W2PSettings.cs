@@ -27,10 +27,15 @@ namespace WolvenKit.CR2W.FilePatchers
                 {
                     return 2500;
                 }
+                else if (fileName.Contains("fire_funeral_alternative"))
+                {
+                    return 3500;
+                }
                 else if (fileName.Contains("h_shrine_eternal_fire_wide_materialswap")) // shrine_of_ethernal_fire_altar_wide_bounce
                 {
                     return 2500;
                 }
+                // TODO Change these since the w2ps themselves got changed
                 else if (fileName.Contains("h_shrine_ethernal_fire_bounce")) // shrine_of_ethernal_fire_altar_spot
                 {
                     return 2000;
@@ -70,6 +75,22 @@ namespace WolvenKit.CR2W.FilePatchers
                 {
                     return 50;
                 }
+                else if (fileName.Contains("shrine_eternal_fire_wide_materialswap"))
+                {
+                    return 120;
+                }
+                else if (fileName.Contains("mq1046_fire_house"))
+                {
+                    return 150;
+                }
+                else if (fileName.Contains("barons_stable_fire_4"))
+                {
+                    return 150;
+                }
+                else if (fileName.StartsWith("h_"))
+                {
+                    return 40;
+                }
 
                 return null;
             }
@@ -93,8 +114,16 @@ namespace WolvenKit.CR2W.FilePatchers
                 {
                     return 10;
                 }
+                else if (fileName.Contains("shrine_eternal_fire_wide_materialswap"))
+                {
+                    return 10;
+                }
+                else if (fileName.StartsWith("h_"))
+                {
+                    return 10;
+                }
 
-                return null;
+                return 10;
             }
 
             private set { }

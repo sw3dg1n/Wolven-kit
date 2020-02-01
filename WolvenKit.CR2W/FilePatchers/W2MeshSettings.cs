@@ -37,6 +37,10 @@ namespace WolvenKit.CR2W.FilePatchers
                 {
                     return 2300;
                 }
+                else if (fileName.Contains("funeral_pyre_burned"))
+                {
+                    return 3500;
+                }
                 else if (fileName.Contains("lighthouse_fire"))
                 {
                     return 1500;

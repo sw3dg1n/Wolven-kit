@@ -27,6 +27,10 @@ namespace WolvenKit.CR2W.FilePatchers
                 {
                     return 2500;
                 }
+                else if (fileName.Contains("funeral_pyre_burned"))
+                {
+                    return 3500;
+                }
                 else if (fileName.Contains("lighthouse_fire"))
                 {
                     return 2500;
@@ -70,6 +74,10 @@ namespace WolvenKit.CR2W.FilePatchers
                 {
                     return 3000;
                 }
+                else if (fileName.Contains("funeral_pyre_burned"))
+                {
+                    return 3500;
+                }
                 else if (fileName.Contains("lighthouse_fire"))
                 {
                     return 4000;
@@ -109,7 +117,7 @@ namespace WolvenKit.CR2W.FilePatchers
                      || (fileName.Contains("lantern") && !fileName.Contains("dwarf")) || fileName.Contains("torch_hand_long") || fileName.Contains("stand_mw_cooking_big_cauldron") || fileName.Contains("candelabra_tall_three_point.w2ent")
                      || fileName.Contains("chandelier_bright_noshadow") || fileName.Contains("candelabra_tall_three_point_complex") || fileName.Contains("braziers_wall_round.w2ent") || fileName.Contains("hanging_lamp.w2ent")
                      || (fileName.Contains("coal_small") && !fileName.Contains("double_spotlight.w2ent") && !fileName.Contains("smaller"))
-                     || fileName.Contains("mh308_campfire") || fileName.Contains("mh103_campfire"))
+                     || fileName.Contains("mh308_campfire") || fileName.Contains("mh103_campfire") || fileName.Contains("candelabra.w2ent"))
                 {
                     return 0.01F;
                 }
@@ -170,6 +178,10 @@ namespace WolvenKit.CR2W.FilePatchers
                 {
                     return 10;
                 }
+                else if (fileName.Contains("funeral_pyre_burned"))
+                {
+                    return 250;
+                }
                 else if (fileName.Contains("hanging_lamp"))
                 {
                     // TODO This could still be increased if the issue with the missing "glow" mesh cannot be resolved and there is still enough headroom
@@ -203,6 +215,10 @@ namespace WolvenKit.CR2W.FilePatchers
                 {
                     return 50;
                 }
+                else if (fileName.Contains("stand_mw_cooking_roasted_pig"))
+                {
+                    return 50;
+                }
                 else if (fileName.Contains("torch_wall"))
                 {
                     return 15;
@@ -230,11 +246,13 @@ namespace WolvenKit.CR2W.FilePatchers
             private set { }
         }
 
-        public bool UnifyGlowRadius
+        public bool PatchGlowRadius
         {
             get
             {
-                if (fileName.Contains("candle") && (!fileName.Contains("holder") || fileName.Contains("small")) && !fileName.Contains("shelf"))
+                if (fileName.Contains("candle")
+                    && !fileName.Contains("shelf")
+                    && (!fileName.Contains("holder") || fileName.Contains("small")))
                 {
                     return true;
                 }

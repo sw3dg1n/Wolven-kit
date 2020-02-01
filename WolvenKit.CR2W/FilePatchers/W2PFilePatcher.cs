@@ -88,7 +88,7 @@ namespace WolvenKit.CR2W.BatchProcessors
 
         private static void PatchLODs(CVariable variableLODs, W2PSettings w2PSettings)
         {
-            if (w2PSettings.LOD1 == null || w2PSettings.LODIncrement == null)
+            if (w2PSettings.LOD1 == null)
             {
                 return;
             }
