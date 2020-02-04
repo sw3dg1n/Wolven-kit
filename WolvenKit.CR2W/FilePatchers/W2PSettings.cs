@@ -27,6 +27,10 @@ namespace WolvenKit.CR2W.FilePatchers
                 {
                     return 2500;
                 }
+                else if (fileName.Contains("drakkar_fire"))
+                {
+                    return 450;
+                }
                 else if (fileName.Contains("fire_funeral_alternative"))
                 {
                     return 3500;
@@ -35,18 +39,13 @@ namespace WolvenKit.CR2W.FilePatchers
                 {
                     return 2500;
                 }
-                // TODO Change these since the w2ps themselves got changed
-                else if (fileName.Contains("h_shrine_ethernal_fire_bounce")) // shrine_of_ethernal_fire_altar_spot
-                {
-                    return 2000;
-                }
                 else if (fileName.Contains("lighthouse_fire"))
                 {
                     return 2500;
                 }
-                else if (fileName.Contains("p_fire_medium_subuv_spot")) // shrine_of_ethernal_fire_altar_wide
+                else if (fileName.Contains("p_fire_medium_subuv_spot_smaller")) // shrine_of_ethernal_fire_altar_spot
                 {
-                    return 1500;
+                    return 2200;
                 }
                 else if (fileName.Contains("pile_corpses_fire"))
                 {

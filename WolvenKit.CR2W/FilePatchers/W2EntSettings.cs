@@ -27,6 +27,10 @@ namespace WolvenKit.CR2W.FilePatchers
                 {
                     return 2500;
                 }
+                else if (fileName.Contains("burning_drakkar"))
+                {
+                    return 450;
+                }
                 else if (fileName.Contains("funeral_pyre_burned"))
                 {
                     return 3500;
@@ -41,7 +45,7 @@ namespace WolvenKit.CR2W.FilePatchers
                 }
                 else if (fileName.Contains("shrine_of_ethernal_fire_altar_spot"))
                 {
-                    return 2000;
+                    return 2200;
                 }
                 else if (fileName.Contains("shrine_of_ethernal_fire_altar_wide.w2ent"))
                 {
@@ -69,6 +73,10 @@ namespace WolvenKit.CR2W.FilePatchers
                 else if (fileName.Contains("bonfire_medium"))
                 {
                     return 2500;
+                }
+                else if (fileName.Contains("burning_drakkar"))
+                {
+                    return 450;
                 }
                 else if (fileName.Contains("chandelier_small.w2ent"))
                 {
@@ -160,6 +168,10 @@ namespace WolvenKit.CR2W.FilePatchers
                 else if (fileName.Contains("braziers_wall_wire"))
                 {
                     return 80;
+                }
+                else if (fileName.Contains("burning_drakkar"))
+                {
+                    return 75;
                 }
                 else if (fileName.StartsWith("campfire_"))
                 {
