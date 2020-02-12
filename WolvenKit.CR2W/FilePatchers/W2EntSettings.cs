@@ -122,8 +122,8 @@ namespace WolvenKit.CR2W.FilePatchers
                     return 0.17F;
                 }
                 else if (fileName.Contains("candle") || fileName.Contains("campfire_") || fileName.Contains("chandelier_small") || fileName.Contains("braziers_wall_square")
-                     || (fileName.Contains("lantern") && !fileName.Contains("dwarf")) || fileName.Contains("torch_hand_long") || fileName.Contains("stand_mw_cooking_big_cauldron") || fileName.Contains("candelabra_tall_three_point.w2ent")
-                     || fileName.Contains("chandelier_bright_noshadow") || fileName.Contains("candelabra_tall_three_point_complex") || fileName.Contains("braziers_wall_round.w2ent") || fileName.Contains("hanging_lamp.w2ent")
+                     || (fileName.Contains("lantern") && !fileName.Contains("dwarf")) || fileName.Contains("torch_hand_long") || fileName.Contains("stand_mw_cooking_big_cauldron") || fileName.Contains("candelabra_tall_three_point")
+                     || fileName.Contains("chandelier_bright_noshadow") || fileName.Contains("braziers_wall_round.w2ent") || fileName.Contains("hanging_lamp.w2ent")
                      || (fileName.Contains("coal_small") && !fileName.Contains("double_spotlight.w2ent") && !fileName.Contains("smaller"))
                      || fileName.Contains("mh308_campfire") || fileName.Contains("mh103_campfire") || fileName.Contains("candelabra.w2ent"))
                 {
@@ -168,6 +168,10 @@ namespace WolvenKit.CR2W.FilePatchers
                 else if (fileName.Contains("braziers_wall_wire"))
                 {
                     return 80;
+                }
+                else if (fileName.Contains("brick_stove_round"))
+                {
+                    return 40;
                 }
                 else if (fileName.Contains("burning_drakkar"))
                 {

@@ -76,6 +76,10 @@ namespace WolvenKit.CR2W.FilePatchers
                 {
                     return 50;
                 }
+                else if (fileName.Contains("brick_stove_round"))
+                {
+                    return 100;
+                }
                 else if (fileName.Contains("shrine_of_ethernal_fire_altar_wide"))
                 {
                     return 300;
@@ -106,6 +110,10 @@ namespace WolvenKit.CR2W.FilePatchers
                 else if (fileName.Contains("braziers_wall_chain"))
                 {
                     return 40;
+                }
+                else if (fileName.Contains("brick_stove_round"))
+                {
+                    return 300;
                 }
 
                 return 10;

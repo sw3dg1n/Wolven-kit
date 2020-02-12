@@ -120,7 +120,7 @@ namespace WolvenKit.CR2W.FilePatchers
                                         || (w2MeshFileName.Contains("candle") && (!w2MeshFileName.Contains("holder") || w2MeshFileName.Contains("small")))
                                         || w2MeshFileName.Contains("lantern_red.w2mesh") || w2MeshFileName.Contains("lantern_red_table.w2mesh") || w2MeshFileName.Contains("lighthouse_fire")
                                         || w2MeshFileName.Contains("copper_cauldron") || w2MeshFileName.Contains("ob_forge") || w2MeshFileName.Equals("campfire.w2mesh") || w2MeshFileName.Contains("burn_wood")
-                                        || w2MeshFileName.Contains("troll_campfire") || w2MeshFileName.Contains("pig_spitroast"))
+                                        || w2MeshFileName.Contains("troll_campfire") || w2MeshFileName.Contains("pig_spitroast") || w2MeshFileName.Contains("brick_stove_round"))
                                     {
                                         W2MeshFilePathsForFiresRenamed.Add(w2MeshFilePathForFire);
                                         W2MeshBufferFilePathsForFiresRenamed.Add(w2MeshBufferFilePathForFire);
