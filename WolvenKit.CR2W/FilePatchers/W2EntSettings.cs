@@ -235,6 +235,10 @@ namespace WolvenKit.CR2W.FilePatchers
                 {
                     return 50;
                 }
+                else if (fileName.Contains("torch_hand_long"))
+                {
+                    return 40;
+                }
                 else if (fileName.Contains("torch_wall"))
                 {
                     return 15;

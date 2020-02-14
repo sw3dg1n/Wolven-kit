@@ -85,7 +85,8 @@ namespace WolvenKit.CR2W.FilePatchers
                             w2PFilePathsForFires.AddRange(W2EntFilePatcher.GetW2PFilePathsForFires(null, flatCompiledData, absoluteModFilePath, modDirectory, dlcDirectory));
                         }
 
-                        if (w2PFilePathsForFires.Any() || relativeModFilePath.Contains("hanging_lamp") || relativeModFilePath.Contains("lantern") || relativeModFilePath.Contains("mh207_lighthouse_brazier"))
+                        if ((w2PFilePathsForFires.Any() && !relativeModFilePath.Contains("boat_man"))
+                            || relativeModFilePath.Contains("hanging_lamp") || relativeModFilePath.Contains("lantern") || relativeModFilePath.Contains("mh207_lighthouse_brazier"))
                         {
                             W2EntFilePathsForFires.Add(absoluteModFilePath);
 
