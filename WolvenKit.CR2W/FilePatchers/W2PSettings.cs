@@ -51,6 +51,26 @@ namespace WolvenKit.CR2W.FilePatchers
                 {
                     return 1500;
                 }
+                else if (fileName.Contains("torch_fx3") || fileName.Contains("torch_fx4") || fileName.Contains("torch_smoke"))
+                {
+                    return 100;
+                }
+                else if (fileName.Contains("torch_fx5"))
+                {
+                    return 200;
+                }
+                else if (fileName.Contains("torch_local_effect"))
+                {
+                    return 300;
+                }
+                else if (fileName.Contains("torch"))
+                {
+                    return 600;
+                }
+                else if (fileName.Contains("candle"))
+                {
+                    return 100;
+                }
 
                 return 1200;
             }
