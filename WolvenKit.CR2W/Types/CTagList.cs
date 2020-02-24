@@ -8,6 +8,7 @@ namespace WolvenKit.CR2W.Types
     public class CTagList : CVariable
     {
         public List<CName> tags = new List<CName>();
+        private byte numberOfTags;
 
         public CTagList(CR2WFile cr2w)
             : base(cr2w)
@@ -16,9 +17,14 @@ namespace WolvenKit.CR2W.Types
 
         public override void Read(BinaryReader file, uint size)
         {
-            var count = file.ReadByte();
+            numberOfTags = file.ReadByte();
 
-            for (var i = 0; i < count; i++)
+            if (numberOfTags >= 128)
+            {
+                return;
+            }
+
+            for (var i = 0; i < numberOfTags; i++)
             {
                 var var = new CName(cr2w);
                 var.Read(file, 0);
@@ -28,7 +34,7 @@ namespace WolvenKit.CR2W.Types
 
         public override void Write(BinaryWriter file)
         {
-            file.Write((byte) tags.Count);
+            file.Write(numberOfTags);
             for (var i = 0; i < tags.Count; i++)
             {
                 tags[i].Write(file);
