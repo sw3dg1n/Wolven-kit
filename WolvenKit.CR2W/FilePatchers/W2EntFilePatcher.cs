@@ -739,7 +739,8 @@ namespace WolvenKit.CR2W.FilePatchers
             string w2pFileName = relativeW2PFilePath.Substring(relativeW2PFilePath.LastIndexOf(Path.DirectorySeparatorChar) + 1);
 
             if ((w2pFileName.Contains("fire") || w2pFileName.Contains("flame") || (w2pFileName.Contains("candle") && !w2pFileName.Contains("wraith") && !w2pFileName.Contains("smoke") && !w2pFileName.Contains("spark"))
-                || w2pFileName.Contains("_brazier") || w2pFileName.Contains("torch") || w2pFileName.Contains("chandelier") || (w2pFileName.Contains("coal") && !w2pFileName.Contains("smoke"))) && !w2pFileName.Contains("geralt")
+                || w2pFileName.Contains("_brazier") || w2pFileName.Contains("torch") || w2pFileName.Contains("chandelier") || (w2pFileName.Contains("coal") && !w2pFileName.Contains("smoke")))
+                && !w2pFileName.Contains("geralt") && !w2pFileName.Contains("ritual_fire_ilod")
                 && !relativeW2PFilePath.Contains("arson") && !relativeW2PFilePath.Contains("arachas") && !relativeW2PFilePath.Contains("weapons") && !relativeW2PFilePath.Contains("beehive")
                 && !relativeW2PFilePath.Contains("monsters") && !relativeW2PFilePath.Contains("characters") && !relativeW2PFilePath.Contains("environment") && !relativeW2PFilePath.Contains("work")
                 && !relativeW2PFilePath.Contains("igni") && !relativeW2PFilePath.Contains("oil_barrel") && !relativeW2PFilePath.Contains("monster_nest"))
