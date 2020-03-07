@@ -55,6 +55,10 @@ namespace WolvenKit.CR2W.FilePatchers
                 {
                     return 2500;
                 }
+                else if (fileName.Contains("hanging_lamp") || fileName.Contains("lamp_standing"))
+                {
+                    return 200;
+                }
 
                 return 1200;
             }
@@ -144,32 +148,30 @@ namespace WolvenKit.CR2W.FilePatchers
         {
             get
             {
-                bool reducedDistance = true;
-
                 if (fileName.Contains("bonfire_large"))
                 {
                     return 255;
                 }
                 else if (fileName.Contains("bonfire_medium"))
                 {
-                    return (byte)(reducedDistance ? 25 : 70);
+                    return 70;
                 }
                 else if (fileName.Contains("braziers_floor"))
                 {
                     // TODO This could either be reduced more to avoid the shimmering in the distance or maybe even further extended for higher resolutions, supersampling or better antialiasing e.g. via reshade
-                    return (byte)(reducedDistance ? 20 : 30);
+                    return 30;
                 }
                 else if (fileName.Contains("braziers_wall_chain"))
                 {
-                    return (byte)(reducedDistance ? 30 : 50);
+                    return 50;
                 }
                 else if (fileName.Contains("braziers_wall_round"))
                 {
-                    return (byte)(reducedDistance ? 20 : 30);
+                    return 30;
                 }
                 else if (fileName.Contains("braziers_wall_wire"))
                 {
-                    return (byte)(reducedDistance ? 30 : 80);
+                    return 80;
                 }
                 else if (fileName.Contains("brick_stove_round"))
                 {
@@ -181,16 +183,20 @@ namespace WolvenKit.CR2W.FilePatchers
                 }
                 else if (fileName.StartsWith("campfire_"))
                 {
-                    return (byte)(reducedDistance ? 10 : 15);
+                    return 15;
                 }
                 else if (fileName.Contains("candle") && (!fileName.Contains("holder") || fileName.Contains("small")))
                 {
-                    // TODO This could either be even further extended for higher resolutions, supersampling or better antialiasing e.g. via reshade
-                    return (byte)(reducedDistance ? 10 : 15);
+                    // TODO This could be even further extended for higher resolutions, supersampling or better antialiasing e.g. via reshade
+                    return 15;
+                }
+                else if (fileName.Contains("chandelier_small.w2ent"))
+                {
+                    return 80;
                 }
                 else if (fileName.Contains("chandelier_small"))
                 {
-                    return (byte)(reducedDistance ? 30 : 80);
+                    return 20;
                 }
                 else if (fileName.Contains("coal_medium"))
                 {
@@ -200,14 +206,13 @@ namespace WolvenKit.CR2W.FilePatchers
                 {
                     return 250;
                 }
-                else if (fileName.Contains("hanging_lamp"))
+                else if (fileName.Contains("hanging_lamp") || fileName.Contains("lamp_standing"))
                 {
-                    // TODO This could still be increased if the issue with the missing "glow" mesh cannot be resolved and there is still enough headroom
-                    return (byte)(reducedDistance ? 20 : 30);
+                    return 25;
                 }
                 else if (fileName.Contains("lantern") && !fileName.Contains("dwarf"))
                 {
-                    return (byte)(reducedDistance ? 20 : 30);
+                    return 30;
                 }
                 else if (fileName.Contains("lighthouse_fire") || fileName.Contains("mh207_lighthouse_brazier"))
                 {
@@ -223,27 +228,27 @@ namespace WolvenKit.CR2W.FilePatchers
                 }
                 else if (fileName.Contains("shrine_of_ethernal") && !fileName.Contains("small"))
                 {
-                    return (byte)(reducedDistance ? 40 : 100);
+                    return 100;
                 }
                 else if (fileName.Contains("shrine_of_ethernal_fire_altar_small_spot_bounce"))
                 {
-                    return (byte)(reducedDistance ? 20 : 30);
+                    return 30;
                 }
                 else if (fileName.Contains("stand_mw_cooking_big_cauldron"))
                 {
-                    return 50;
+                    return 45;
                 }
                 else if (fileName.Contains("stand_mw_cooking_roasted_pig"))
                 {
-                    return 50;
+                    return 45;
                 }
                 else if (fileName.Contains("torch_hand_long"))
                 {
-                    return (byte)(reducedDistance ? 15 : 40);
+                    return 40;
                 }
                 else if (fileName.Contains("torch_wall"))
                 {
-                    return (byte)(reducedDistance ? 10 : 15);
+                    return 15;
                 }
 
                 return null;
