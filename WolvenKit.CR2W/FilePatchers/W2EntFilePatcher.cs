@@ -53,10 +53,12 @@ namespace WolvenKit.CR2W.FilePatchers
         {
         }
 
-        public List<string> PatchForIncreasedDrawDistance(string filePath, Dictionary<string, string> relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap,
+        public (List<string> relativeCollisionMeshFilePaths, List<string> relativeMeshFilePathsToDelete) PatchForIncreasedDrawDistance(string filePath,
+            Dictionary<string, string> relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap,
             Dictionary<string, string> relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap, W2EntSettings w2EntSettings)
         {
             List<string> relativeCollisionMeshFilePaths = new List<string>();
+            List<string> relativeMeshFilePathsToDelete = new List<string>();
 
             CR2WFile w2EntFile = ReadW2EntFile(filePath, localizedStringSource);
 
@@ -94,16 +96,24 @@ namespace WolvenKit.CR2W.FilePatchers
             if (streamingDataBufferForFires != null)
             {
                 PatchMeshStreamingDistance(filePath, w2EntFile, w2EntSettings);
-                relativeCollisionMeshFilePaths.AddRange(PatchW2MeshFilePath(filePath, streamingDataBufferForFires.Content.chunks, relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap));
+
+                (List<string> newRelativeCollisionMeshFilePaths1, List<string> newRelativeMeshFilePathsToDelete1) = PatchW2MeshFilePath(filePath, streamingDataBufferForFires.Content.chunks,
+                    relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap);
+
+                relativeCollisionMeshFilePaths.AddRange(newRelativeCollisionMeshFilePaths1);
+                relativeMeshFilePathsToDelete.AddRange(newRelativeMeshFilePathsToDelete1);
 
                 WriteCByteArrayContainer(streamingDataBufferForFires);
             }
 
-            relativeCollisionMeshFilePaths.AddRange(PatchW2MeshFilePath(filePath, w2EntFile.chunks, relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap));
+            (List<string> newRelativeCollisionMeshFilePaths2, List<string> newRelativeMeshFilePathsToDelete2) = PatchW2MeshFilePath(filePath, w2EntFile.chunks, relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap);
+
+            relativeCollisionMeshFilePaths.AddRange(newRelativeCollisionMeshFilePaths2);
+            relativeMeshFilePathsToDelete.AddRange(newRelativeMeshFilePathsToDelete2);
 
             WriteCR2WFile(w2EntFile);
 
-            return relativeCollisionMeshFilePaths;
+            return (relativeCollisionMeshFilePaths, relativeMeshFilePathsToDelete);
         }
 
         internal static CR2WFile ReadW2EntFile(string filePath, ILocalizedStringSource localizedStringSource)
@@ -500,9 +510,11 @@ namespace WolvenKit.CR2W.FilePatchers
             }
         }
 
-        private static List<string> PatchW2MeshFilePath(string w2EntFilePath, List<CR2WChunk> chunks, Dictionary<string, string> relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap)
+        private static (List<string> relativeCollisionMeshFilePaths, List<string> relativeMeshFilePathsToDelete) PatchW2MeshFilePath(string w2EntFilePath, List<CR2WChunk> chunks,
+            Dictionary<string, string> relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap)
         {
             List<string> relativeCollisionMeshFilePaths = new List<string>();
+            List<string> relativeMeshFilePathsToDelete = new List<string>();
 
             List<CR2WChunk> meshComponentsToCopyAndRename = new List<CR2WChunk>();
             HashSet<CR2WChunk> meshComponentsWithAttachments = new HashSet<CR2WChunk>();
@@ -583,6 +595,14 @@ namespace WolvenKit.CR2W.FilePatchers
                             {
                                 relativeCollisionMeshFilePaths.Add(relativeW2MeshFilePath);
                             }
+                            else if (!w2MeshFileName.Contains("brick_stove_round"))
+                            {
+                                relativeMeshFilePathsToDelete.Add(relativeW2MeshFilePath);
+                            }
+                        }
+                        else if (!w2MeshFileName.Contains("torch_hand") && !w2MeshFileName.Contains("torch_wall_metal_holder"))
+                        {
+                            relativeMeshFilePathsToDelete.Add(relativeW2MeshFilePath);
                         }
 
                         string relativeRenamedW2MeshFilePath;
@@ -595,7 +615,7 @@ namespace WolvenKit.CR2W.FilePatchers
                 }
             }
 
-            return relativeCollisionMeshFilePaths;
+            return (relativeCollisionMeshFilePaths, relativeMeshFilePathsToDelete);
         }
 
         private static void patchNameWithILODCollisionSuffix(CR2WChunk meshComponent)

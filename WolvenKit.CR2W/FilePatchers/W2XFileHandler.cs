@@ -255,8 +255,6 @@ namespace WolvenKit.CR2W.FilePatchers
                         Directory.CreateDirectory(Path.GetDirectoryName(absoluteRenamedFilePath));
                         File.Copy(absoluteOriginalFilePath, absoluteRenamedFilePath);
                     }
-
-                    // TODO delete the original file once everything is stable, only applicable for w2p files
                 }
 
                 if (!relativeOriginalFilePathToRelativeRenamedFilePathMap.ContainsKey(relativeOriginalFilePath))

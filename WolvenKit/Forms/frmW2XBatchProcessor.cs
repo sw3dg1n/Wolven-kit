@@ -166,6 +166,9 @@ namespace WolvenKit.Forms
 
             log.AddText("Patching w2p files for increased draw distance...\n", frmOutput.Logtype.Normal);
             patchW2PFilesForFires(absoluteRenamedW2PFilePaths);
+
+            log.AddText("Cleaning up a few things...\n", frmOutput.Logtype.Normal);
+            cleanUp(activeMod.ModDirectory, activeMod.DlcDirectory, w2XFileHandler.W2PFilePathsForFires);
         }
 
         private List<string> patchW2EntFilesForFires(List<string> w2EntFilePathsForFires, string modDirectory, string dlcDirectory, Dictionary<string, string> relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap,
@@ -186,12 +189,22 @@ namespace WolvenKit.Forms
 
                 try
                 {
-                    foreach (string relativeCollisionMeshFilePath in w2EntFilePatcher.PatchForIncreasedDrawDistance(w2EntFilePathForFire, relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap,
-                        relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap, new W2EntSettings(Path.GetFileName(w2EntFilePathForFire))))
+                    (List<string> relativeCollisionMeshFilePaths, List<string> relativeMeshFilePathsToDelete) = w2EntFilePatcher.PatchForIncreasedDrawDistance(w2EntFilePathForFire,
+                        relativeOriginalW2MeshFilePathToRelativeRenamedW2MeshFilePathMap, relativeOriginalW2PFilePathToRelativeRenamedW2PFilePathMap, new W2EntSettings(Path.GetFileName(w2EntFilePathForFire)));
+
+                    foreach (string relativeCollisionMeshFilePath in relativeCollisionMeshFilePaths)
                     {
                         string initialPath = relativeCollisionMeshFilePath.StartsWith(W2XFileHandler.PathDLC) ? dlcDirectory : modDirectory;
 
                         absoluteCollisionMeshFilePaths.Add(initialPath + Path.DirectorySeparatorChar + W2XFileHandler.PathBundle + Path.DirectorySeparatorChar + relativeCollisionMeshFilePath);
+                    }
+
+                    foreach (string relativeMeshFilePathToDelete in relativeMeshFilePathsToDelete)
+                    {
+                        string initialPath = relativeMeshFilePathToDelete.StartsWith(W2XFileHandler.PathDLC) ? dlcDirectory : modDirectory;
+
+                        File.Delete(initialPath + Path.DirectorySeparatorChar + W2XFileHandler.PathBundle + Path.DirectorySeparatorChar + relativeMeshFilePathToDelete);
+                        File.Delete(initialPath + Path.DirectorySeparatorChar + W2XFileHandler.PathBundle + Path.DirectorySeparatorChar + relativeMeshFilePathToDelete + W2XFileHandler.FileExtensionSuffixW2MeshBuffer);
                     }
                 }
                 catch (Exception e)
@@ -260,6 +273,36 @@ namespace WolvenKit.Forms
                 }
 
                 log.AddText("Successfully processed file '" + w2PFilePathForFire + "\n", frmOutput.Logtype.Success);
+            }
+        }
+
+        private static void cleanUp(string modDirectory, string dlcDirectory, List<string> absolutOriginalW2PFilePathsForFires)
+        {
+            foreach (string absolutOriginalW2PFilePathForFires in absolutOriginalW2PFilePathsForFires)
+            {
+                if (!absolutOriginalW2PFilePathForFires.EndsWith("h_shrine_eternal_fire_wide_materialswap.w2p") && !absolutOriginalW2PFilePathForFires.EndsWith("q403_fire_funeral_alternative_ilod.w2p")
+                     && !absolutOriginalW2PFilePathForFires.EndsWith("torch_moving.w2p") && !absolutOriginalW2PFilePathForFires.EndsWith("cs001_fireplace.w2p")
+                      && !absolutOriginalW2PFilePathForFires.EndsWith("p_fire_medium_subuv_spot_smaller.w2p") && !absolutOriginalW2PFilePathForFires.EndsWith("fireplace_looped.w2p")
+                       && !absolutOriginalW2PFilePathForFires.EndsWith("fireplace_looped_3.w2p") && !absolutOriginalW2PFilePathForFires.EndsWith("fireplace_smoke_embers_distort_bathhouse.w2p")
+                       && !absolutOriginalW2PFilePathForFires.EndsWith("torch_hand_fire.w2p") && !absolutOriginalW2PFilePathForFires.EndsWith("torch_fx1.w2p")
+                       && !absolutOriginalW2PFilePathForFires.EndsWith("mq1046_fire_house.w2p") && !absolutOriginalW2PFilePathForFires.EndsWith("q103_barons_stable_fire_4.w2p"))
+                    File.Delete(absolutOriginalW2PFilePathForFires);
+            }
+
+            deleteEmptyDirectories(modDirectory);
+            deleteEmptyDirectories(dlcDirectory);
+        }
+
+        private static void deleteEmptyDirectories(string rootDirectory)
+        {
+            foreach (var directory in Directory.GetDirectories(rootDirectory))
+            {
+                deleteEmptyDirectories(directory);
+
+                if (Directory.GetDirectories(directory).Length == 0 && Directory.GetFiles(directory).Length == 0)
+                {
+                    Directory.Delete(directory, false);
+                }
             }
         }
 
