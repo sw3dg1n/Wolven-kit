@@ -1683,6 +1683,21 @@ _col - for simple stuff like boxes and spheres", "Information about importing mo
             }
         }
 
+        private void w2meshLODBatchProcessorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (ActiveMod == null)
+            {
+                MessageBox.Show("No mod is currently loaded. Please open a mod.", "No Mod Loaded");
+            }
+            else
+            {
+                using (var fwbp = new frmW2MeshLODBatchProcessor(ActiveMod))
+                {
+                    fwbp.ShowDialog();
+                }
+            }
+        }
+
         private void RecordStepsToReproduceBugToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (MessageBox.Show(@"This will launch an app that will help you record the steps needed to reproduce the bug/problem.
