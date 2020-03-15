@@ -619,7 +619,7 @@ namespace WolvenKit
             // 
             this.batchProcessorToolStripMenuItem.Name = "batchProcessorToolStripMenuItem";
             this.batchProcessorToolStripMenuItem.Size = new System.Drawing.Size(247, 26);
-            this.batchProcessorToolStripMenuItem.Text = "Immersive Fires batch processor";
+            this.batchProcessorToolStripMenuItem.Text = "True Fires batch processor";
             this.batchProcessorToolStripMenuItem.Click += new System.EventHandler(this.w2xBatchProcessorToolStripMenuItem_Click);
             // 
             // toolStripSeparator5

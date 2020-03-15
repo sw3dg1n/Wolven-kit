@@ -280,7 +280,7 @@ namespace WolvenKit.Forms
         {
             foreach (string absolutOriginalW2PFilePathForFires in absolutOriginalW2PFilePathsForFires)
             {
-                if (!absolutOriginalW2PFilePathForFires.EndsWith("h_shrine_eternal_fire_wide_materialswap.w2p") && !absolutOriginalW2PFilePathForFires.EndsWith("q403_fire_funeral_alternative_ilod.w2p")
+                if (!absolutOriginalW2PFilePathForFires.EndsWith("_ilod.w2p") && !absolutOriginalW2PFilePathForFires.EndsWith("h_shrine_eternal_fire_wide_materialswap.w2p")
                      && !absolutOriginalW2PFilePathForFires.EndsWith("torch_moving.w2p") && !absolutOriginalW2PFilePathForFires.EndsWith("cs001_fireplace.w2p")
                       && !absolutOriginalW2PFilePathForFires.EndsWith("p_fire_medium_subuv_spot_smaller.w2p") && !absolutOriginalW2PFilePathForFires.EndsWith("fireplace_looped.w2p")
                        && !absolutOriginalW2PFilePathForFires.EndsWith("fireplace_looped_3.w2p") && !absolutOriginalW2PFilePathForFires.EndsWith("fireplace_smoke_embers_distort_bathhouse.w2p")
