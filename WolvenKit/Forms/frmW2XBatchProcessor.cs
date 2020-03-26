@@ -285,7 +285,8 @@ namespace WolvenKit.Forms
                       && !absolutOriginalW2PFilePathForFires.EndsWith("p_fire_medium_subuv_spot_smaller.w2p") && !absolutOriginalW2PFilePathForFires.EndsWith("fireplace_looped.w2p")
                        && !absolutOriginalW2PFilePathForFires.EndsWith("fireplace_looped_3.w2p") && !absolutOriginalW2PFilePathForFires.EndsWith("fireplace_smoke_embers_distort_bathhouse.w2p")
                        && !absolutOriginalW2PFilePathForFires.EndsWith("torch_hand_fire.w2p") && !absolutOriginalW2PFilePathForFires.EndsWith("torch_fx1.w2p")
-                       && !absolutOriginalW2PFilePathForFires.EndsWith("mq1046_fire_house.w2p") && !absolutOriginalW2PFilePathForFires.EndsWith("q103_barons_stable_fire_4.w2p"))
+                       && !absolutOriginalW2PFilePathForFires.EndsWith("mq1046_fire_house.w2p") && !absolutOriginalW2PFilePathForFires.EndsWith("q103_barons_stable_fire_4.w2p")
+                       && !absolutOriginalW2PFilePathForFires.EndsWith("medium_fire_anim.w2p"))
                     File.Delete(absolutOriginalW2PFilePathForFires);
             }
 

@@ -57,7 +57,7 @@ namespace WolvenKit.CR2W.FilePatchers
                 }
                 else if (fileName.Contains("torch_fx5"))
                 {
-                    return 200;
+                    return 60;
                 }
                 else if (fileName.Contains("torch_local_effect"))
                 {
