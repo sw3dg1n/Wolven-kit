@@ -18,14 +18,14 @@ namespace WolvenKit.CR2W.Types
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public ushort typeId
         {
-            get { return (ushort) cr2w.GetStringIndex(Type, true); }
+            get { return (ushort)cr2w.GetStringIndex(Type, true); }
             set { Type = cr2w.strings[value].str; }
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public ushort nameId
         {
-            get { return (ushort) cr2w.GetStringIndex(Name, true); }
+            get { return (ushort)cr2w.GetStringIndex(Name, true); }
             set { Name = cr2w.strings[value].str; }
         }
 
@@ -50,6 +50,10 @@ namespace WolvenKit.CR2W.Types
 
         public string Name { get; set; }
         public string Type { get; set; }
+        public virtual string Info {
+            get { return ""; }
+            set { }
+        }
 
         public virtual Control GetEditor()
         {

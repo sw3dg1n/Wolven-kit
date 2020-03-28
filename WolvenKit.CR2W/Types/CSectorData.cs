@@ -144,7 +144,7 @@ namespace WolvenKit.CR2W.Types
             box3 = new CFloat(cr2w) { Name = "box3", Type = "Float" };
             box4 = new CFloat(cr2w) { Name = "box4", Type = "Float" };
             box5 = new CFloat(cr2w) { Name = "box5", Type = "Float" };
-            patchHash = new CUInt64(cr2w) { Name = "patchHash", Type = "UInt64" };
+            patchHash = new CPathUInt64(cr2w) { Name = "patchHash", Type = "UInt64" };
         }
 
         public override CVariable Create(CR2WFile cr2w)

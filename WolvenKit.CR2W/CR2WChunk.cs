@@ -52,8 +52,8 @@ namespace WolvenKit.CR2W
 
         public uint ParentChunkId
         {
-            get { return (uint) parentPtr.val; }
-            set { parentPtr.val = (int) value; }
+            get { return (uint)parentPtr.val; }
+            set { parentPtr.val = (int)value; }
         }
 
         public CR2WChunk Parent
@@ -62,7 +62,7 @@ namespace WolvenKit.CR2W
             {
                 if (ParentChunkId <= 0)
                     return null;
-                return cr2w.chunks[(int) ParentChunkId - 1];
+                return cr2w.chunks[(int)ParentChunkId - 1];
             }
         }
 
@@ -74,16 +74,16 @@ namespace WolvenKit.CR2W
             {
                 if (data is CVector)
                 {
-                    var firstString = ((CVector) data).GetVariableByType("String");
+                    var firstString = ((CVector)data).GetVariableByType("String");
                     if (firstString != null)
                     {
-                        return ((CString) firstString).val;
+                        return ((CString)firstString).val;
                     }
 
-                    var firstName = ((CVector) data).GetVariableByType("CName");
+                    var firstName = ((CVector)data).GetVariableByType("CName");
                     if (firstName != null)
                     {
-                        return ((CName) firstName).Value;
+                        return ((CName)firstName).Value;
                     }
                 }
 
@@ -103,6 +103,12 @@ namespace WolvenKit.CR2W
             set { }
         }
 
+        public string Info
+        {
+            get { return ""; }
+            set { }
+        }
+
         public CR2WFile CR2WOwner => cr2w;
 
         public virtual Control GetEditor()
@@ -114,7 +120,7 @@ namespace WolvenKit.CR2W
         {
             data.Name = Name;
 
-            var vars = new List<IEditableVariable> {flags, parentPtr, typeName, data};
+            var vars = new List<IEditableVariable> { flags, parentPtr, typeName, data };
             if (unknownBytes != null)
             {
                 vars.Add(unknownBytes);
@@ -168,7 +174,7 @@ namespace WolvenKit.CR2W
 
             if (bytesLeft != 0)
             {
-                unknownBytes.Read(file, (uint) bytesLeft);
+                unknownBytes.Read(file, (uint)bytesLeft);
             }
             else
             {
@@ -178,7 +184,7 @@ namespace WolvenKit.CR2W
 
         public void WriteData(BinaryWriter file)
         {
-            offset = (uint) file.BaseStream.Position;
+            offset = (uint)file.BaseStream.Position;
 
             var posstart = file.BaseStream.Position;
 
@@ -193,7 +199,7 @@ namespace WolvenKit.CR2W
                 unknownBytes.Write(file);
             }
 
-            var newsize = (uint) (file.BaseStream.Position - posstart);
+            var newsize = (uint)(file.BaseStream.Position - posstart);
             if (size != newsize)
             {
                 size = newsize;
@@ -244,11 +250,11 @@ namespace WolvenKit.CR2W
 
             if (data != null)
             {
-                chunk.data = (CVector) data.Copy(context);
+                chunk.data = (CVector)data.Copy(context);
             }
             if (unknownBytes != null)
             {
-                chunk.unknownBytes = (CBytes) unknownBytes.Copy(context);
+                chunk.unknownBytes = (CBytes)unknownBytes.Copy(context);
             }
 
             return chunk;

@@ -38,6 +38,7 @@ namespace WolvenKit
             this.colName = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.colValue = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.colType = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.colInfo = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.contextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.expandAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.expandAllChildrenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -50,6 +51,7 @@ namespace WolvenKit
             this.copyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pasteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.copyTextToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.copyInfoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolSplitPtr = new System.Windows.Forms.ToolStripSeparator();
             this.ptrPropertiesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.treeView)).BeginInit();
@@ -61,19 +63,23 @@ namespace WolvenKit
             this.treeView.AllColumns.Add(this.colName);
             this.treeView.AllColumns.Add(this.colValue);
             this.treeView.AllColumns.Add(this.colType);
+            this.treeView.AllColumns.Add(this.colInfo);
             this.treeView.AlternateRowBackColor = System.Drawing.Color.LightCyan;
             this.treeView.CellEditUseWholeCell = false;
             this.treeView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.colName,
             this.colValue,
-            this.colType});
+            this.colType,
+            this.colInfo});
             this.treeView.ContextMenuStrip = this.contextMenu;
+            this.treeView.Cursor = System.Windows.Forms.Cursors.Default;
             this.treeView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.treeView.FullRowSelect = true;
+            this.treeView.HideSelection = false;
             this.treeView.Location = new System.Drawing.Point(0, 0);
             this.treeView.Name = "treeView";
             this.treeView.ShowGroups = false;
-            this.treeView.Size = new System.Drawing.Size(813, 493);
+            this.treeView.Size = new System.Drawing.Size(1412, 493);
             this.treeView.TabIndex = 1;
             this.treeView.UseAlternatingBackColors = true;
             this.treeView.UseCompatibleStateImageBehavior = false;
@@ -101,6 +107,12 @@ namespace WolvenKit
             this.colType.Text = "Type";
             this.colType.Width = 100;
             // 
+            // colInfo
+            // 
+            this.colInfo.AspectName = "Info";
+            this.colInfo.Text = "Info";
+            this.colInfo.Width = 500;
+            // 
             // contextMenu
             // 
             this.contextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -115,6 +127,7 @@ namespace WolvenKit
             this.copyToolStripMenuItem,
             this.pasteToolStripMenuItem,
             this.copyTextToolStripMenuItem,
+            this.copyInfoToolStripMenuItem,
             this.toolSplitPtr,
             this.ptrPropertiesToolStripMenuItem});
             this.contextMenu.Name = "contextMenu";
@@ -194,6 +207,13 @@ namespace WolvenKit
             this.copyTextToolStripMenuItem.Text = "Copy Text";
             this.copyTextToolStripMenuItem.Click += new System.EventHandler(this.copyTextToolStripMenuItem_Click);
             // 
+            // copyInfoToolStripMenuItem
+            // 
+            this.copyInfoToolStripMenuItem.Name = "copyInfoToolStripMenuItem";
+            this.copyInfoToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
+            this.copyInfoToolStripMenuItem.Text = "Copy Info";
+            this.copyInfoToolStripMenuItem.Click += new System.EventHandler(this.copyInfoToolStripMenuItem_Click);
+            // 
             // toolSplitPtr
             // 
             this.toolSplitPtr.Name = "toolSplitPtr";
@@ -210,7 +230,7 @@ namespace WolvenKit
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(813, 493);
+            this.ClientSize = new System.Drawing.Size(1412, 493);
             this.CloseButton = false;
             this.CloseButtonVisible = false;
             this.Controls.Add(this.treeView);
@@ -232,6 +252,7 @@ namespace WolvenKit
         private OLVColumn colName;
         private OLVColumn colValue;
         private OLVColumn colType;
+        private OLVColumn colInfo;
         private ContextMenuStrip contextMenu;
         private ToolStripMenuItem addVariableToolStripMenuItem;
         private ToolStripMenuItem removeVariableToolStripMenuItem;
@@ -246,5 +267,6 @@ namespace WolvenKit
         private ToolStripSeparator toolSplitPtr;
         private ToolStripMenuItem ptrPropertiesToolStripMenuItem;
         private ToolStripMenuItem copyTextToolStripMenuItem;
+        private ToolStripMenuItem copyInfoToolStripMenuItem;
     }
 }

@@ -93,6 +93,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="PathHashDecoder.cs" />
     <Compile Include="FilePatchers\SharedDataBuffer.cs" />
     <Compile Include="FilePatchers\W2EntFilePatcher.cs" />
     <Compile Include="FilePatchers\W2EntSettings.cs" />

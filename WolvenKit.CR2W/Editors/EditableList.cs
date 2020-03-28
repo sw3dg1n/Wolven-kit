@@ -19,6 +19,11 @@ namespace WolvenKit.CR2W.Editors
         public List<T> List { get; set; }
         public string Name { get; set; }
         public string Type { get; set; }
+        public string Info
+        {
+            get { return ""; }
+            set { }
+        }
         public CR2WFile CR2WOwner { get; }
 
         public Control GetEditor()
@@ -45,7 +50,7 @@ namespace WolvenKit.CR2W.Editors
         {
             if (var is T)
             {
-                List.Add((T) var);
+                List.Add((T)var);
 
                 var.ParentVariable = null;
             }
@@ -55,10 +60,10 @@ namespace WolvenKit.CR2W.Editors
         {
             if (child is T)
             {
-                List.Remove((T) child);
+                List.Remove((T)child);
                 if (child is CVariable)
                 {
-                    ((CVariable) child).ParentVariable = null;
+                    ((CVariable)child).ParentVariable = null;
                 }
             }
         }

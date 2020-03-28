@@ -18,6 +18,11 @@ namespace WolvenKit.CR2W.Editors
         public object Object { get; set; }
         public string Name { get; set; }
         public string Type { get; set; }
+        public string Info
+        {
+            get { return ""; }
+            set { }
+        }
         public CR2WFile CR2WOwner { get; }
 
         public Control GetEditor()

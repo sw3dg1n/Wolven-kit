@@ -8,6 +8,7 @@ namespace WolvenKit.CR2W.Editors
     {
         string Name { get; set; }
         string Type { get; set; }
+        string Info { get; set; }
         CR2WFile CR2WOwner { get; }
         Control GetEditor();
         List<IEditableVariable> GetEditableVariables();

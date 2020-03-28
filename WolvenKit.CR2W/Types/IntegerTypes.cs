@@ -26,7 +26,7 @@ namespace WolvenKit.CR2W.Types
         {
             if (val is ulong)
             {
-                this.val = (ulong) val;
+                this.val = (ulong)val;
             }
 
             return this;
@@ -39,7 +39,7 @@ namespace WolvenKit.CR2W.Types
 
         public override CVariable Copy(CR2WCopyAction context)
         {
-            var var = (CUInt64) base.Copy(context);
+            var var = (CUInt64)base.Copy(context);
             var.val = val;
             return var;
         }
@@ -54,6 +54,20 @@ namespace WolvenKit.CR2W.Types
         public override string ToString()
         {
             return val.ToString();
+        }
+    }
+
+    public class CPathUInt64 : CUInt64
+    {
+        public CPathUInt64(CR2WFile cr2w)
+            : base(cr2w)
+        {
+        }
+
+        public override string Info
+        {
+            get { return PathHashDecoder.Instance.getPath(val); }
+            set { }
         }
     }
 
@@ -80,7 +94,7 @@ namespace WolvenKit.CR2W.Types
         {
             if (val is uint)
             {
-                this.val = (uint) val;
+                this.val = (uint)val;
             }
 
             return this;
@@ -93,7 +107,7 @@ namespace WolvenKit.CR2W.Types
 
         public override CVariable Copy(CR2WCopyAction context)
         {
-            var var = (CUInt32) base.Copy(context);
+            var var = (CUInt32)base.Copy(context);
             var.val = val;
             return var;
         }
@@ -134,7 +148,7 @@ namespace WolvenKit.CR2W.Types
         {
             if (val is ushort)
             {
-                this.val = (ushort) val;
+                this.val = (ushort)val;
             }
 
             return this;
@@ -147,7 +161,7 @@ namespace WolvenKit.CR2W.Types
 
         public override CVariable Copy(CR2WCopyAction context)
         {
-            var var = (CUInt16) base.Copy(context);
+            var var = (CUInt16)base.Copy(context);
             var.val = val;
             return var;
         }
@@ -188,7 +202,7 @@ namespace WolvenKit.CR2W.Types
         {
             if (val is byte)
             {
-                this.val = (byte) val;
+                this.val = (byte)val;
             }
 
             return this;
@@ -201,7 +215,7 @@ namespace WolvenKit.CR2W.Types
 
         public override CVariable Copy(CR2WCopyAction context)
         {
-            var var = (CUInt8) base.Copy(context);
+            var var = (CUInt8)base.Copy(context);
             var.val = val;
             return var;
         }
@@ -243,7 +257,7 @@ namespace WolvenKit.CR2W.Types
         {
             if (val is long)
             {
-                this.val = (long) val;
+                this.val = (long)val;
             }
 
             return this;
@@ -256,7 +270,7 @@ namespace WolvenKit.CR2W.Types
 
         public override CVariable Copy(CR2WCopyAction context)
         {
-            var var = (CInt64) base.Copy(context);
+            var var = (CInt64)base.Copy(context);
             var.val = val;
             return var;
         }
@@ -297,7 +311,7 @@ namespace WolvenKit.CR2W.Types
         {
             if (val is int)
             {
-                this.val = (int) val;
+                this.val = (int)val;
             }
 
             return this;
@@ -310,7 +324,7 @@ namespace WolvenKit.CR2W.Types
 
         public override CVariable Copy(CR2WCopyAction context)
         {
-            var var = (CInt32) base.Copy(context);
+            var var = (CInt32)base.Copy(context);
             var.val = val;
             return var;
         }
@@ -351,7 +365,7 @@ namespace WolvenKit.CR2W.Types
         {
             if (val is short)
             {
-                this.val = (short) val;
+                this.val = (short)val;
             }
 
             return this;
@@ -364,7 +378,7 @@ namespace WolvenKit.CR2W.Types
 
         public override CVariable Copy(CR2WCopyAction context)
         {
-            var var = (CInt16) base.Copy(context);
+            var var = (CInt16)base.Copy(context);
             var.val = val;
             return var;
         }
@@ -405,7 +419,7 @@ namespace WolvenKit.CR2W.Types
         {
             if (val is sbyte)
             {
-                this.val = (sbyte) val;
+                this.val = (sbyte)val;
             }
 
             return this;
@@ -418,7 +432,7 @@ namespace WolvenKit.CR2W.Types
 
         public override CVariable Copy(CR2WCopyAction context)
         {
-            var var = (CInt8) base.Copy(context);
+            var var = (CInt8)base.Copy(context);
             var.val = val;
             return var;
         }
@@ -492,7 +506,7 @@ namespace WolvenKit.CR2W.Types
         {
             if (val is sbyte)
             {
-                this.val = (sbyte) val;
+                this.val = (sbyte)val;
             }
 
             return this;
@@ -505,7 +519,7 @@ namespace WolvenKit.CR2W.Types
 
         public override CVariable Copy(CR2WCopyAction context)
         {
-            var var = (CDynamicInt) base.Copy(context);
+            var var = (CDynamicInt)base.Copy(context);
             var.val = val;
             return var;
         }
@@ -539,14 +553,14 @@ namespace WolvenKit.CR2W.Types
 
         public override void Write(BinaryWriter file)
         {
-            file.Write(val ? (byte) 1 : (byte) 0);
+            file.Write(val ? (byte)1 : (byte)0);
         }
 
         public override CVariable SetValue(object val)
         {
             if (val is bool)
             {
-                this.val = (bool) val;
+                this.val = (bool)val;
             }
 
             return this;
@@ -559,7 +573,7 @@ namespace WolvenKit.CR2W.Types
 
         public override CVariable Copy(CR2WCopyAction context)
         {
-            var var = (CBool) base.Copy(context);
+            var var = (CBool)base.Copy(context);
             var.val = val;
             return var;
         }
