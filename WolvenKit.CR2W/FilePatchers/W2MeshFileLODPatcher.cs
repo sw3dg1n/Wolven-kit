@@ -15,13 +15,11 @@ namespace WolvenKit.CR2W.FilePatchers
         private const string VariableNameCookedData = "cookedData";
         private const string VariableNameRenderLODs = "renderLODs";
 
-        private const float autoHideDistance = 2500;
-
         public W2MeshFileLODPatcher(ILocalizedStringSource localizedStringSource) : base(localizedStringSource)
         {
         }
 
-        public void PatchDrawDistanceAndLOD(string filePath, W2MeshSettings w2MeshSettings)
+        public void PatchDrawDistanceAndLOD(string filePath, float autoHideDistance)
         {
             CR2WFile w2MeshFile = ReadCR2WFile(filePath, localizedStringSource);
 
@@ -68,7 +66,7 @@ namespace WolvenKit.CR2W.FilePatchers
                     }
                     else if (IsCookedData(variable))
                     {
-                        PatchLODs((CVector)variable, w2MeshSettings);
+                        PatchLODs((CVector)variable, autoHideDistance);
                     }
                 }
 
@@ -86,7 +84,7 @@ namespace WolvenKit.CR2W.FilePatchers
             WriteCR2WFile(w2MeshFile);
         }
 
-        private static void PatchLODs(CVector variableCookedData, W2MeshSettings w2MeshSettings)
+        private static void PatchLODs(CVector variableCookedData, float autoHideDistance)
         {
             float valueLOD = autoHideDistance - 1;
 

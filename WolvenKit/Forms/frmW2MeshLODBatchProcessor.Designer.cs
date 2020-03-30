@@ -32,6 +32,7 @@
             this.dockPanel = new WeifenLuo.WinFormsUI.Docking.DockPanel();
             this.panel1 = new System.Windows.Forms.Panel();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.textBoxAutoHideDistance = new System.Windows.Forms.TextBox();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.SuspendLayout();
@@ -51,14 +52,15 @@
             // 
             this.dockPanel.AutoSize = true;
             this.dockPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.dockPanel.Location = new System.Drawing.Point(0, -14);
+            this.dockPanel.Location = new System.Drawing.Point(0, -41);
             this.dockPanel.Name = "dockPanel";
-            this.dockPanel.Size = new System.Drawing.Size(1728, 575);
+            this.dockPanel.Size = new System.Drawing.Size(1728, 602);
             this.dockPanel.TabIndex = 1;
             this.dockPanel.ActiveContentChanged += new System.EventHandler(this.dockPanel_ActiveContentChanged);
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.textBoxAutoHideDistance);
             this.panel1.Controls.Add(this.button1);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel1.Location = new System.Drawing.Point(0, 0);
@@ -75,6 +77,14 @@
             this.panel2.Size = new System.Drawing.Size(1728, 561);
             this.panel2.TabIndex = 4;
             // 
+            // textBoxAutoHideDistance
+            // 
+            this.textBoxAutoHideDistance.Location = new System.Drawing.Point(827, 26);
+            this.textBoxAutoHideDistance.Name = "textBoxAutoHideDistance";
+            this.textBoxAutoHideDistance.Size = new System.Drawing.Size(75, 20);
+            this.textBoxAutoHideDistance.TabIndex = 1;
+            this.textBoxAutoHideDistance.Text = "2500";
+            // 
             // frmW2MeshLODBatchProcessor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -88,6 +98,7 @@
             this.Text = "W2Mesh LOD Batch Processor";
             this.Load += new System.EventHandler(this.frmW2XBatchProcessor_Load);
             this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
             this.ResumeLayout(false);
@@ -100,5 +111,6 @@
         private WeifenLuo.WinFormsUI.Docking.DockPanel dockPanel;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.TextBox textBoxAutoHideDistance;
     }
 }

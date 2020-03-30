@@ -53,6 +53,14 @@ namespace WolvenKit.Forms
         {
             ShowLog();
 
+            int autoHideDistance;
+
+            if (!int.TryParse(textBoxAutoHideDistance.Text, out autoHideDistance))
+            {
+                log.AddText("The specified autoHideDistance is not an integer.\n", frmOutput.Logtype.Error);
+                return;
+            }
+
             log.AddText("Initializing file lists...\n", frmOutput.Logtype.Normal);
 
             List<string> w2MeshFilePathsInMod = new List<string>();
@@ -68,10 +76,11 @@ namespace WolvenKit.Forms
             }
 
             log.AddText("Patching w2mesh files for increased draw distance and LOD...\n", frmOutput.Logtype.Normal);
-            patchW2MeshFilesForFires(w2MeshFilePathsInMod, null);
+
+            patchW2MeshFilesForFires(w2MeshFilePathsInMod, autoHideDistance);
         }
 
-        private void patchW2MeshFilesForFires(List<string> w2MeshFilePathsForFires, W2MeshSettings w2MeshSettings)
+        private void patchW2MeshFilesForFires(List<string> w2MeshFilePathsForFires, float autoHideDistance)
         {
             W2MeshFileLODPatcher w2MeshFilePatcher = new W2MeshFileLODPatcher(MainController.Get());
 
@@ -86,7 +95,7 @@ namespace WolvenKit.Forms
 
                 try
                 {
-                    w2MeshFilePatcher.PatchDrawDistanceAndLOD(w2MeshFilePathForFire, w2MeshSettings != null ? w2MeshSettings : new W2MeshSettings(Path.GetFileName(w2MeshFilePathForFire)));
+                    w2MeshFilePatcher.PatchDrawDistanceAndLOD(w2MeshFilePathForFire, autoHideDistance);
                 }
                 catch (Exception e)
                 {
