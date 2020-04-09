@@ -394,5 +394,10 @@ namespace WolvenKit
         {
             MainController.Get().ProjectUnsaved = true;
         }
+
+        private void treeView_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }

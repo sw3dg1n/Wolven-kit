@@ -88,6 +88,7 @@ namespace WolvenKit
             this.treeView.CellEditStarting += new BrightIdeasSoftware.CellEditEventHandler(this.treeView_CellEditStarting);
             this.treeView.CellClick += new System.EventHandler<BrightIdeasSoftware.CellClickEventArgs>(this.treeView_CellClick);
             this.treeView.ItemsChanged += new System.EventHandler<BrightIdeasSoftware.ItemsChangedEventArgs>(this.treeView_ItemsChanged);
+            this.treeView.SelectedIndexChanged += new System.EventHandler(this.treeView_SelectedIndexChanged);
             // 
             // colName
             // 
@@ -99,19 +100,19 @@ namespace WolvenKit
             // 
             this.colValue.AspectName = "Value";
             this.colValue.Text = "Value";
-            this.colValue.Width = 404;
+            this.colValue.Width = 650;
             // 
             // colType
             // 
             this.colType.AspectName = "Type";
             this.colType.Text = "Type";
-            this.colType.Width = 100;
+            this.colType.Width = 150;
             // 
             // colInfo
             // 
             this.colInfo.AspectName = "Info";
             this.colInfo.Text = "Info";
-            this.colInfo.Width = 500;
+            this.colInfo.Width = 650;
             // 
             // contextMenu
             // 
@@ -131,7 +132,7 @@ namespace WolvenKit
             this.toolSplitPtr,
             this.ptrPropertiesToolStripMenuItem});
             this.contextMenu.Name = "contextMenu";
-            this.contextMenu.Size = new System.Drawing.Size(185, 242);
+            this.contextMenu.Size = new System.Drawing.Size(185, 264);
             this.contextMenu.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenu_Opening);
             // 
             // expandAllToolStripMenuItem

@@ -47,6 +47,10 @@ namespace WolvenKit.CR2W.FilePatchers
                 {
                     return 2200;
                 }
+                else if (fileName.Contains("p_fire_medium_subuv_spot_smallest")) // shrine_of_ethernal_fire_altar_small
+                {
+                    return 2200;
+                }
                 else if (fileName.Contains("pile_corpses_fire"))
                 {
                     return 1500;
