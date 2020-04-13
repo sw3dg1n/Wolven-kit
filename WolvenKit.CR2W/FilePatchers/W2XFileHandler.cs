@@ -86,7 +86,8 @@ namespace WolvenKit.CR2W.FilePatchers
                         }
 
                         if ((w2PFilePathsForFires.Any()
-                            && !relativeModFilePath.Contains("boat_man") && !relativeModFilePath.Contains("bonfire_large_no_sparks") && !relativeModFilePath.Contains("q203_torch_for_him") && !relativeModFilePath.Contains("bridge_gate_brazier_rigid"))
+                            && !relativeModFilePath.Contains("boat_man") && !relativeModFilePath.Contains("bonfire_large_no_sparks") && !relativeModFilePath.Contains("q203_torch_for_him")
+                            && !relativeModFilePath.Contains("bridge_gate_brazier_rigid") && !relativeModFilePath.Contains("torch_eternal_fire"))
                             || relativeModFilePath.Contains("hanging_lamp") || relativeModFilePath.Contains("lantern") || relativeModFilePath.Contains("mh207_lighthouse_brazier"))
                         {
                             W2EntFilePathsForFires.Add(absoluteModFilePath);
