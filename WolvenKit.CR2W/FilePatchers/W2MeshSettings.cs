@@ -70,7 +70,7 @@ namespace WolvenKit.CR2W.FilePatchers
                 }
                 else if (fileName.Contains("braziers_wall_square"))
                 {
-                    return 50;
+                    return 150;
                 }
                 else if (fileName.Contains("braziers_wall_wire"))
                 {
